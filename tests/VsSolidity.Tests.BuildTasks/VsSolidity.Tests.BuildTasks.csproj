@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net472</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="Test.testproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="**\bindings\**" />
+    <Compile Remove="**\node_modules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\VsSolidity.BuildTasks\VsSolidity.BuildTasks.csproj" />
+  </ItemGroup>
+
+</Project>

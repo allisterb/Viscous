@@ -408,7 +408,7 @@ FodyWeavers.xsd
 .history/
 
 # Built Visual Studio Code Extensions
-*.vsix
+**/bin/**/*.vsix
 
 # Windows Installer files from build outputs
 *.cab
@@ -416,3 +416,9 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+
+# Project
+**/launchSettings.json
+**/dotnet-tools.json
+/src/VsSolidity.BuildTasks/Properties/launchSettings.json
