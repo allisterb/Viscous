@@ -24,7 +24,7 @@
     </Project>
   </TemplateContent>
   <WizardExtension>
-	<Assembly>VsSolidity.Vsix, Version=0.0.1.0, Culture=neutral, PublicKeyToken=null</Assembly>
-	<FullClassName>VsSolidity.SolidityProjectWizard</FullClassName>
+	<Assembly>VsSolidity.Vsix, Version=0.1.5.0, Culture=neutral, PublicKeyToken=null</Assembly>
+	<FullClassName>VsSolidity.UI.SolidityProjectWizard</FullClassName>
   </WizardExtension>
 </VSTemplate>

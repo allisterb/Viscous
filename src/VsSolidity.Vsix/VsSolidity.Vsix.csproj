@@ -14,7 +14,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>VsSolidity</RootNamespace>
-    <AssemblyName>VsSolidity</AssemblyName>
+    <AssemblyName>VsSolidity.Vsix</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <GeneratePkgDefFile>true</GeneratePkgDefFile>
     <UseCodebase>true</UseCodebase>
@@ -87,7 +87,7 @@
     <Compile Include="SolidityProject\SolidityProjectTreePropertiesProvider.cs" />
     <Compile Include="UI\BlockchainExplorer\BlockchainExplorerTree.cs" />
     <Compile Include="UI\BlockchainExplorer\BlockchainViewModel.cs" />
-    <Compile Include="UI\SolidityProjectWizard.cs" />
+    <Compile Include="SolidityProject\SolidityProjectWizard.cs" />
     <Compile Include="SolidityProject\SolidityConfiguredProject.cs" />
     <Compile Include="SolidityProject\SolidityUnconfiguredProject.cs" />
     <Compile Include="SolidityProject\SolidityProjectProperties.cs" />
@@ -99,7 +99,7 @@
     <Compile Include="LanguageServer\SolidityLanguageClient.cs" />
     <Compile Include="VsSolidityPackage.cs" />
     <Compile Include="VsSolidityPackageIds.cs" />
-    <Compile Include="UI\SolidityProjectWizardDialogWindow.xaml.cs">
+    <Compile Include="SolidityProject\SolidityProjectWizardDialogWindow.xaml.cs">
       <DependentUpon>SolidityProjectWizardDialogWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\EthereumBlockchainDashboard\EthereumBlockchainDashboardTransactionsUserControl.xaml.cs">
@@ -339,7 +339,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\SolidityProjectWizardDialogWindow.xaml">
+    <Page Include="SolidityProject\SolidityProjectWizardDialogWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
