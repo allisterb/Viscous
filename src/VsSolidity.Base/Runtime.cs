@@ -110,8 +110,8 @@ public abstract class Runtime
         var filePath= logdir is null ? Path.Combine(AssemblyLocation, toolname + "-" + logname + ".log") : Path.Combine(logdir, toolname + "-" + logname + ".log");
         var logger = new LoggerConfiguration()
              .Enrich.FromLogContext()
-             .MinimumLevel.Is(debug ? Serilog.Events.LogEventLevel.Verbose : Serilog.Events.LogEventLevel.Information)    
-             .WriteTo.File(filePath)
+             .MinimumLevel.Is(debug ? Serilog.Events.LogEventLevel.Verbose : Serilog.Events.LogEventLevel.Information)
+             .WriteTo.File(filePath)            
              .CreateLogger();
         var lf = new SerilogLoggerFactory(logger);
         var lp = new SerilogLoggerProvider(logger, false);        

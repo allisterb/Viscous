@@ -25,7 +25,6 @@ namespace VsSolidity
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [InstalledProductRegistration("#110", "#112", "0.1.5.0", IconResourceID = 400)]
     [Guid(PackageGuidString)]
-    //[ProvideAutoLoad("4646B819-1AE0-4E79-97F4-8A8176FDD664", PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideAutoLoad(UIContextGuids.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
@@ -44,25 +43,12 @@ namespace VsSolidity
         expression: "(SingleProject | MultipleProjects) & Solidity",
         termNames: new[] { "SingleProject", "MultipleProjects", "Solidity" },
         termValues: new[] { SolutionHasSingleProject_string, SolutionHasMultipleProjects_string, "HierSingleSelectionName:package.json$" })]
-    [ProvideToolWindow(typeof(UI.BlockchainExplorerToolWindow), Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
-    [ProvideToolWindowVisibility(typeof(UI.BlockchainExplorerToolWindow), SolutionHasSingleProject_string)]
-    [ProvideToolWindowVisibility(typeof(UI.BlockchainExplorerToolWindow), SolutionHasMultipleProjects_string)]
-    [ProvideToolWindowVisibility(typeof(UI.BlockchainExplorerToolWindow), NoSolution_string)]
-    [ProvideToolWindowVisibility(typeof(UI.BlockchainExplorerToolWindow), EmptySolution_string)]
-    [ProvideToolWindow(typeof(UI.EthereumBlockchainDashboardToolWindow), Style = VsDockStyle.MDI)]
-    [ProvideToolWindow(typeof(UI.DeploySolidityProjectToolWindow), Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
-    [ProvideToolWindowVisibility(typeof(UI.DeploySolidityProjectToolWindow), SolutionHasSingleProject_string)]
-    [ProvideToolWindowVisibility(typeof(UI.DeploySolidityProjectToolWindow), SolutionHasMultipleProjects_string)]
-    [ProvideToolWindow(typeof(UI.RunSmartContractToolWindow), Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
-    [ProvideToolWindowVisibility(typeof(UI.RunSmartContractToolWindow), SolutionHasSingleProject_string)]
-    [ProvideToolWindowVisibility(typeof(UI.RunSmartContractToolWindow), SolutionHasMultipleProjects_string)]
-    [ProvideToolWindow(typeof(UI.SolidityStaticAnalysisToolWindow), Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
     public sealed partial class VsSolidityPackage : AsyncPackage, IVsSolutionEvents7, IVsSolutionEvents
     {
         #region Constructors
         static VsSolidityPackage()
         {
-            Runtime.Initialize("VsSolidity", "VS");
+            Runtime.WithFileLogging("VsSolidity", "VS", false);
         }
         #endregion
 
@@ -127,7 +113,7 @@ namespace VsSolidity
         /// <returns>A task representing the async work of package initialization, or an already completed task if there is none. Do not return null from this method.</returns>
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            await base.InitializeAsync(cancellationToken, progress);
+            await base.InitializeAsync(cancellationToken, progress);            
             Instance = this;
             // When initialized asynchronously, the current thread may be a background thread at this point.
             // Do any initialization that requires the UI thread after switching to the UI thread.
