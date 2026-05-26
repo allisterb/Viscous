@@ -160,7 +160,7 @@ namespace VsSolidity
             {
                 Directory.CreateDirectory(Runtime.LocalAppDataDir.CombinePath("CustomProjectSystems", "Solidity", "Tools"));
             }
-            await Runtime.CopyFileAsync(Runtime.AssemblyLocation.CombinePath("VsSolidity.BuildTasks.dll"), Runtime.LocalAppDataDir.CombinePath("CustomProjectSystems", "Solidity", "Tools", "VsSolidity.SolidityProjectBuildTasks.dll"));
+            await Runtime.CopyFileAsync(Runtime.AssemblyLocation.CombinePath("VsSolidity.BuildTasks.dll"), Runtime.LocalAppDataDir.CombinePath("CustomProjectSystems", "Solidity", "Tools", "VsSolidity.BuildTasks.dll"));
             if (!File.Exists(Runtime.LocalAppDataDir.CombinePath("CustomProjectSystems", "Solidity", "Tools", "CompactJson.dll")))
             {
                 await Runtime.CopyFileAsync(Runtime.AssemblyLocation.CombinePath("CompactJson.dll"), Runtime.LocalAppDataDir.CombinePath("CustomProjectSystems", "Solidity", "Tools", "CompactJson.dll"));
@@ -174,7 +174,7 @@ namespace VsSolidity
                 {
                     Directory.CreateDirectory(Runtime.LocalAppDataDir.CombinePath("CustomProjectSystems", "Solidity", "Tools"));
                 }
-                await Runtime.CopyFileAsync(Runtime.AssemblyLocation.CombinePath("VsSolidity.SolidityProjectBuildTasks.dll"), Runtime.LocalAppDataDir.CombinePath("CustomProjectSystems", "Solidity", "Tools", "VsSolidity.SolidityProjectBuildTasks.dll"));
+                await Runtime.CopyFileAsync(Runtime.AssemblyLocation.CombinePath("VsSolidity.SolidityProjectBuildTasks.dll"), Runtime.LocalAppDataDir.CombinePath("CustomProjectSystems", "Solidity", "Tools", "VsSolidity.BuildTasks.dll"));
                 if (!File.Exists(Runtime.LocalAppDataDir.CombinePath("CustomProjectSystems", "Solidity", "Tools", "CompactJson.dll")))
                 {
                     await Runtime.CopyFileAsync(Runtime.AssemblyLocation.CombinePath("CompactJson.dll"), Runtime.LocalAppDataDir.CombinePath("CustomProjectSystems", "Solidity", "Tools", "CompactJson.dll"));
@@ -240,13 +240,13 @@ namespace VsSolidity
         #endregion
 
         #region Constants
-        public const string PackageGuidString = "711b90a1-97e6-4b9a-91c4-3d62ccd32d4e";
+        public const string PackageGuidString = "724F436A-F472-4DDE-81D8-2544C883F574";
 
-        public const string SolidityFileUIContextRule = "82268519-FB9D-4B7E-8B01-2A311F4181E2";
+        public const string SolidityFileUIContextRule = "EFAF43FC-845F-40DF-AE69-34EAD5ED8F4C";
 
-        public const string SolidityProjectFileUIContextRule = "9d4c64d4-52eb-4ebe-aa01-1d975eb3a9d7";
+        public const string SolidityProjectFileUIContextRule = "8D4CA0F3-610A-4BC5-90D2-CA8C486B6EE8";
 
-        public const string NPMFileUIContextRule = "9A7CA75A-FA6E-45B2-B6E9-4BFF0AB7BB88";
+        public const string NPMFileUIContextRule = "333C0751-5D5E-47A8-804D-6763A1363906";
 
         public const string SlitherExe = "slither-0.10.3.exe";
 

@@ -22,7 +22,7 @@ namespace VsSolidity.UI
         /// <summary>
         /// Command menu group (command set GUID).
         /// </summary>
-        public static readonly Guid CommandSet = new Guid("5e1dc4ca-7f1b-4ff0-a794-7e162ab8f421");
+        public static readonly Guid CommandSet = new Guid("3009F3D7-FE03-405C-A55E-3B83041CDB76");
 
         /// <summary>
         /// VS Package that provides this command, not null.
