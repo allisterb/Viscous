@@ -182,9 +182,6 @@
     <Content Include="SolidityProject.imagemanifest">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="solidity-0.0.185.tgz">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>

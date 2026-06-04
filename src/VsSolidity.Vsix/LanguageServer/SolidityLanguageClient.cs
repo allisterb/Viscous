@@ -90,7 +90,7 @@ namespace VsSolidity
             var programPath = "cmd.exe";
             info.FileName = programPath;
             //info.Arguments = "/c " + Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "npm", "nomicfoundation-solidity-language-server.cmd") +  " --stdio";
-            info.Arguments = "/c " + "node \"" + Path.Combine(Runtime.AssemblyLocation, "node_modules", "solidity", "dist", "cli", "server.js") + "\" --stdio";
+            info.Arguments = "/c " + "node \"" + Path.Combine(Runtime.AssemblyLocation, "node_modules", "vscode-solidity-server", "dist", "cli", "server.js") + "\" --stdio";
             info.WorkingDirectory = AssemblyLocation;
             info.RedirectStandardInput = true;
             info.RedirectStandardOutput = true;
@@ -118,12 +118,12 @@ namespace VsSolidity
 
         public static Dictionary<string, object> InstallVSCodeSolidityLanguageServer()
         {
-            return RunCmd("cmd.exe", "/c npm install solidity-0.0.185.tgz --force --quiet --no-progress", AssemblyLocation);
+            return RunCmd("cmd.exe", "/c npm install vscode-solidity-server --quiet --no-progress", AssemblyLocation);
         }
 
         public static async Task<Dictionary<string, object>> InstallVSCodeSolidityLanguageServerAsync()
         {
-            return await RunCmdAsync("cmd.exe", "/c npm install solidity-0.0.185.tgz --force --quiet --no-progress", AssemblyLocation);
+            return await RunCmdAsync("cmd.exe", "/c npm install vscode-solidity-server --quiet --no-progress", AssemblyLocation);
         }
 
         #region ILanguageClient, ILanguageClientCustomMessage2 implementation
@@ -142,7 +142,7 @@ namespace VsSolidity
                     return null;
                 }
             }
-            if (Directory.Exists(Path.Combine(Runtime.AssemblyLocation, "node_modules")) && File.Exists(Path.Combine(Runtime.AssemblyLocation, "node_modules", "solidity", "dist", "cli", "server.js")))
+            if (Directory.Exists(Path.Combine(Runtime.AssemblyLocation, "node_modules")) && File.Exists(Path.Combine(Runtime.AssemblyLocation, "node_modules", "vscode-solidity-server", "dist", "cli", "server.js")))
             {
                VSUtil.LogInfo("VsSolidity", "Solidity language server present.");
             }
