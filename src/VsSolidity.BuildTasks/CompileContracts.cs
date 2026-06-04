@@ -329,7 +329,7 @@ namespace VsSolidity
             if (!CheckRunCmdOutput(RunCmd("cmd.exe", "/c dotnet tool list", ProjectDir), "nethereum.generator.console"))
             {
                 Log.LogMessage(MessageImportance.High, $"Installing Nethereum generator .NET tool...");
-                if (!CheckRunCmdOutput(RunCmd("cmd.exe", "/c dotnet tool install Nethereum.Generator.Console", ProjectDir), "successfully installed"))
+                if (!CheckRunCmdOutput(RunCmd("cmd.exe", "/c dotnet tool install --local Nethereum.Generator.Console --version 4.29.0", ProjectDir), "successfully installed"))
                 {
                     Log.LogError("Could not install Nethereum.Generator.Console .NET tool in " + ProjectDir);
                     return false;
