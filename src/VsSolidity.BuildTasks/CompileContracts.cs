@@ -37,38 +37,19 @@ namespace VsSolidity
         
         public Dictionary<string, Source> Sources => Contracts.ToDictionary(k => k.GetMetadata("Filename"), v => new Source() { Urls = new[] { Path.Combine(v.GetMetadata("RelativeDir"), v.ItemSpec) } });
 
-        public string SolcPath => Path.Combine(TaskToolsDir, ".solc-select", "artifacts", "solc-" + CompilerVersion, "solc-" + CompilerVersion);
+        public string SolcPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".solc-select", "artifacts", "solc-" + CompilerVersion, "solc-" + CompilerVersion);
 
         public string SlitherPath => Path.Combine(TaskToolsDir, "slither-0.10.3.exe");
 
         public static string TaskToolsDir { get; } =  Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CustomProjectSystems", "Solidity", "Tools");
         
         public override bool Execute()
-        {
-            if (File.Exists(Path.Combine(ProjectDir, "package.json")) && !File.Exists(Path.Combine(ProjectDir, "node_modules", "solc", "solc.js")))
-            {
-                Log.LogMessage(MessageImportance.High, "Installing NPM dependencies in project directory {0}...", ProjectDir);
-             
-                var npmoutput = RunCmd("cmd.exe", "/c npm install", ProjectDir);
-                if (!CheckRunCmdError(npmoutput))
-                {
-                    Log.LogMessage(MessageImportance.High, ((string)npmoutput["stdout"]).Trim());
-                    
-                }
-                else
-                {
-                    Log.LogError("Could not install NPM dependencies: " + GetRunCmdError(npmoutput));
-                }
-            }
-
-           
+        {                       
             if (!InstallSolcCompiler())
             {
                 Log.LogError("No solc compiler available. Stopping.");
                 return false;
-            }
-            
-
+            }            
             var cmdline = SolcPath + " --standard-json --base-path=\"" + ProjectDir + "\"" + " --include-path=\"" + Path.Combine(ProjectDir, "node_modules") + "\"";
             var sources = Contracts.ToDictionary(k => k.GetMetadata("Filename"), v => new Source() { Content =   File.ReadAllText(Path.Combine(v.GetMetadata("RelativeDir"), v.ItemSpec))  });
             Log.LogMessage(MessageImportance.High, "Compiling {0} file(s) in directory {1} using solc compiler targeting EVM version {2}...", Contracts.Count(), ProjectDir, EVMVersion);
@@ -363,15 +344,19 @@ namespace VsSolidity
             {                
                 return true;
             }
+            else
+            {
+                Log.LogMessage(MessageImportance.High, $"Solc compiler version {CompilerVersion} not found at {SolcPath}. Installing...");
+            }
             var solcselectpath = Path.Combine(TaskToolsDir, "solc-select.exe");
             if (!File.Exists(solcselectpath))
             {
                 Log.LogError("Could not find solc-select executable.");
-                return false;
-                
+                return false;                
             }
-            var output = RunCmd("cmd.exe", $"/c solc-select.exe install {CompilerVersion}", TaskToolsDir);
-            if (CheckRunCmdOutput(output, $"Version '{CompilerVersion}' installed") && File.Exists(SolcPath))
+            Dictionary<string, string> envVars = new Dictionary<string, string>() { { "VIRTUAL_ENV", TaskToolsDir }, { "HOMEPATH", TaskToolsDir } };           
+            var output = RunCmd("cmd.exe", $"/c {solcselectpath} install {CompilerVersion}", TaskToolsDir, envVars);
+            if ((CheckRunCmdOutput(output, $"Version '{CompilerVersion}' installed", true) || (CheckRunCmdOutput(output,  $"Version '{CompilerVersion}' is already installed, skipping...")) && File.Exists(SolcPath)))
             {
                 Log.LogMessage(MessageImportance.High, $"solc {CompilerVersion} compiler installed at " + SolcPath);
                 return true;
@@ -383,16 +368,23 @@ namespace VsSolidity
             }
         }
 
-        public Dictionary<string, object> RunCmd(string filename, string arguments, string workingdirectory)
+        public Dictionary<string, object> RunCmd(string filename, string arguments, string workingdirectory, Dictionary<string, string> envVars = null)
         {
             ProcessStartInfo info = new ProcessStartInfo();
             info.FileName = filename;
             info.Arguments = arguments;
             info.WorkingDirectory = workingdirectory;
+            if (envVars != null)
+            {
+                foreach (var kv in envVars)
+                {
+                    info.EnvironmentVariables[kv.Key] = kv.Value;
+                }
+            }
             info.RedirectStandardOutput = true;
             info.RedirectStandardError = true;
             info.UseShellExecute = false;
-            info.CreateNoWindow = true;
+            info.CreateNoWindow = true;            
             var output = new Dictionary<string, object>();
             using (var process = new Process())
             {
