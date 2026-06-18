@@ -21,7 +21,7 @@ namespace VsSolidity.UI
     /// implementation of the IVsUIElementPane interface.
     /// </para>
     /// </remarks>
-    [Guid("4505b590-ce1c-436b-8fa4-0543c98b90ef")]
+    [Guid("d284f7d7-ba72-4287-991d-18821ddf9b91")]
     public class BlockchainExplorerToolWindow : ToolWindowPane
     {
         /// <summary>

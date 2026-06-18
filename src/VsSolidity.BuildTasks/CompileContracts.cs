@@ -51,7 +51,6 @@ namespace VsSolidity
                 return false;
             }            
             var cmdline = SolcPath + " --standard-json --base-path=\"" + ProjectDir + "\"" + " --include-path=\"" + Path.Combine(ProjectDir, "node_modules") + "\"";
-            var sources = Contracts.ToDictionary(k => k.GetMetadata("Filename"), v => new Source() { Content =   File.ReadAllText(Path.Combine(v.GetMetadata("RelativeDir"), v.ItemSpec))  });
             Log.LogMessage(MessageImportance.High, "Compiling {0} file(s) in directory {1} using solc compiler targeting EVM version {2}...", Contracts.Count(), ProjectDir, EVMVersion);
             Log.LogCommandLine(MessageImportance.High, cmdline);
             var psi = new ProcessStartInfo("cmd.exe", "/c " + cmdline)
@@ -394,7 +393,7 @@ namespace VsSolidity
                     Log.LogCommandLine($"{filename} {arguments}");
                     if (!process.Start())
                     {
-                        output["error"] = ("Could not start {file} {args} in {dir}.", info.FileName, info.Arguments, info.WorkingDirectory);
+                        output["error"] = $"Could not start {info.FileName} {info.Arguments} in {info.WorkingDirectory}.";
                         return output;
                     }
                     var stdout = process.StandardOutput.ReadToEnd();
@@ -419,8 +418,10 @@ namespace VsSolidity
 
         public bool CheckRunCmdError(Dictionary<string, object> output) => output.ContainsKey("error") || output.ContainsKey("exception");
 
-        public string GetRunCmdError(Dictionary<string, object> output) => (output.ContainsKey("error") ? (string)output["error"] : "")
-            + (output.ContainsKey("exception") ? (string)output["exception"] : "" + (output.ContainsKey("stderr") ? (string)output["stderr"] : ""));
+        public string GetRunCmdError(Dictionary<string, object> output) =>
+            (output.ContainsKey("error") ? (string)output["error"] : "")
+            + (output.ContainsKey("exception") ? output["exception"].ToString() : "")
+            + (output.ContainsKey("stderr") ? (string)output["stderr"] : "");
 
         public bool CheckRunCmdOutput(Dictionary<string, object> output, string checktext, bool ignoreErrors = false)
         {

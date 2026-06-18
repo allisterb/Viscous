@@ -39,17 +39,19 @@ namespace VsSolidity.UI
         public BlockchainExplorerToolWindowControl() : base()
         {
             instance = this;
-            // Bug workaround, see https://github.com/microsoft/XamlBehaviorsWpf/issues/86
-            var _ = new Card();
-            var __ = new BlockchainExplorerTree();            
-            /*
-            System.Uri resourceLocater = new System.Uri("/VsSolidity.VsSolidity;component/ui/blockchainexplorer/blockchainexplorertoolwind" +
-        "owcontrol.xaml", System.UriKind.Relative);
+            InitializeComponent();
 
-#line 1 "..\..\..\..\UI\BlockchainExplorer\BlockchainExplorerToolWindowControl.xaml"
-            System.Windows.Application.LoadComponent(this, resourceLocater);
-            */
-            InitializeComponent();       
+            // Items, TreeNodeStyle, TreeStyle, NodeSortDescriptions, SelectNodesOnRightClick and IsLazyLoading are
+            // declared on the generic base TreeViewBase<BlockchainInfo>. Setting them in XAML makes WPF BAML resolve the
+            // generic base type and throw NotImplementedException (Baml2006SchemaContext.ResolveBamlType), so they are
+            // assigned here. Set styling/sort first, then bind Items last so the first render already has them applied.
+            BlockchainExplorerTree.IsLazyLoading = false;
+            BlockchainExplorerTree.SelectNodesOnRightClick = true;
+            BlockchainExplorerTree.TreeStyle = (Style)FindResource("TreeViewStyle");
+            BlockchainExplorerTree.TreeNodeStyle = (Style)FindResource("TreeViewItemStyle");
+            BlockchainExplorerTree.NodeSortDescriptions = (System.Collections.Generic.IEnumerable<System.ComponentModel.SortDescription>)FindResource("AscendingNames");
+            BlockchainExplorerTree.SetBinding(TreeViewBase<BlockchainInfo>.ItemsProperty,
+                new System.Windows.Data.Binding(nameof(BlockchainViewModel.Objects)) { Source = (BlockchainViewModel)Resources["Blockchains"] });
 #if IS_VSIX
             VSTheme.WatchThemeChanges();
             instance = this;

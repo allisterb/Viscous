@@ -136,6 +136,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <None Include="reset-exp-instance.ps1" />
     <None Include="UI\TreeView\Classes.cd" />
     <Resource Include="Images\SolidityProjectProjectIcon.png" />
     <Resource Include="Images\SoliditySourceFileIcon.png" />
