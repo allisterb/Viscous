@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.Shell;
 
 namespace VsSolidity.UI
 {
-    [Guid("5813549f-de3e-46d9-aaf9-0d06109baa6f")]
+    [Guid("E32C33B5-D9B6-40CC-8546-9CB96A66E888")]
     public class DeploySolidityProjectToolWindow : ToolWindowPane
     {
         /// <summary>
