@@ -15,7 +15,7 @@ namespace VsSolidity.UI
     /// implementation of the IVsUIElementPane interface.
     /// </para>
     /// </remarks>
-    [Guid("a95ee9d3-7813-4138-b179-80fe62b95a67")]
+    [Guid("EE7F46DB-959E-4447-A921-D54E8F7B8D4E")]
     public class RunSmartContractToolWindow : ToolWindowPane
     {
         /// <summary>
