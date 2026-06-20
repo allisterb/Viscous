@@ -188,6 +188,8 @@
           <ButtonText>Blockchain Explorer</ButtonText>
         </Strings>
       </Button>
+      <!-- Hidden from View > Other Windows. Uncomment to expose the Blockchain Dashboard tool window
+           (also uncomment EthereumBlockchainDashboardToolWindowCommand.InitializeAsync in VsSolidityPackage.cs).
       <Button guid="guidVsSolidityPackageCmdSet" id="cmdidVsSolidityBlockchainDashboardToolWindowCommand" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
         <Icon guid="guidImages3" id="bmpPic1" />
@@ -195,20 +197,23 @@
           <ButtonText>VsSolidity Blockchain Dashboard</ButtonText>
         </Strings>
       </Button>
+      -->
       <Button guid="guidVsSolidityPackageCmdSet" id="cmdidDeploySolidityProjectToolWindowCommand" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
         <Icon guid="guidImages4" id="bmpPic1" />
         <Strings>
-          <ButtonText>DeploySolidityProjectToolWindow</ButtonText>
+          <ButtonText>Deploy Solidity Project</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidVsSolidityPackageCmdSet" id="cmdidRunSmartContractToolWindowCommand" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
         <Icon guid="guidImages5" id="bmpPic1" />
         <Strings>
-          <ButtonText>RunSmartContractToolWindow</ButtonText>
+          <ButtonText>Run Smart Contract</ButtonText>
         </Strings>
       </Button>
+      <!-- Hidden from View > Other Windows. Uncomment to expose the Solidity Static Analysis tool window
+           (also uncomment SolidityStaticAnalysisToolWindowCommand.InitializeAsync in VsSolidityPackage.cs).
       <Button guid="guidVsSolidityPackageCmdSet" id="cmdidSolidityAnalysisToolWindowCommand" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
         <Icon guid="guidImages6" id="bmpPic1" />
@@ -216,6 +221,7 @@
           <ButtonText>Solidity Static Analysis ToolWindow</ButtonText>
         </Strings>
       </Button>
+      -->
     </Buttons>
 	  
 	
