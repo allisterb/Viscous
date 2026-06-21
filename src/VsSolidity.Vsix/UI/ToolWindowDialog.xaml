@@ -4,7 +4,8 @@
         xmlns:numeric="http://gu.se/NumericInput"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:VsSolidityui="clr-namespace:VsSolidity.UI;assembly="
-        xmlns:controls="clr-namespace:Wpf.Ui.Controls;assembly=Wpf.Ui">
+        xmlns:controls="clr-namespace:Wpf.Ui.Controls;assembly=Wpf.Ui"
+        xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0">
 
     <ui:ContentDialog.Resources>
         <ResourceDictionary>
@@ -83,7 +84,7 @@
                                      Margin="0,12,0,0"
                                      Content="{TemplateBinding Title}"
                                      ContentTemplate="{TemplateBinding TitleTemplate}"
-                                     TextBlock.FontSize="20"
+                                     TextBlock.FontSize="14"
                                      TextBlock.FontWeight="SemiBold">
                                                 <ContentPresenter.Resources>
                                                     <Style BasedOn="{StaticResource {x:Type TextBlock}}" TargetType="{x:Type TextBlock}">
@@ -142,6 +143,7 @@
                                                 <controls:Button
                                          Grid.Column="0"
                                          HorizontalAlignment="Stretch"
+                                         Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogButtonStyleKey}}"
                                          Appearance="{TemplateBinding PrimaryButtonAppearance}"
                                          Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type controls:ContentDialog}}, Mode=OneTime, Path=TemplateButtonCommand}"
                                          CommandParameter="{x:Static controls:ContentDialogButton.Primary}"
@@ -154,6 +156,7 @@
                                                 <controls:Button
                                          Grid.Column="2"
                                          HorizontalAlignment="Stretch"
+                                         Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogButtonStyleKey}}"
                                          Appearance="{TemplateBinding SecondaryButtonAppearance}"
                                          Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type controls:ContentDialog}}, Mode=OneTime, Path=TemplateButtonCommand}"
                                          CommandParameter="{x:Static controls:ContentDialogButton.Secondary}"
@@ -166,6 +169,7 @@
                                                 <controls:Button
                                          Grid.Column="4"
                                          HorizontalAlignment="Stretch"
+                                         Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogButtonStyleKey}}"
                                          Appearance="{TemplateBinding CloseButtonAppearance}"
                                          Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type controls:ContentDialog}}, Mode=OneTime, Path=TemplateButtonCommand}"
                                          CommandParameter="{x:Static controls:ContentDialogButton.Close}"
