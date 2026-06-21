@@ -1,5 +1,5 @@
 <Project DefaultTargets="Build">
-	<UsingTask  TaskName="CompileContracts" AssemblyFile="C:\\Projects\\VsSolidity2\\tests\\VsSolidity.Tests.BuildTasks\\bin\\Debug\\net472\\VsSolidity.BuildTasks.dll"/>
+	<UsingTask  TaskName="CompileContracts" AssemblyFile="C:\\Projects\\VsSolidity\\tests\\VsSolidity.Tests.BuildTasks\\bin\\Debug\\net472\\VsSolidity.BuildTasks.dll"/>
 	<ItemGroup>
 		<Compile Include="SmartContract1.sol" />
 	</ItemGroup>

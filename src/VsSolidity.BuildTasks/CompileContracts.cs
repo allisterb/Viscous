@@ -242,18 +242,9 @@ namespace VsSolidity
                     }
                 }
             }
-            string slitherAnalysisOutputPath = Path.Combine(outputdir, "slither-analysis.json");    
-            
-            string slitherargs = $"\"{ProjectDir}\" --compile-force-framework solc --solc \"{SolcPath}\" --solc-args \"--base-path {ProjectDir} --include-path {Path.Combine(ProjectDir, "node_modules")} \" --json {slitherAnalysisOutputPath}";
-            var slithercmdrun = RunCmd(SlitherPath, slitherargs, ProjectDir);
-            if (slithercmdrun.ContainsKey("stderr") && ((string) slithercmdrun["stderr"]).Contains($"{ProjectDir} analyzed"))
-            {
-                Log.LogMessage(MessageImportance.High, "Slither analysis completed. Output written to " + slitherAnalysisOutputPath);
-            }            
-            else
-            {
-                Log.LogWarning("Slither analysis may not have completed successfully.");
-            }
+
+            RunSlitherAnalysis();
+
             return true;
         }
 
@@ -363,6 +354,28 @@ namespace VsSolidity
             else
             {
                 Log.LogError($"Could not install solc {CompilerVersion} compiler: " + GetRunCmdError(output));
+                return false;
+            }
+        }
+
+        protected bool RunSlitherAnalysis()
+        {
+            var outputdir = Path.Combine(ProjectDir, OutputPath);
+            string slitherAnalysisOutputPath = Path.Combine(outputdir, "slither-analysis.json");
+            if (File.Exists(slitherAnalysisOutputPath))
+            {
+                File.Move(slitherAnalysisOutputPath, slitherAnalysisOutputPath + ".bak");
+            }
+            string slitherargs = $"\"{ProjectDir}\" --compile-force-framework solc --solc \"{SolcPath}\" --solc-args \"--base-path {ProjectDir} --include-path {Path.Combine(ProjectDir, "node_modules")} \" --json {slitherAnalysisOutputPath}";
+            var slithercmdrun = RunCmd(SlitherPath, slitherargs, ProjectDir);
+            if (slithercmdrun.ContainsKey("stderr") && ((string)slithercmdrun["stderr"]).Contains($"{ProjectDir} analyzed"))
+            {
+                Log.LogMessage(MessageImportance.High, "Slither analysis completed. Output written to " + slitherAnalysisOutputPath);
+                return true;
+            }
+            else
+            {
+                Log.LogWarning("Slither analysis may not have completed successfully.");
                 return false;
             }
         }

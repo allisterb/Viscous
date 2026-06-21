@@ -44,9 +44,12 @@ namespace VsSolidity.UI
             root.Data["Label"] = Runtime.GetWindowsRelativePath(filePath, projectDir); ;
             var vm = (SolidityStaticAnalysisViewModel)TryFindResource("StaticAnalysis");
             vm.ClearAnalysis();
-            foreach (var d in analysis.results.detectors)
+            if (analysis.results.detectors != null && analysis.results.detectors.Length > 0)
             {
-                vm.AddDetectorResult(d);
+                foreach (var d in analysis.results.detectors)
+                {
+                    vm.AddDetectorResult(d);
+                }
             }
             SolidityStaticAnalysisTree.Refresh();
         }
