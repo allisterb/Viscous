@@ -387,8 +387,10 @@
     <!-- TreeView items data template-->
     <DataTemplate x:Key="BlockchainInfoTemplate" DataType="{x:Type vm:BlockchainInfo}">
         <StackPanel x:Name="GroupPanel" Orientation="Horizontal">
-            <ui:Image x:Name="NodeImage" Width="16" Height="16" Source="{StaticResource BlockchainNetworkDrawingImage}"/>
-            <Label x:Name="NodeText" Content="{Binding Path=DisplayName}" Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogLabelStyleKey}}" />
+            <ui:Image x:Name="NodeImage" Width="16" Height="16" VerticalAlignment="Center" Source="{StaticResource BlockchainNetworkDrawingImage}"/>
+            <!-- Tight TextBlock (not a padded Label) to match the compact row height/text alignment of native VS trees
+                 like Solution Explorer. Inherits the VS environment font and tool-window text color from the control root. -->
+            <TextBlock x:Name="NodeText" Text="{Binding Path=DisplayName}" VerticalAlignment="Center" Margin="6,0,0,0" TextTrimming="CharacterEllipsis" />
         </StackPanel>
         <DataTemplate.Triggers>
             <MultiDataTrigger>
@@ -476,6 +478,9 @@
     <!-- TreeView style -->
     <Style x:Key="TreeViewItemStyle" TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogTreeViewItemStyleKey}}">
         <Setter Property="HeaderTemplate" Value="{StaticResource BlockchainInfoTemplate}" />
+        <!-- Stretch the node content across the row so the selection highlight spans the full panel width, matching
+             native VS trees (Solution Explorer) instead of only boxing the icon + text. -->
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     </Style>
     <Style x:Key="TreeViewStyle" TargetType="{x:Type TreeView}" BasedOn="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogTreeViewStyleKey}}" />
     
