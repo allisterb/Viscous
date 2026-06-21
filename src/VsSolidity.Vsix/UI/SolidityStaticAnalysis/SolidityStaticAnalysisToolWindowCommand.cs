@@ -17,12 +17,12 @@ namespace VsSolidity.UI
         /// <summary>
         /// Command ID.
         /// </summary>
-        public const int CommandId = 0x0104;
+        public const int CommandId = 4132;
 
         /// <summary>
-        /// Command menu group (command set GUID).
+        /// Command menu group (command set GUID). Must match guidVsSolidityPackageCmdSet / cmdidSolidityAnalysisToolWindowCommand in VsSolidityPackage.vsct.
         /// </summary>
-        public static readonly Guid CommandSet = new Guid("45556A81-55BC-4A34-9CC5-C8E6551DF71F");
+        public static readonly Guid CommandSet = new Guid("3009F3D7-FE03-405C-A55E-3B83041CDB76");
 
         /// <summary>
         /// VS Package that provides this command, not null.

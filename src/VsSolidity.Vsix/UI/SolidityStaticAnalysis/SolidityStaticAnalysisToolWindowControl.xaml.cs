@@ -15,8 +15,20 @@ namespace VsSolidity.UI
         #region Constructor
         public SolidityStaticAnalysisToolWindowControl()
         {
-            var _ = new Wpf.Ui.Markdown.Controls.MarkdownViewer();  
+            var _ = new Wpf.Ui.Markdown.Controls.MarkdownViewer();
             this.InitializeComponent();
+
+            // Items, TreeNodeStyle, TreeStyle, NodeSortDescriptions, SelectNodesOnRightClick and IsLazyLoading are
+            // declared on the generic base TreeViewBase<SolidityStaticAnalysisInfo>. Setting them in XAML makes WPF BAML
+            // resolve the generic base type and throw NotImplementedException, so assign them here. Set styling/sort
+            // first, then bind Items last so the tree's first render already has them applied.
+            SolidityStaticAnalysisTree.IsLazyLoading = false;
+            SolidityStaticAnalysisTree.SelectNodesOnRightClick = true;
+            SolidityStaticAnalysisTree.TreeStyle = (System.Windows.Style)FindResource("TreeViewStyle");
+            SolidityStaticAnalysisTree.TreeNodeStyle = (System.Windows.Style)FindResource("TreeViewItemStyle");
+            SolidityStaticAnalysisTree.NodeSortDescriptions = (System.Collections.Generic.IEnumerable<System.ComponentModel.SortDescription>)FindResource("AscendingNames");
+            SolidityStaticAnalysisTree.SetBinding(TreeViewBase<SolidityStaticAnalysisInfo>.ItemsProperty,
+                new System.Windows.Data.Binding(nameof(SolidityStaticAnalysisViewModel.Objects)) { Source = (SolidityStaticAnalysisViewModel)Resources["StaticAnalysis"] });
 #if IS_VSIX
             VSTheme.WatchThemeChanges();
             instance = this;

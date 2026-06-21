@@ -212,16 +212,13 @@
           <ButtonText>Run Smart Contract</ButtonText>
         </Strings>
       </Button>
-      <!-- Hidden from View > Other Windows. Uncomment to expose the Solidity Static Analysis tool window
-           (also uncomment SolidityStaticAnalysisToolWindowCommand.InitializeAsync in VsSolidityPackage.cs).
       <Button guid="guidVsSolidityPackageCmdSet" id="cmdidSolidityAnalysisToolWindowCommand" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
         <Icon guid="guidImages6" id="bmpPic1" />
         <Strings>
-          <ButtonText>Solidity Static Analysis ToolWindow</ButtonText>
+          <ButtonText>Solidity Static Analysis</ButtonText>
         </Strings>
-      </Button>
-      -->
+      </Button>      
     </Buttons>
 	  
 	

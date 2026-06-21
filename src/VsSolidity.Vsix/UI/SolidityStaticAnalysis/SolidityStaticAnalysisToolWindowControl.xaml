@@ -33,14 +33,12 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <StackPanel Orientation="Vertical" Grid.Row="0">
+            <!-- Items, TreeNodeStyle, TreeStyle, NodeSortDescriptions, SelectNodesOnRightClick and IsLazyLoading are
+                 declared on the generic base TreeViewBase<SolidityStaticAnalysisInfo>. Setting them in XAML makes WPF
+                 BAML resolve the generic base type and throw NotImplementedException (Baml2006SchemaContext.ResolveBamlType),
+                 so they are assigned in the control's constructor instead. -->
             <VsSolidityui:SolidityStaticAnalysisTree x:Name="SolidityStaticAnalysisTree"
-                Items="{Binding Source={StaticResource StaticAnalysis}, Path=Objects}"
-                TreeNodeStyle="{StaticResource TreeViewItemStyle}"
-                TreeStyle="{StaticResource TreeViewStyle}"
-                NodeSortDescriptions="{StaticResource AscendingNames}"
-                SelectNodesOnRightClick="True"
                 SelectedItemChanged="OnSelectedItemChanged"
-                IsLazyLoading="False"
                 Margin="0,0,0,10" />
         </StackPanel>
         <uimd:MarkdownViewer Name="StaticAnalysisMarkdownViewer" Grid.Row="1" HeaderBrush="{DynamicResource {x:Static VsSolidityui:VSTheme.ToolWindowTextKey}}" HyperlinkBrush="{DynamicResource {x:Static VsSolidityui:VSTheme.ToolWindowTextKey}}" HyperlinkInteractive="False"  />

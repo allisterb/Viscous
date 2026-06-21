@@ -5,18 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace VsSolidity.UI
 {
-    /// <summary>
-    /// This class implements the tool window exposed by this package and hosts a user control.
-    /// </summary>
-    /// <remarks>
-    /// In Visual Studio tool windows are composed of a frame (implemented by the shell) and a pane,
-    /// usually implemented by the package implementer.
-    /// <para>
-    /// This class derives from the ToolWindowPane class provided from the MPF in order to use its
-    /// implementation of the IVsUIElementPane interface.
-    /// </para>
-    /// </remarks>
-    [Guid("4f52fe4e-7335-406c-ab70-135b601790b1")]
+    [Guid("F3414058-27BB-4D0A-8E78-EE513B1E3863")]
     public class SolidityStaticAnalysisToolWindow : ToolWindowPane
     {
         /// <summary>

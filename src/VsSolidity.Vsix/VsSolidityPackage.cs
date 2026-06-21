@@ -46,6 +46,7 @@ namespace VsSolidity
     [ProvideToolWindow(typeof(UI.BlockchainExplorerToolWindow), Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
     [ProvideToolWindow(typeof(UI.DeploySolidityProjectToolWindow), Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
     [ProvideToolWindow(typeof(UI.RunSmartContractToolWindow), Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
+    [ProvideToolWindow(typeof(UI.SolidityStaticAnalysisToolWindow), Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
     public sealed partial class VsSolidityPackage : AsyncPackage, IVsSolutionEvents7, IVsSolutionEvents
     {
         #region Constructors
@@ -144,10 +145,9 @@ namespace VsSolidity
             ApplicationThemeManager.Apply(UI.VSTheme.ApplicationThemeGuess);
             await SolidityProjectMenuCommands.InitializeAsync(this);
             await UI.BlockchainExplorerToolWindowCommand.InitializeAsync(this);
-            //await UI.EthereumBlockchainDashboardToolWindowCommand.InitializeAsync(this);
             await UI.DeploySolidityProjectToolWindowCommand.InitializeAsync(this); 
             await UI.RunSmartContractToolWindowCommand.InitializeAsync(this);
-            //await UI.SolidityStaticAnalysisToolWindowCommand.InitializeAsync(this);
+            await UI.SolidityStaticAnalysisToolWindowCommand.InitializeAsync(this);
             
         }
         #endregion
