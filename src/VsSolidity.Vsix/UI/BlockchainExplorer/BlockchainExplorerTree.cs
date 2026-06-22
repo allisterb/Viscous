@@ -45,8 +45,6 @@ namespace VsSolidity.UI
 
         public static RoutedCommand EditContractCmd { get; } = new RoutedCommand();
 
-        public static RoutedCommand NewContractCmd { get; } = new RoutedCommand();
-
         public static RoutedCommand DeleteContractCmd { get; } = new RoutedCommand();
 
         public static RoutedCommand RunContractCmd { get; } = new RoutedCommand();
@@ -98,17 +96,16 @@ namespace VsSolidity.UI
             {
                 item.ContextMenu = (ContextMenu)TryFindResource("ContractContextMenu");
             }
-            else if (data.Kind == BlockchainInfoKind.Folder && data.Name == "Endpoints")
+            else if (data.Kind == BlockchainInfoKind.Folder &&
+                     (data.Name == "Endpoints" || data.Name == "Accounts" || data.Name == "Contracts" || data.Name == "Deploy Profiles"))
             {
-                item.ContextMenu = (ContextMenu)TryFindResource("EndpointsFolderContextMenu"); ;
-            }
-            else if (data.Kind == BlockchainInfoKind.Folder && data.Name == "Deploy Profiles")
-            {
-                item.ContextMenu = (ContextMenu)TryFindResource("DeployProfilesFolderContextMenu"); ;
-            }
-            else if (data.Kind == BlockchainInfoKind.Folder && data.Name == "Contracts")
-            {
-                item.ContextMenu = (ContextMenu)TryFindResource("ContractsFolderContextMenu");
+                // The predefined network sub-folders have no actions of their own; all "Add ..." operations live on
+                // the parent Network node. Give each an empty menu so the Network menu can't inherit through, and
+                // cancel its opening so nothing pops up. ContextMenuOpening bubbles, so this also fires for the leaf
+                // items inside the folder (Account/Endpoint/Deploy Profile/Contract); only suppress when the menu
+                // being opened belongs to THIS folder (e.Source is the owner), or we'd cancel their menus too.
+                item.ContextMenu = new ContextMenu();
+                item.ContextMenuOpening += (s, e) => { if (ReferenceEquals(e.Source, item)) e.Handled = true; };
             }
             return item;
         }

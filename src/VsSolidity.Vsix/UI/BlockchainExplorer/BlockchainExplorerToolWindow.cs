@@ -10,37 +10,14 @@ using Wpf.Ui.Controls;
 
 namespace VsSolidity.UI
 {
-    /// <summary>
-    /// This class implements the tool window exposed by this package and hosts a user control.
-    /// </summary>
-    /// <remarks>
-    /// In Visual Studio tool windows are composed of a frame (implemented by the shell) and a pane,
-    /// usually implemented by the package implementer.
-    /// <para>
-    /// This class derives from the ToolWindowPane class provided from the MPF in order to use its
-    /// implementation of the IVsUIElementPane interface.
-    /// </para>
-    /// </remarks>
     [Guid("d284f7d7-ba72-4287-991d-18821ddf9b91")]
     public class BlockchainExplorerToolWindow : ToolWindowPane
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BlockchainExplorerToolWindow"/> class.
-        /// </summary>
         public BlockchainExplorerToolWindow() : base(VsSolidityPackage.Instance)
         {
             this.Caption = "Blockchain Explorer";
             this.BitmapImageMoniker = KnownMonikers.NeuralNetwork;
-            this.ToolBar = new CommandID(VsSolidityPackageIds.BlockchainExplorerGuid, VsSolidityPackageIds.BlockchainExplorerTWindowId);
-            
-            // Bug workaround, see https://github.com/microsoft/XamlBehaviorsWpf/issues/86
-            var _ = new Card(); 
-            var __ = new BlockchainExplorerTree();
-            var ____ = new Wpf.Ui.ThemeService();
-            
-            // This is the user control hosted by the tool window; Note that, even if this class implements IDisposable,
-            // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on
-            // the object returned by the Content property.
+            this.ToolBar = new CommandID(VsSolidityPackageIds.BlockchainExplorerGuid, VsSolidityPackageIds.BlockchainExplorerTWindowId);                            
             var control = new BlockchainExplorerToolWindowControl();
             
             this.Content = control;

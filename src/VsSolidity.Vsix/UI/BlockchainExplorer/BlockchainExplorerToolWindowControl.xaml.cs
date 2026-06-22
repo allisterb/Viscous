@@ -216,6 +216,11 @@ namespace VsSolidity.UI
             {
                 var window = (BlockchainExplorerToolWindowControl)sender;
                 var tree = window.BlockchainExplorerTree;
+                // Launched from the Network node (or, historically, the Endpoints folder). Resolve the network's
+                // Endpoints folder so the uniqueness check and the add target the same place.
+                var endpointsFolder = tree.SelectedItem != null && tree.SelectedItem.Kind == BlockchainInfoKind.Network
+                    ? tree.SelectedItem.GetOrAddChild("Endpoints", BlockchainInfoKind.Folder)
+                    : tree.SelectedItem;
                 var dw = new ToolWindowDialog(RootContentDialog)
                 {
                     Title = "Add EVM network endpoint",
@@ -236,7 +241,7 @@ namespace VsSolidity.UI
                     {
                         if (!string.IsNullOrEmpty(rpcurl.Text) && Uri.TryCreate(rpcurl.Text, UriKind.Absolute, out var _))
                         {
-                            if (tree.SelectedItem.HasChild(rpcurl.Text, BlockchainInfoKind.Endpoint))
+                            if (endpointsFolder.HasChild(rpcurl.Text, BlockchainInfoKind.Endpoint))
                             {
                                 ShowValidationErrors(errors, "Enter a unique network endpoint URL.");
                                 return;
@@ -270,8 +275,7 @@ namespace VsSolidity.UI
 
                 var uri = new Uri(rpcurl.Text);
 
-                var endpoints = tree.SelectedItem.Kind == BlockchainInfoKind.Network ? tree.SelectedItem.GetChild("Endpoints", BlockchainInfoKind.Folder) : tree.SelectedItem;
-                endpoints.AddChild(rpcurl.Text, BlockchainInfoKind.Endpoint);
+                endpointsFolder.AddChild(rpcurl.Text, BlockchainInfoKind.Endpoint);
                 if (!tree.RootItem.Save("BlockchainExplorerTree", out var ex))
                 {
                     System.Windows.MessageBox.Show("Error saving tree data: " + ex?.Message);
@@ -739,6 +743,8 @@ namespace VsSolidity.UI
             {
                 var window = (BlockchainExplorerToolWindowControl)sender;
                 var tree = window.BlockchainExplorerTree;
+                // Launched from the Network node. Get-or-create its "Accounts" folder so a network persisted
+                // without one doesn't throw "Sequence contains no elements".
                 var selected = GetSelectedItem(sender);
                 if (selected == null || selected.Kind != BlockchainInfoKind.Network)
                 {
@@ -749,8 +755,6 @@ namespace VsSolidity.UI
 #endif
                     return;
                 }
-                // Get-or-create so a network without an "Accounts" folder (e.g. one persisted by older code)
-                // doesn't throw "Sequence contains no elements".
                 var item = selected.GetOrAddChild("Accounts", BlockchainInfoKind.Folder);
                 var dw = new ToolWindowDialog(RootContentDialog)
                 {
@@ -764,6 +768,9 @@ namespace VsSolidity.UI
                 var acctpubkey = (Wpc.TextBox)((StackPanel)sp.Children[0]).Children[1];
                 var acctlabel = (Wpc.TextBox)((StackPanel)sp.Children[0]).Children[3];
                 var errors = (Wpc.TextBlock)((StackPanel)sp.Children[1]).Children[0];
+                // Shared dialog resource: clear values retained from a previous open.
+                acctpubkey.Text = "";
+                acctlabel.Text = "";
                 var validForClose = false;
                 dw.ButtonClicked += (cd, args) =>
                 {
@@ -843,13 +850,12 @@ namespace VsSolidity.UI
                 var _sp = (StackPanel)TryFindResource("EditContractDialog");
                 var dw = new ToolWindowDialog(RootContentDialog)
                 {
-                    Title = "Edit contract " + item.DisplayName,
+                    Title = "Contract details: " + item.DisplayName,
                     Content = _sp,
-                    PrimaryButtonText = "Save",
-                    PrimaryButtonIcon = new SymbolIcon(SymbolRegular.Save16),
-                    SecondaryButtonText = "Run",
-                    SecondaryButtonIcon = new SymbolIcon(SymbolRegular.Run16),
-                    CloseButtonText = "Cancel",
+                    // Deployed contracts are view-only here; "Run" opens the Run Contract dialog.
+                    PrimaryButtonText = "Run",
+                    PrimaryButtonIcon = new SymbolIcon(SymbolRegular.Run16),
+                    CloseButtonText = "Close",
                 };
                 var sp = (StackPanel)(_sp).Children[0];
                 var address = (Wpc.TextBox)(sp.Children[1]);
@@ -867,23 +873,15 @@ namespace VsSolidity.UI
                 deployedOn.Text = (string)item.Data["DeployedOn"];
                 abi.Text = (string)item.Data["Abi"];               
                 var r = await dw.ShowAsync();
-                if (r == ContentDialogResult.None)
-                {
-                    return;
-                }
-                else if (r == ContentDialogResult.Secondary)
+                if (r == ContentDialogResult.Primary)
                 {
                     BlockchainExplorerTree.RunContractCmd.Execute(null, tree);
-                    return;
                 }
-                //item.Data["Label"] = label.Text;
-                //item.Data["Abi"] = abi.Text;
-                //tree.Save();                
             }
             catch (Exception ex)
             {
 #if IS_VSIX
-                VSUtil.ShowModalErrorDialogBox(ex?.Message, "Edit Contract error");
+                VSUtil.ShowModalErrorDialogBox(ex?.Message, "View Contract error");
 #else
                 System.Windows.MessageBox.Show(ex?.Message);
 #endif

@@ -621,6 +621,11 @@
 
     <!-- Context Menus -->
     <ContextMenu x:Key="NetworkContextMenu" Style="{DynamicResource ContextMenuStyle}">
+        <MenuItem Header="Add Endpoint..." Command="{x:Static VsSolidityui:BlockchainExplorerTree.NewEndpointCmd}">
+            <MenuItem.Icon>
+                <Image Source="{StaticResource GlobeDrawingImage}" />
+            </MenuItem.Icon>
+        </MenuItem>
         <MenuItem Header="Add Account..." Command="{x:Static VsSolidityui:BlockchainExplorerTree.NewAccountCmd}">
             <MenuItem.Icon>
                 <Image Source="{StaticResource AddAccountDrawingImage}"  />
@@ -638,26 +643,10 @@
         </MenuItem>
     </ContextMenu>
 
-    <ContextMenu x:Key="EndpointsFolderContextMenu" Style="{DynamicResource ContextMenuStyle}">
-        <MenuItem Header="Add Endpoint..." Command="{x:Static VsSolidityui:BlockchainExplorerTree.NewEndpointCmd}">
-            <MenuItem.Icon>
-                <Image Source="{StaticResource GlobeDrawingImage}" />
-            </MenuItem.Icon>
-        </MenuItem>
-    </ContextMenu>
-
     <ContextMenu x:Key="EndpointContextMenu" Style="{DynamicResource ContextMenuStyle}">
         <MenuItem Header="Delete" Command="{x:Static VsSolidityui:BlockchainExplorerTree.DeleteEndpointCmd}">
             <MenuItem.Icon>
                 <Image Source="{StaticResource DeleteFileDrawingImage}" />
-            </MenuItem.Icon>
-        </MenuItem>
-    </ContextMenu>
-
-    <ContextMenu x:Key="DeployProfilesFolderContextMenu" Style="{DynamicResource ContextMenuStyle}">
-        <MenuItem Header="Add Deploy Profile..." Command="{x:Static VsSolidityui:BlockchainExplorerTree.NewDeployProfileCmd}">
-            <MenuItem.Icon>
-                <Image Source="{StaticResource AddDeployProfileDrawingImage}" />
             </MenuItem.Icon>
         </MenuItem>
     </ContextMenu>
@@ -693,16 +682,8 @@
         </MenuItem>
     </ContextMenu>
 
-    <ContextMenu x:Key="ContractsFolderContextMenu" Style="{DynamicResource ContextMenuStyle}">
-        <MenuItem Header="Add Contract..." Command="{x:Static VsSolidityui:BlockchainExplorerTree.NewContractCmd}">
-            <MenuItem.Icon>
-                <Image Source="{StaticResource AddContractDrawingImage}" />
-            </MenuItem.Icon>
-        </MenuItem>
-    </ContextMenu>
-
     <ContextMenu x:Key="ContractContextMenu" Style="{DynamicResource ContextMenuStyle}">
-        <MenuItem Header="Edit..." Command="{x:Static VsSolidityui:BlockchainExplorerTree.EditContractCmd}">
+        <MenuItem Header="View..." Command="{x:Static VsSolidityui:BlockchainExplorerTree.EditContractCmd}">
             <MenuItem.Icon>
                 <Image Source="{StaticResource EditContractDrawingImage}" />
             </MenuItem.Icon>
@@ -865,7 +846,7 @@
             <Label Content="Address:" VerticalAlignment="Center" Margin="1,0,0,2" />
             <ui:TextBox x:Name="EditContractAddressTextBox"  HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="True" />
             <Label Content="Label:" VerticalAlignment="Center" Margin="1,0,0,2" />
-            <ui:TextBox x:Name="EditContractLabelTextBox"  HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center" />
+            <ui:TextBox x:Name="EditContractLabelTextBox"  HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="True" />
             <Label Content="Creator:" VerticalAlignment="Center" Margin="1,0,0,2" />
             <ui:TextBox x:Name="EditContractCreatorTextBox"  HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="True" />
             <Label Content="Transaction Hash:" VerticalAlignment="Center" Margin="1,0,0,2" />
