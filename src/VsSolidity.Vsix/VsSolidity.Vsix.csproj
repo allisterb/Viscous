@@ -56,11 +56,6 @@
     <Compile Include="UI\DeploySolidityProject\DeploySolidityProjectToolWindowControl.xaml.cs">
       <DependentUpon>DeploySolidityProjectToolWindowControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\RunSmartContract\RunSmartContractToolWindow.cs" />
-    <Compile Include="UI\RunSmartContract\RunSmartContractToolWindowCommand.cs" />
-    <Compile Include="UI\RunSmartContract\RunSmartContractToolWindowControl.xaml.cs">
-      <DependentUpon>RunSmartContractToolWindowControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\SolidityStaticAnalysis\SolidityStaticAnalysisTree.cs" />
     <Compile Include="UI\SolidityStaticAnalysis\SolidityStaticAnalysisViewModel.cs" />
     <Compile Include="UI\SolidityStaticAnalysis\SolidityStaticAnalysisToolWindow.cs" />
@@ -130,7 +125,6 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Resources\DeploySolidityProjectToolWindowCommand.png" />
-    <Content Include="Resources\RunSmartContractToolWindowCommand.png" />
     <Content Include="Resources\SolidityAnalysisToolWindowCommand.png" />
     <Content Include="VsSolidityLogo200x200.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -287,10 +281,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="UI\DeploySolidityProject\DeploySolidityProjectToolWindowControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\RunSmartContract\RunSmartContractToolWindowControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

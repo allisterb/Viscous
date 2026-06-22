@@ -34,14 +34,6 @@
     group; your package should define its own command set in order to avoid collisions
     with command ids defined by other packages. -->
 
-	<Menus>
-        <Menu guid="guidBlockchainExplorer" id="TWindowToolbar" type="ToolWindowToolbar">
-		    <CommandFlag>DefaultDocked</CommandFlag>
-			<Strings>
-			    <ButtonText>Tool Window Toolbar</ButtonText>
-			</Strings>
-		</Menu>
-	</Menus>
 
     <!-- In this section you can define new menu groups. A menu group is a container for
          other menus or buttons (commands); from a visual point of view you can see the
@@ -61,9 +53,6 @@
       </Groups>
 
 
-		<Group guid="guidBlockchainExplorer" id="TWindowToolbarGroup" priority="0x0000">
-			<Parent guid="guidBlockchainExplorer" id="TWindowToolbar" />
-		</Group>
     </Groups>
 
     <!--Buttons section. -->
@@ -140,46 +129,9 @@
         </Strings>
       </Button>
 
-	  <!-- Blockchain Explorer toolbar buttons -->
-    <Button guid="guidBlockchainExplorer" id="MyCommand" priority="0x0100" type="Button">
-		  <Parent guid="VSMainMenu" id="View.DevWindowsGroup.OtherWindows.Group1" />
-		  <Icon guid="ImageCatalogGuid" id="StatusHelpOutline" />
-		  <CommandFlag>IconIsMoniker</CommandFlag>
-		  <Strings>
-			  <ButtonText>Help Explorer</ButtonText>
-			  <LocCanonicalName>.View.HelpExplorer</LocCanonicalName>
-		  </Strings>
-	  </Button>
 
-		<Button guid="guidBlockchainExplorer" id="MultipleProjectTypeDisplay" priority="0x0001" type="Button">
-			<Parent guid="guidBlockchainExplorer" id="TWindowToolbarGroup" />
-			<Icon guid="ImageCatalogGuid" id="DynamicDiscoveryDocument" />
-			<CommandFlag>IconIsMoniker</CommandFlag>
-			<!--<CommandFlag>IconAndText</CommandFlag>-->
-			<Strings>
-				<ButtonText>Display Multiple Project Type Links</ButtonText>
-			</Strings>
-		</Button>
 
-		<Button guid="guidBlockchainExplorer" id="MultipleFileTypeDisplay" priority="0x0001" type="Button">
-			<Parent guid="guidBlockchainExplorer" id="TWindowToolbarGroup" />
-			<Icon guid="ImageCatalogGuid" id="ProjectFilterFile" />
-			<CommandFlag>IconIsMoniker</CommandFlag>
-			<!--<CommandFlag>IconAndText</CommandFlag>-->
-			<Strings>
-				<ButtonText>Display Multiple File Type Links</ButtonText>
-			</Strings>
-		</Button>
 
-		<Button guid="guidBlockchainExplorer" id="CreateCapabilitiyFile" priority="0x0001" type="Button">
-			<Parent guid="guidBlockchainExplorer" id="TWindowToolbarGroup" />
-			<Icon guid="ImageCatalogGuid" id="CacheGroup" />
-			<CommandFlag>IconIsMoniker</CommandFlag>
-			<!--<CommandFlag>IconAndText</CommandFlag>-->
-			<Strings>
-				<ButtonText>Save Project Capabilities to file</ButtonText>
-			</Strings>
-		</Button>
       
       <Button guid="guidVsSolidityPackageCmdSet" id="cmdidBlockchainExplorerToolWindowCommand" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
@@ -205,17 +157,6 @@
         <Icon guid="guidImages4" id="bmpPic1" />
         <Strings>
           <ButtonText>Deploy Solidity Project</ButtonText>
-        </Strings>
-      </Button>
-      -->
-      <!-- Hidden from View > Other Windows: the run UI is the Run Contract dialog in the Blockchain Explorer; this
-           separate tab tool window is redundant. Uncomment this button and RunSmartContractToolWindowCommand.InitializeAsync
-           in VsSolidityPackage.cs to expose it again.
-      <Button guid="guidVsSolidityPackageCmdSet" id="cmdidRunSmartContractToolWindowCommand" priority="0x0100" type="Button">
-        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
-        <Icon guid="guidImages5" id="bmpPic1" />
-        <Strings>
-          <ButtonText>Run Smart Contract</ButtonText>
         </Strings>
       </Button>
       -->
@@ -246,7 +187,6 @@
       <Bitmap guid="guidImages2" href="Resources\BlockchainExplorerToolWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
       <Bitmap guid="guidImages3" href="Resources\VsSolidityBlockchainDashboardToolWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
       <Bitmap guid="guidImages4" href="Resources\DeploySolidityProjectToolWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
-      <Bitmap guid="guidImages5" href="Resources\RunSmartContractToolWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
       <Bitmap guid="guidImages6" href="Resources\SolidityAnalysisToolWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
     </Bitmaps>
   </Commands>
@@ -287,7 +227,6 @@
       <IDSymbol value="256" name="cmdidBlockchainExplorerToolWindowCommand" />
       <IDSymbol value="4129" name="cmdidVsSolidityBlockchainDashboardToolWindowCommand" />
       <IDSymbol value="4130" name="cmdidDeploySolidityProjectToolWindowCommand" />
-      <IDSymbol value="4131" name="cmdidRunSmartContractToolWindowCommand" />
       <IDSymbol value="4132" name="cmdidSolidityAnalysisToolWindowCommand" />
     </GuidSymbol>
 
@@ -342,14 +281,6 @@
       <IDSymbol name="bmpPicStrikethrough" value="6" />
     </GuidSymbol>
 
-	<GuidSymbol name="guidBlockchainExplorer" value="{C3C0198D-94D1-4AA7-BAFB-ABF494F938B9}">
-		  <IDSymbol name="MyCommand" value="0x0100" />
-		  <IDSymbol name="TWindowToolbar" value="0x1000" />
-		  <IDSymbol name="TWindowToolbarGroup" value="0x1050" />
-		  <IDSymbol name="MultipleProjectTypeDisplay" value="0x0111" />
-		  <IDSymbol name="MultipleFileTypeDisplay" value="0x0112" />
-		  <IDSymbol name="CreateCapabilitiyFile" value="0x0113" />
-	</GuidSymbol>
   
     <GuidSymbol value="{d4953174-0817-4c69-92b5-b90aa84c3022}" name="guidImages2">
       <IDSymbol name="bmpPic1" value="1" />
@@ -378,14 +309,6 @@
       <IDSymbol name="bmpPicStrikethrough" value="6" />
     </GuidSymbol>
   
-    <GuidSymbol value="{4a633e61-420d-41e3-bae2-62fbc81ce4f1}" name="guidImages5">
-      <IDSymbol name="bmpPic1" value="1" />
-      <IDSymbol name="bmpPic2" value="2" />
-      <IDSymbol name="bmpPicSearch" value="3" />
-      <IDSymbol name="bmpPicX" value="4" />
-      <IDSymbol name="bmpPicArrows" value="5" />
-      <IDSymbol name="bmpPicStrikethrough" value="6" />
-    </GuidSymbol>
   
     <GuidSymbol value="{e94e1c8d-511c-4915-ad7a-6f9d56ede8c7}" name="guidImages6">
       <IDSymbol name="bmpPic1" value="1" />

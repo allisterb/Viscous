@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel.Design;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
 
@@ -17,7 +16,6 @@ namespace VsSolidity.UI
         {
             this.Caption = "Blockchain Explorer";
             this.BitmapImageMoniker = KnownMonikers.NeuralNetwork;
-            this.ToolBar = new CommandID(VsSolidityPackageIds.BlockchainExplorerGuid, VsSolidityPackageIds.BlockchainExplorerTWindowId);                            
             var control = new BlockchainExplorerToolWindowControl();
             
             this.Content = control;
