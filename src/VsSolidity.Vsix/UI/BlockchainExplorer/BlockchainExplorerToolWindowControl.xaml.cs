@@ -521,11 +521,15 @@ namespace VsSolidity.UI
                 var name = (Wpc.TextBox)((StackPanel)sp.Children[0]).Children[1];
                 var endpoint = (ComboBox)((StackPanel)sp.Children[1]).Children[1];
                 var accounts = (ComboBox)((StackPanel)sp.Children[2]).Children[1];
-                var pkey = (Wpc.TextBox)((StackPanel)sp.Children[3]).Children[1];
+                var pkey = (Wpc.PasswordBox)((StackPanel)sp.Children[3]).Children[1];
                 var errors = (Wpc.TextBlock)((StackPanel)sp.Children[4]).Children[0];
                 endpoint.ItemsSource = item.GetNetworkEndPoints();
                 endpoint.SelectedIndex = 0;
                 accounts.ItemsSource = item.GetNetworkAccounts();
+                // The dialog is a shared resource, so its inputs keep their values between opens. Clear the name
+                // and (especially) the private-key box so a stale value can't concatenate with a freshly entered one.
+                name.Text = "";
+                pkey.Password = "";
                 var validForClose = false;
 
                 dw.ButtonClicked += (cd, args) =>
@@ -541,6 +545,10 @@ namespace VsSolidity.UI
                             if (dp.Contains(name.Text))
                             {
                                 ShowValidationErrors(errors, "The " + name.Text + " deploy profile already exists.");
+                            }
+                            else if (!IsValidPrivateKey(pkey.Password))
+                            {
+                                ShowValidationErrors(errors, "Enter a valid private key: 64 hex characters, optionally 0x-prefixed.");
                             }
                             else
                             {
@@ -573,7 +581,7 @@ namespace VsSolidity.UI
                 }
                 else 
                 {
-                    item.GetChild("Deploy Profiles", BlockchainInfoKind.Folder).AddDeployProfile(name.Text, (string)endpoint.SelectedValue, (string)accounts.SelectedValue, pkey.Text);
+                    item.GetChild("Deploy Profiles", BlockchainInfoKind.Folder).AddDeployProfile(name.Text, (string)endpoint.SelectedValue, (string)accounts.SelectedValue, pkey.Password);
                 }
               
                 if (!tree.RootItem.Save("BlockchainExplorerTree", out var ex))
@@ -618,14 +626,16 @@ namespace VsSolidity.UI
                 var name = (Wpc.TextBox)((StackPanel)sp.Children[0]).Children[1];
                 var endpoint = (ComboBox)((StackPanel)sp.Children[1]).Children[1];
                 var accounts = (ComboBox)((StackPanel)sp.Children[2]).Children[1];
-                var pkey = (Wpc.TextBox)((StackPanel)sp.Children[3]).Children[1];
+                var pkey = (Wpc.PasswordBox)((StackPanel)sp.Children[3]).Children[1];
                 var errors = (Wpc.TextBlock)((StackPanel)sp.Children[4]).Children[0];
                 name.Text = item.Name;
                 endpoint.ItemsSource = item.Parent.Parent.GetNetworkEndPoints();
                 endpoint.SelectedValue = item.Data["Endpoint"];
                 accounts.ItemsSource = item.Parent.Parent.GetNetworkAccounts();
                 accounts.SelectedValue = item.Data["Account"];
-                pkey.Text = item.TryGetDeployProfilePrivateKey() ?? "";
+                // Don't pre-fill the secret into the shared box (avoids exposing it and prevents a stale value from
+                // concatenating with a new entry). Blank on save keeps the existing key; typing a new one replaces it.
+                pkey.Password = "";
                 var validForClose = false;
 
                 dw.ButtonClicked += (cd, args) =>
@@ -638,9 +648,13 @@ namespace VsSolidity.UI
                         if (!string.IsNullOrEmpty(name.Text) && accounts.SelectedValue != null && endpoint.SelectedValue != null)
                         {
                             var dp = item.Parent.Parent.GetNetworkDeployProfiles();
-                            if (dp.Contains(name.Text))
+                            if (name.Text != item.Name && dp.Contains(name.Text))
                             {
                                 ShowValidationErrors(errors, "The " + name.Text + " deploy profile already exists.");
+                            }
+                            else if (!IsValidPrivateKey(pkey.Password))
+                            {
+                                ShowValidationErrors(errors, "Enter a valid private key: 64 hex characters, optionally 0x-prefixed.");
                             }
                             else
                             {
@@ -675,9 +689,9 @@ namespace VsSolidity.UI
                 item.Name = name.Text;
                 item.Data["Account"] = accounts.SelectedValue;
                 item.Data["Endpoint"] = endpoint.SelectedValue;
-                if (!string.IsNullOrEmpty(pkey.Text))
+                if (!string.IsNullOrEmpty(pkey.Password))
                 {
-                    item.Data["PrivateKey"] = item.SetDeployProfilePrivateKey(pkey.Text);
+                    item.Data["PrivateKey"] = item.SetDeployProfilePrivateKey(pkey.Password);
                 }
                 if (!tree.RootItem.Save("BlockchainExplorerTree", out var ex))
                 {
@@ -725,7 +739,19 @@ namespace VsSolidity.UI
             {
                 var window = (BlockchainExplorerToolWindowControl)sender;
                 var tree = window.BlockchainExplorerTree;
-                var item = GetSelectedItem(sender).GetChild("Accounts", BlockchainInfoKind.Folder);
+                var selected = GetSelectedItem(sender);
+                if (selected == null || selected.Kind != BlockchainInfoKind.Network)
+                {
+#if IS_VSIX
+                    VSUtil.ShowModalErrorDialogBox("Select a network in the Blockchain Explorer, then choose Add Account.", "Add Account");
+#else
+                    System.Windows.MessageBox.Show("Select a network in the Blockchain Explorer, then choose Add Account.");
+#endif
+                    return;
+                }
+                // Get-or-create so a network without an "Accounts" folder (e.g. one persisted by older code)
+                // doesn't throw "Sequence contains no elements".
+                var item = selected.GetOrAddChild("Accounts", BlockchainInfoKind.Folder);
                 var dw = new ToolWindowDialog(RootContentDialog)
                 {
                     Title = "Add Account",
@@ -895,7 +921,9 @@ namespace VsSolidity.UI
                 var estimateGasRadioButton = (RadioButton) ((StackPanel)(((StackPanel)transactPanel.Children[0]).Children[4])).Children[1];
                 var customGasRadioButton = (RadioButton) ((StackPanel) (((StackPanel)(((StackPanel)transactPanel.Children[0]).Children[4])).Children[2])).Children[0];
                 var customGasNumberBox = (Wpc.TextBox)((StackPanel)(((StackPanel)(((StackPanel)transactPanel.Children[0]).Children[4])).Children[2])).Children[1];
-                fromAddressTextBox.Text = (string)item.Data["Address"];                                
+                // Default the "from" account to the contract's deployer (Creator), not the contract's own
+                // address. The user can change it, and a supplied private key overrides it with the key's address.
+                fromAddressTextBox.Text = item.Data.ContainsKey("Creator") ? (string)item.Data["Creator"] : "";
                 transactCheckBox.Checked += (s, ev) =>
                 {
                     transactPanel.IsEnabled = true;
@@ -948,6 +976,15 @@ namespace VsSolidity.UI
                 System.Windows.MessageBox.Show("Error saving tree data: " +  ex?.Message);
 #endif
             }
+        }
+
+        // A secp256k1 private key is 32 bytes: 64 hex characters, optionally 0x-prefixed. Empty is allowed (the field is optional).
+        private static bool IsValidPrivateKey(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return true;
+            var k = s.Trim();
+            if (k.StartsWith("0x") || k.StartsWith("0X")) k = k.Substring(2);
+            return k.Length == 64 && k.All(Uri.IsHexDigit);
         }
 
         private void ShowValidationErrors(Wpc.TextBlock textBlock, string message)

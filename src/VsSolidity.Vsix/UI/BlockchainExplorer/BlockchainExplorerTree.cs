@@ -64,6 +64,12 @@ namespace VsSolidity.UI
         protected override TreeViewItem CreateTreeViewItem(BlockchainInfo data)
         {
             var item = base.CreateTreeViewItem(data);
+            // Each item gets its own ContextMenu below, so WPF opens it on right-click and consumes the
+            // right-mouse-up before the base's SelectNodesOnRightClick handler runs, leaving the selection
+            // stale. Select on right-button-down instead. PreviewMouseRightButtonDown tunnels (root -> leaf),
+            // so the deepest (actually clicked) item runs last and ends up selected; using the bubbling
+            // ContextMenuOpening would instead let an ancestor win and select the wrong node.
+            item.PreviewMouseRightButtonDown += (s, e) => item.IsSelected = true;
             if (data.Kind == BlockchainInfoKind.Folder && data.Name == "EVM Networks")
             {
                 item.ContextMenu = (ContextMenu)TryFindResource("RootContextMenu");

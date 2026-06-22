@@ -185,6 +185,9 @@ namespace VsSolidity.UI.ViewModel
         
         public BlockchainInfo GetChild(string name, BlockchainInfoKind kind) => Children.Single(c =>  c.Name == name && c.Kind == kind);
 
+        public BlockchainInfo GetOrAddChild(string name, BlockchainInfoKind kind, Dictionary<string, object> data = null) =>
+            HasChild(name, kind) ? GetChild(name, kind) : AddChild(name, kind, data);
+
         public IEnumerable<BlockchainInfo> GetChildren(BlockchainInfoKind kind) => Children.Where(c => c.Kind == kind);
 
         public IEnumerable<string> GetNetworkEndPoints() => GetChild("Endpoints", BlockchainInfoKind.Folder).GetChildren(BlockchainInfoKind.Endpoint).Select(bi => bi.Name);
@@ -342,7 +345,7 @@ namespace VsSolidity.UI.ViewModel
             // DPAPI, scoped to the Windows user, so the key can still be decrypted across VS sessions and
             // reboots. (ProtectedMemory/SameLogon only survives within a single logon session and is wrong
             // for data that gets persisted to disk.)
-            return ProtectedData.Protect(Encoding.UTF8.GetBytes(pkey), null, DataProtectionScope.CurrentUser);
+            return ProtectedData.Protect(Encoding.UTF8.GetBytes(pkey.Trim()), null, DataProtectionScope.CurrentUser);
         }
         #endregion
     }
