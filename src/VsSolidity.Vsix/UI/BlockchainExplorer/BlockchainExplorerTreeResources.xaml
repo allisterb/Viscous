@@ -670,6 +670,15 @@
             <Style TargetType="{x:Type ui:TextBox}" BasedOn="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogTextBoxStyleKey}}">
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}" />
                 <Setter Property="FontSize" Value="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}" />
+                <!-- WPF-UI TextBox defaults to a tall (~32px) Fluent input; constrain to the native VS single-line height. -->
+                <Setter Property="MinHeight" Value="22" />
+                <Setter Property="Padding" Value="2,1" />
+            </Style>
+            <!-- Field labels in the dialogs are ui:TextBlock (WPF-UI): give them the VS environment font and text color. -->
+            <Style TargetType="{x:Type ui:TextBlock}">
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}" />
+                <Setter Property="FontFamily" Value="{DynamicResource {x:Static vsshell:VsFonts.EnvironmentFontFamilyKey}}" />
+                <Setter Property="FontSize" Value="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}" />
             </Style>
         </Style.Resources>
     </Style>
@@ -678,15 +687,15 @@
     <StackPanel x:Key="AddNetworkDialog" Orientation="Vertical" VerticalAlignment="Top" Style="{DynamicResource DialogStyle}">
         <StackPanel Orientation="Vertical">
             <ui:TextBlock Text="Enter the network name:" VerticalAlignment="Center"  Margin="1,0,0,2" />
-            <ui:TextBox x:Name="NetworkNameTextBox" Width="150" Margin="0,2,10,4" VerticalAlignment="Center"/>
+            <ui:TextBox x:Name="NetworkNameTextBox" HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center"/>
         </StackPanel>
         <StackPanel Orientation="Vertical" >
             <ui:TextBlock Text="JSON-RPC Url:" VerticalAlignment="Center" Margin="1,0,0,2" />
-            <ui:TextBox x:Name="NetworkRpcUrlTextBox"  Width="150" Margin="0,2,10,4" VerticalAlignment="Center" />
+            <ui:TextBox x:Name="NetworkRpcUrlTextBox"  HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center" />
         </StackPanel>
         <StackPanel Orientation="Vertical">
             <ui:TextBlock Text="Network chain id (optional):" VerticalAlignment="Center" Margin="1,0,0,2" />
-            <ui:NumberBox SpinButtonPlacementMode="Hidden" Icon="{ui:SymbolIcon NumberSymbolSquare24}" Name="NetworkChainIdNumberBox" Width="150" Margin="0,2,10,4" VerticalAlignment="Center"/>
+            <ui:NumberBox SpinButtonPlacementMode="Hidden" Icon="{ui:SymbolIcon NumberSymbolSquare24}" Name="NetworkChainIdNumberBox" HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center"/>
         </StackPanel>
         <StackPanel Orientation="Vertical">
             <Grid>
@@ -700,7 +709,7 @@
     <StackPanel x:Key="AddEndpointDialog" Orientation="Vertical" VerticalAlignment="Top" Style="{DynamicResource DialogStyle}">
         <StackPanel Orientation="Vertical" >
             <ui:TextBlock Text="JSON-RPC Url:" VerticalAlignment="Center" Margin="1,0,0,2" />
-            <ui:TextBox x:Name="EndpointRpcUrlTextBox"  Width="150" Margin="0,2,10,4" VerticalAlignment="Center" />
+            <ui:TextBox x:Name="EndpointRpcUrlTextBox"  HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center" />
         </StackPanel>
         <StackPanel Orientation="Vertical">
             <ui:TextBlock Name = "AddEndpointDialogValidationErrors" Foreground="Red" Visibility="Hidden" VerticalAlignment="Center" TextWrapping="WrapWithOverflow" />
@@ -710,7 +719,7 @@
     <StackPanel x:Key="AddFolderDialog" Orientation="Vertical" VerticalAlignment="Top" Style="{DynamicResource DialogStyle}">
         <StackPanel Orientation="Vertical" >
             <ui:TextBlock Text="Folder name:" VerticalAlignment="Center" Margin="1,0,0,2" />
-            <ui:TextBox x:Name="FolderNameTextBox"  Width="150" Margin="0,2,10,4" VerticalAlignment="Center" />
+            <ui:TextBox x:Name="FolderNameTextBox"  HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center" />
         </StackPanel>
         <StackPanel Orientation="Vertical">
             <ui:TextBlock Name = "AddFolderDialogValidationErrors" Foreground="Red" Visibility="Hidden" VerticalAlignment="Center" TextWrapping="WrapWithOverflow" />
@@ -722,7 +731,7 @@
             <ui:TextBlock Text="Account Public Key:" VerticalAlignment="Center" Margin="1,0,0,2" />
             <ui:TextBlock x:Name="EditAccountPublicKeyTextBox" TextWrapping="Wrap" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True"  Width="160" Height="75" VerticalAlignment="Center" Margin="1,0,0,2"   />
             <ui:TextBlock Text="Account Label:" VerticalAlignment="Center" Margin="1,0,0,2" />
-            <ui:TextBox x:Name="EditAccountLabelTextBox"  Width="150" Margin="0,2,10,4" VerticalAlignment="Center" />
+            <ui:TextBox x:Name="EditAccountLabelTextBox"  HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center" />
         </StackPanel>
     </StackPanel>
 
@@ -731,7 +740,7 @@
             <ui:TextBlock Text="Account Public Key:" VerticalAlignment="Center" Margin="1,0,0,2" />
             <ui:TextBox x:Name="AddAccountPublicKeyTextBox" TextWrapping="Wrap" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True"  Width="160" Height="75" VerticalAlignment="Center" Margin="1,0,0,2"   />
             <ui:TextBlock Text="Account Label:" VerticalAlignment="Center" Margin="1,0,0,2" />
-            <ui:TextBox x:Name="AddAccountLabelTextBox"  Width="150" Margin="0,2,10,4" VerticalAlignment="Center" />
+            <ui:TextBox x:Name="AddAccountLabelTextBox"  HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center" />
         </StackPanel>
         <StackPanel Orientation="Vertical">
             <ui:TextBlock Name = "AddAccountDialogValidationErrors" Foreground="Red" Visibility="Hidden" VerticalAlignment="Center" TextWrapping="WrapWithOverflow" />
@@ -741,19 +750,19 @@
     <StackPanel x:Key="AddDeployProfileDialog" Orientation="Vertical" VerticalAlignment="Top" Style="{DynamicResource DialogStyle}">
         <StackPanel Orientation="Vertical" >
             <ui:TextBlock Text="Name:" VerticalAlignment="Center" Margin="1,0,0,2" />
-            <ui:TextBox x:Name="DeployProfileNameTextBox"  Width="150" Margin="0,2,10,4" VerticalAlignment="Center" />
+            <ui:TextBox x:Name="DeployProfileNameTextBox"  HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center" />
         </StackPanel>
         <StackPanel Orientation="Vertical">
             <ui:TextBlock Text="Endpoint:" VerticalAlignment="Center"  Margin="1,0,0,2" />
-            <ComboBox x:Name="DeployProfileEndpointListView" Width="150" Margin="0,2,10,4" VerticalAlignment="Center"/>
+            <ComboBox x:Name="DeployProfileEndpointListView" HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center"/>
         </StackPanel>
         <StackPanel Orientation="Vertical">
             <ui:TextBlock Text="Account:" VerticalAlignment="Center"  Margin="1,0,0,2" />
-            <ComboBox x:Name="DeployProfileAccountListView" Width="150" Margin="0,2,10,4" VerticalAlignment="Center"/>
+            <ComboBox x:Name="DeployProfileAccountListView" HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center"/>
         </StackPanel>
         <StackPanel Orientation="Vertical">
             <ui:TextBlock Text="Private Key (optional):" VerticalAlignment="Center" Margin="1,0,0,2" />
-            <ui:PasswordBox Name="DeployProfileAccountPrivateKeyPasswordBox" Width="150" Margin="0,2,10,4" VerticalAlignment="Center"/>
+            <ui:PasswordBox Name="DeployProfileAccountPrivateKeyPasswordBox" HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center"/>
         </StackPanel>
         <StackPanel Orientation="Vertical">
             <ui:TextBlock Name = "AddDeployProfileDialogValidationErrors" Grid.Row="0" Foreground="Red" Visibility="Hidden" VerticalAlignment="Center" TextWrapping="WrapWithOverflow" 
@@ -764,15 +773,15 @@
     <StackPanel x:Key="EditContractDialog" Orientation="Vertical" VerticalAlignment="Top" Style="{DynamicResource DialogStyle}">
         <StackPanel Orientation="Vertical" >
             <Label Content="Address:" VerticalAlignment="Center" Margin="1,0,0,2" />
-            <ui:TextBox x:Name="EditContractAddressTextBox"  Width="150" Margin="0,2,10,4" VerticalAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="True" />
+            <ui:TextBox x:Name="EditContractAddressTextBox"  HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="True" />
             <Label Content="Label:" VerticalAlignment="Center" Margin="1,0,0,2" />
-            <ui:TextBox x:Name="EditContractLabelTextBox"  Width="150" Margin="0,2,10,4" VerticalAlignment="Center" />
+            <ui:TextBox x:Name="EditContractLabelTextBox"  HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center" />
             <Label Content="Creator:" VerticalAlignment="Center" Margin="1,0,0,2" />
-            <ui:TextBox x:Name="EditContractCreatorTextBox"  Width="150" Margin="0,2,10,4" VerticalAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="True" />
+            <ui:TextBox x:Name="EditContractCreatorTextBox"  HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="True" />
             <Label Content="Transaction Hash:" VerticalAlignment="Center" Margin="1,0,0,2" />
-            <ui:TextBox x:Name="EditContractTransactionHashTextBox"  Width="150" Margin="0,2,10,4" VerticalAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="True" />
+            <ui:TextBox x:Name="EditContractTransactionHashTextBox"  HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="True" />
             <Label Content="Deployed On:" VerticalAlignment="Center" Margin="1,0,0,2" />
-            <ui:TextBox x:Name="EditContractDeployedOnTextBox"  Width="150" Margin="0,2,10,4" VerticalAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="True" />
+            <ui:TextBox x:Name="EditContractDeployedOnTextBox"  HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="True" />
             <Label Content="ABI:" VerticalAlignment="Center" Margin="1,0,0,2" />
             <ui:TextBox x:Name="EditContractAbiTextBox"  Width="150" Height="100" Margin="0,2,10,4" VerticalAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="True" TextWrapping="WrapWithOverflow" />
         </StackPanel>
@@ -789,15 +798,15 @@
         <StackPanel IsEnabled="False" >
             <StackPanel Orientation="Vertical">
                 <Label Content="Account:" VerticalAlignment="Center"  Margin="1,0,0,2" />
-                <ui:TextBox x:Name="RunContractAccountTextBox"  Width="150" Margin="0,2,10,4" VerticalAlignment="Center" IsReadOnlyCaretVisible="True" />
+                <ui:TextBox x:Name="RunContractAccountTextBox"  HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center" IsReadOnlyCaretVisible="True" />
                 <Label Content="Private Key (optional):" VerticalAlignment="Center" Margin="1,0,0,2" />
-                <ui:PasswordBox Name="RunContractAccountPrivateKeyPasswordBox" Width="150" Margin="0,2,10,4" VerticalAlignment="Center"/>
+                <ui:PasswordBox Name="RunContractAccountPrivateKeyPasswordBox" HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center"/>
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Left">
                     <Label Content="Gas Limit:"  Margin="4,0,0,2" />
                     <RadioButton Content="Estimated Gas" GroupName="SmartContractGasGroup" IsChecked="True" FontSize="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}" Foreground="{DynamicResource {x:Static VsSolidityui:VSTheme.ToolWindowTextKey}}" />
                     <StackPanel Orientation="Horizontal">
                         <RadioButton Content="Custom"  GroupName="SmartContractGasGroup" FontSize="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}" Foreground="{DynamicResource {x:Static VsSolidityui:VSTheme.ToolWindowTextKey}}"/>
-                        <ui:NumberBox SpinButtonPlacementMode="Inline" Value="3000000" IsEnabled="False" Width="150" Margin="0,2,10,4" VerticalAlignment="Center"/>
+                        <ui:NumberBox SpinButtonPlacementMode="Inline" Value="3000000" IsEnabled="False" HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center"/>
                     </StackPanel>
                 </StackPanel>
             </StackPanel>

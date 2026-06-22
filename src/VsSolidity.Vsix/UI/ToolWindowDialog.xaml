@@ -15,8 +15,8 @@
             <VsSolidityui:ContentDialogButtonEnumToBoolConverter x:Key="EnumToBoolConverter" />
             <VsSolidityui:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 
-            <CornerRadius x:Key="DialogOverlayCornerRadius">8,8,0,0</CornerRadius>
-            <CornerRadius x:Key="DialogFooterCornerRadius">0,0,8,8</CornerRadius>
+            <CornerRadius x:Key="DialogOverlayCornerRadius">0</CornerRadius>
+            <CornerRadius x:Key="DialogFooterCornerRadius">0</CornerRadius>
 
             <Style TargetType="{x:Type VsSolidityui:ToolWindowDialog}">
                 <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
@@ -24,11 +24,11 @@
                 <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
                 <Setter Property="ScrollViewer.IsDeferredScrollingEnabled" Value="False" />
                 <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
-                <Setter Property="Border.CornerRadius" Value="{DynamicResource PopupCornerRadius}" />
+                <Setter Property="Border.CornerRadius" Value="0" />
                 <Setter Property="SnapsToDevicePixels" Value="True" />
                 <Setter Property="DialogMaxHeight" Value="850" />
                 <Setter Property="OverridesDefaultStyle" Value="True" />
-                <Setter Property="Padding" Value="24" />
+                <Setter Property="Padding" Value="12" />
                 <Setter Property="DialogMaxWidth" Value="1000" />
                 <Setter Property="VerticalContentAlignment" Value="Stretch" />
                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -37,9 +37,9 @@
                 <Setter Property="KeyboardNavigation.DirectionalNavigation" Value="Cycle" />
                 <Setter Property="DialogMargin" Value="35" />
                 <Setter Property="BorderThickness" Value="1" />
-                <Setter Property="Foreground" Value="{DynamicResource ContentDialogForeground}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource ContentDialogBorderBrush}" />
-                <Setter Property="Background" Value="{DynamicResource ContentDialogBackground}" />
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowBorderKey}}" />
+                <Setter Property="Background" Value="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowBackgroundKey}}" />
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type VsSolidityui:ToolWindowDialog}">
@@ -69,10 +69,10 @@
                                             <RowDefinition Height="*" />
                                             <RowDefinition Height="Auto" />
                                         </Grid.RowDefinitions>
-                                        <Border Background="{DynamicResource ContentDialogTopOverlay}" CornerRadius="{StaticResource DialogOverlayCornerRadius}" />
+                                        <Border Background="Transparent" CornerRadius="{StaticResource DialogOverlayCornerRadius}" />
                                         <Grid
                                  Grid.Row="0"
-                                 Margin="24,10"
+                                 Margin="16,6"
                                  Focusable="False">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto" />
@@ -81,7 +81,7 @@
 
                                             <ContentPresenter
                                      Grid.Row="0"
-                                     Margin="0,12,0,0"
+                                     Margin="0,4,0,0"
                                      Content="{TemplateBinding Title}"
                                      ContentTemplate="{TemplateBinding TitleTemplate}"
                                      TextBlock.FontSize="14"
@@ -96,7 +96,7 @@
                                             <controls:PassiveScrollViewer
                                      x:Name="PART_ContentScroll"
                                      Grid.Row="1"
-                                     Margin="0,20"
+                                     Margin="0,10"
                                      Padding="0,0,12,0"
                                      CanContentScroll="{TemplateBinding ScrollViewer.CanContentScroll}"
                                      HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
@@ -133,16 +133,19 @@
 
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition x:Name="PrimaryColumn" Width="*" />
+                                                    <!-- Leading filler pushes the buttons to the right, like native VS dialogs. -->
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition x:Name="PrimaryColumn" Width="Auto" />
                                                     <ColumnDefinition x:Name="FirstSpacer" Width="8" />
-                                                    <ColumnDefinition x:Name="SecondaryColumn" Width="*" />
+                                                    <ColumnDefinition x:Name="SecondaryColumn" Width="Auto" />
                                                     <ColumnDefinition x:Name="SecondSpacer" Width="8" />
-                                                    <ColumnDefinition x:Name="CloseColumn" Width="*" />
+                                                    <ColumnDefinition x:Name="CloseColumn" Width="Auto" />
                                                 </Grid.ColumnDefinitions>
 
                                                 <controls:Button
-                                         Grid.Column="0"
+                                         Grid.Column="1"
                                          HorizontalAlignment="Stretch"
+                                         MinWidth="75"
                                          Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogButtonStyleKey}}"
                                          Appearance="{TemplateBinding PrimaryButtonAppearance}"
                                          Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type controls:ContentDialog}}, Mode=OneTime, Path=TemplateButtonCommand}"
@@ -154,8 +157,9 @@
                                                                      ConverterParameter={x:Static controls:ContentDialogButton.Primary}}" />
 
                                                 <controls:Button
-                                         Grid.Column="2"
+                                         Grid.Column="3"
                                          HorizontalAlignment="Stretch"
+                                         MinWidth="75"
                                          Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogButtonStyleKey}}"
                                          Appearance="{TemplateBinding SecondaryButtonAppearance}"
                                          Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type controls:ContentDialog}}, Mode=OneTime, Path=TemplateButtonCommand}"
@@ -167,8 +171,9 @@
                                                                      ConverterParameter={x:Static controls:ContentDialogButton.Secondary}}" />
 
                                                 <controls:Button
-                                         Grid.Column="4"
+                                         Grid.Column="5"
                                          HorizontalAlignment="Stretch"
+                                         MinWidth="75"
                                          Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogButtonStyleKey}}"
                                          Appearance="{TemplateBinding CloseButtonAppearance}"
                                          Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type controls:ContentDialog}}, Mode=OneTime, Path=TemplateButtonCommand}"
