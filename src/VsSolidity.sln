@@ -33,6 +33,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{B2FECAA9-8
 		..\.gitignore = ..\.gitignore
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "User", "User", "{4E056F8A-1EB1-474F-9974-C6229E6441A1}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\blockchain-explorer.md = ..\docs\blockchain-explorer.md
+		..\docs\building-and-compiling.md = ..\docs\building-and-compiling.md
+		..\docs\creating-a-project.md = ..\docs\creating-a-project.md
+		..\docs\deploy-smart-contract.md = ..\docs\deploy-smart-contract.md
+		..\docs\dotnet-bindings.md = ..\docs\dotnet-bindings.md
+		..\docs\editing-solidity.md = ..\docs\editing-solidity.md
+		..\docs\README.md = ..\docs\README.md
+		..\docs\run-smart-contract.md = ..\docs\run-smart-contract.md
+		..\docs\static-analysis.md = ..\docs\static-analysis.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -89,6 +102,7 @@ Global
 		{90BA4A89-26AA-4E2D-86EF-F5CC2420EB61} = {324737DF-8DE5-435F-A30C-40AA3E22418E}
 		{99ED2062-8DD2-4969-972C-C9DC81EBF869} = {324737DF-8DE5-435F-A30C-40AA3E22418E}
 		{D1FB6478-62C3-C1AF-67BF-11E03E44EFB4} = {2E47F7C6-FFA9-4DC9-9D13-8C27CAD0478F}
+		{4E056F8A-1EB1-474F-9974-C6229E6441A1} = {B2FECAA9-8BBF-4FD0-B67C-C393392C1050}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {59B9FDF3-2BE8-4EFA-AD36-9AB47885530E}

@@ -364,6 +364,7 @@ namespace VsSolidity
             string slitherAnalysisOutputPath = Path.Combine(outputdir, "slither-analysis.json");
             if (File.Exists(slitherAnalysisOutputPath))
             {
+                if (File.Exists(slitherAnalysisOutputPath + ".bak")) File.Delete(slitherAnalysisOutputPath + ".bak");
                 File.Move(slitherAnalysisOutputPath, slitherAnalysisOutputPath + ".bak");
             }
             string slitherargs = $"\"{ProjectDir}\" --compile-force-framework solc --solc \"{SolcPath}\" --solc-args \"--base-path {ProjectDir} --include-path {Path.Combine(ProjectDir, "node_modules")} \" --json {slitherAnalysisOutputPath}";

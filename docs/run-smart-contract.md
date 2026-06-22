@@ -1,0 +1,90 @@
+# Run a Smart Contract
+
+Once a contract is deployed and listed in the
+[Blockchain Explorer](blockchain-explorer.md), you can interact with it directly
+from Visual Studio — calling its read‑only functions to inspect state, or
+sending transactions to functions that change state.
+
+![The Run Contract dialog](https://ajb.nyc3.cdn.digitaloceanspaces.com/vssolidity/docs/images/run-contract-dialog.png)
+
+> **Where to run a contract:** running a contract is done from the
+> **Blockchain Explorer**, using the **Run Contract** dialog described below.
+
+## Opening the Run Contract dialog
+
+In the [Blockchain Explorer](blockchain-explorer.md), expand a network's
+**Contracts** folder, then either:
+
+- right‑click the contract and choose **Run…**, or
+- right‑click the contract, choose **Edit…**, and click **Run** in the contract
+  details dialog.
+
+The **Run contract** dialog opens for that contract.
+
+## What the dialog shows
+
+- **Contract balance** — the contract's current balance (in ETH) is fetched and
+  displayed at the top.
+- **A button for every function** in the contract's ABI. Functions that take
+  arguments show one input box per parameter, each labelled with its name and
+  Solidity type.
+
+## Calling a function (read‑only)
+
+By default the dialog is in **call** mode — the **Transact (requires gas)**
+checkbox is unchecked.
+
+1. Fill in any parameters for the function.
+2. Click the function's button.
+
+The function is executed as a read‑only **call**: it returns a value without
+changing on‑chain state and without costing gas. The return value is shown in
+the dialog and written to the **VsSolidity** output pane.
+
+This is the right mode for `view` / `pure` functions and for reading public
+state.
+
+## Sending a transaction (state‑changing)
+
+To call a function that changes state, you must send a **transaction**, which
+requires an account to send from and gas to pay for it.
+
+1. Check **Transact (requires gas)**. This enables the transaction options:
+   - **Account** — the address the transaction is sent from. It is pre‑filled
+     from the contract; change it if you want to send from a different account.
+   - **Private Key (optional)** — the key used to sign, if required.
+   - **Gas Limit** — choose **Estimated Gas**, or select **Custom** and enter a
+     specific gas limit (default `3000000`).
+2. Fill in the function's parameters.
+3. Click the function's button.
+
+The transaction is submitted to the network. The result (or any error) is shown
+in the dialog and logged to the **VsSolidity** output pane.
+
+## Reading the results
+
+Every call and transaction is recorded in the **VsSolidity** pane of the
+**Output** window (**View → Output → Show output from: VsSolidity**), including:
+
+- the contract address and endpoint,
+- the function name and the arguments you passed,
+- the returned value, or the failure reason if it didn't succeed.
+
+Keep this pane open while you work so you have a running log of what was sent and
+what came back.
+
+## Tips
+
+- If a function reports a parameter error, check that you supplied a value for
+  **every** parameter and that each value matches the parameter's Solidity type
+  shown in its label.
+- Use a read‑only **call** first to confirm inputs and behavior, then check
+  **Transact** only when you actually want to change on‑chain state.
+- To run a contract you deployed from a different machine or session, make sure
+  it is listed under the correct network's **Contracts** folder in the
+  Blockchain Explorer, with its ABI populated.
+
+## See also
+
+- [Blockchain Explorer](blockchain-explorer.md)
+- [Deploy a Smart Contract](deploy-smart-contract.md)

@@ -218,7 +218,7 @@ namespace VsSolidity
             }
             else
             {
-                VSUtil.LogError("VsSolidity", $"Slither analysis of {filePath} did not complete successfully. {stdout} {stderr}");
+                VSUtil.LogError("VsSolidity", $"Slither analysis of {filePath} did not complete successfully. {stdout} {stderr}\nCheck if any build errors are present.");
                 return null;
             }
         }

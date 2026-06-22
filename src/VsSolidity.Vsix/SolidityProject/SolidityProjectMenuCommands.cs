@@ -124,11 +124,12 @@ namespace VsSolidity
             var filepath = item.ProjectItem.FileNames[1];
             var outputDir = Path.Combine(Path.GetDirectoryName(project.FileName), project.ConfigurationManager.ActiveConfiguration.Properties.Item("OutputPath").Value.ToString());
             var compilerVersion = VSUtil.GetProjectProperty(project, "CompilerVersion");
-            var r = await SolidityCompiler.AnalyzeAsync(filepath, projectdir, outputDir, compilerVersion);            
-            var window = (SolidityStaticAnalysisToolWindow) await this.package.ShowToolWindowAsync(typeof(SolidityStaticAnalysisToolWindow), 0, true, this.package.DisposalToken);
-            window.control.AnalyzeProjectFileItem(filepath, projectdir, r);
-
-
+            var r = await SolidityCompiler.AnalyzeAsync(filepath, projectdir, outputDir, compilerVersion);
+            if (r != null)
+            {
+                var window = (SolidityStaticAnalysisToolWindow)await this.package.ShowToolWindowAsync(typeof(SolidityStaticAnalysisToolWindow), 0, true, this.package.DisposalToken);
+                window.control.AnalyzeProjectFileItem(filepath, projectdir, r);
+            }
         }
 #pragma warning disable VSTHRD110, CS4014
         private void CompileFile(object sender, EventArgs e) => CompileFileAsync();
