@@ -625,10 +625,7 @@ namespace VsSolidity.UI
                 endpoint.SelectedValue = item.Data["Endpoint"];
                 accounts.ItemsSource = item.Parent.Parent.GetNetworkAccounts();
                 accounts.SelectedValue = item.Data["Account"];
-                if (item.Data.ContainsKey("PrivateKey"))
-                {
-                    pkey.Text = item.GetDeployProfilePrivateKey();  
-                }
+                pkey.Text = item.TryGetDeployProfilePrivateKey() ?? "";
                 var validForClose = false;
 
                 dw.ButtonClicked += (cd, args) =>
@@ -894,6 +891,7 @@ namespace VsSolidity.UI
                 var transactCheckBox = (CheckBox)((_sp).Children[0]);
                 var transactPanel = (StackPanel)((_sp).Children[1]);    
                 var fromAddressTextBox = (Wpc.TextBox)((StackPanel)(transactPanel).Children[0]).Children[1];
+                var privateKeyPasswordBox = (Wpc.PasswordBox)((StackPanel)(transactPanel).Children[0]).Children[3];
                 var estimateGasRadioButton = (RadioButton) ((StackPanel)(((StackPanel)transactPanel.Children[0]).Children[4])).Children[1];
                 var customGasRadioButton = (RadioButton) ((StackPanel) (((StackPanel)(((StackPanel)transactPanel.Children[0]).Children[4])).Children[2])).Children[0];
                 var customGasNumberBox = (Wpc.TextBox)((StackPanel)(((StackPanel)(((StackPanel)transactPanel.Children[0]).Children[4])).Children[2])).Children[1];
@@ -916,7 +914,7 @@ namespace VsSolidity.UI
                 };  
                 var formPanel = (StackPanel)(_sp).Children[2];
                 var statusPanel = ((StackPanel)(_sp).Children[3]);
-                await CreateRunContractFormAsync(formPanel, statusPanel, item.Data, transactCheckBox, fromAddressTextBox, () => (estimateGasRadioButton.IsChecked ?? false) ? null : new HexBigInteger(long.TryParse(customGasNumberBox.Text, out var cg) ? cg : 3000000L));
+                await CreateRunContractFormAsync(formPanel, statusPanel, item.Data, transactCheckBox, fromAddressTextBox, () => privateKeyPasswordBox.Password, () => (estimateGasRadioButton.IsChecked ?? false) ? null : new HexBigInteger(long.TryParse(customGasNumberBox.Text, out var cg) ? cg : 3000000L));
                 dw.ButtonClicked += (cd, args) => { };
                 dw.Closing += (d, args) => { };
                 await dw.ShowAsync();                             
@@ -980,7 +978,7 @@ namespace VsSolidity.UI
 
         private void HideValidationSuccess(StackPanel successPanel) => successPanel.Visibility = Visibility.Hidden;
 
-        private async Task CreateRunContractFormAsync(StackPanel form, StackPanel statusPanel, Dictionary<string, object> contractData, CheckBox transactCheckBox, Wpc.TextBox fromAddress, Func<HexBigInteger> gas)
+        private async Task CreateRunContractFormAsync(StackPanel form, StackPanel statusPanel, Dictionary<string, object> contractData, CheckBox transactCheckBox, Wpc.TextBox fromAddress, Func<string> privateKey, Func<HexBigInteger> gas)
         {
             form.Children.Clear();  
             var errors = (Wpc.TextBlock)((Grid)statusPanel.Children[0]).Children[0];
@@ -1095,7 +1093,7 @@ namespace VsSolidity.UI
                                 ShowValidationErrors(errors, "Enter a valid from address to send the transaction from.");
                                 return;
                             }
-                            r = ThreadHelper.JoinableTaskFactory.Run(() => ExecuteAsync(Network.SendContractTransactionAsync(rpcurl, address, abi, function.Name, fromAddress.Text, gas:gas(), functionInput: paramVals)));
+                            r = ThreadHelper.JoinableTaskFactory.Run(() => ExecuteAsync(Network.SendContractTransactionAsync(rpcurl, address, abi, function.Name, fromAddress.Text, privateKey: privateKey(), gas:gas(), functionInput: paramVals)));
                         }
                         else
                         {
@@ -1131,7 +1129,7 @@ namespace VsSolidity.UI
                                 ShowValidationErrors(errors, "Enter a valid from address to send the transaction from.");
                                 return;
                             }
-                            r = ThreadHelper.JoinableTaskFactory.Run(() => ExecuteAsync(Network.SendContractTransactionAsync(rpcurl, address, abi, function.Name, fromAddress.Text, gas:gas())));
+                            r = ThreadHelper.JoinableTaskFactory.Run(() => ExecuteAsync(Network.SendContractTransactionAsync(rpcurl, address, abi, function.Name, fromAddress.Text, privateKey: privateKey(), gas:gas())));
                         }
                         else
                         {

@@ -46,10 +46,8 @@ A typical end‑to‑end workflow looks like this:
 - The **.NET SDK** (`dotnet`) is needed to generate the C# contract
   [bindings](dotnet-bindings.md) during a build.
 - To deploy or run a contract you need a running EVM node or a reachable
-  JSON‑RPC endpoint. A local [Ganache](https://trufflesuite.com/ganache/) node
-  at `http://127.0.0.1:7545` is detected automatically the first time you open
-  the Blockchain Explorer and, if found, is seeded as a ready‑to‑use **Ganache**
-  network with a sample deploy profile.
+  JSON‑RPC endpoint. You can use [Ganache](https://trufflesuite.com/ganache/) node
+  with endpoint typically at `http://127.0.0.1:7545`
 - To deploy, your Solidity project must build successfully — VsSolidity compiles
   it as part of the deploy step.
 

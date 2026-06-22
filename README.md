@@ -1,31 +1,29 @@
 # VsSolidity
 
-**VsSolidity** is a Visual Studio extension for developing, building, and
-deploying [Solidity](https://soliditylang.org/) smart contracts to
-EVM‑compatible blockchains — without leaving the IDE.
+**VsSolidity** is a Visual Studio extension for developing, building, and deploying [Solidity](https://soliditylang.org/) smart contracts.
+
 
 ![Blockchain Explorer](https://ajb.nyc3.cdn.digitaloceanspaces.com/vssolidity/docs/images/blockchain-explorer.png)
 
 ## Features
 
-- **Solidity project system** — a first‑class project type with Solidity
-  compiler integration via MSBuild and npm dependency management.
-- **Rich editing** — syntax highlighting, hover information, IntelliSense, and
-  linting powered by the
-  [vscode‑solidity](https://github.com/juanfranblanco/vscode-solidity) language
+- **Solidity project system** — First‑class Visual Studio project type with Solidity
+  compiler integration and npm dependency management.
+- Integrates with the Visual Studio **New Project…** and **Open Folder…**
+  experiences.
+- - **Rich editing** — syntax highlighting, hover information, IntelliSense, and
+  linting. Uses the  [vscode‑solidity](https://github.com/juanfranblanco/vscode-solidity) language
   server.
-- **Build & compile** — compile projects and individual files from the IDE or on
+- **Integration with Visual Studio Build command and MSBuild** — compile Solidity projects and individual files from the IDE or on
   the command line with MSBuild, with errors reported in the Error List.
-- **.NET bindings** — strongly‑typed C# contract bindings generated on every
-  build (via Nethereum).
-- **Static analysis** — find vulnerabilities and code‑quality issues with
-  [Slither](https://github.com/crytic/slither), shown inside Visual Studio.
 - **Blockchain Explorer** — manage EVM networks, endpoints, accounts, deploy
   profiles, and deployed contracts.
 - **Deploy & run** — deploy a compiled contract to a network and call its
   functions or send transactions, all from the IDE.
-- Integrates with the Visual Studio **New Project…** and **Open Folder…**
-  experiences.
+- - **.NET bindings** — strongly‑typed C# contract bindings generated on every
+  build (via Nethereum).
+- **Static analysis** — find vulnerabilities and code‑quality issues with
+  [Slither](https://github.com/crytic/slither), shown inside Visual Studio.
 
 ## Documentation
 

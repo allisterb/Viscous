@@ -33,20 +33,33 @@ namespace VsSolidity.Ethereum
 
         public static Nethereum.Contracts.Contract GetContract(string rpcurl, string contractAddress, string abi = null) => new Web3(rpcurl).Eth.GetContract(abi ?? "", contractAddress);
 
-        public static async Task<TransactionReceipt> DeployContract(string rpcurl, string bytecode, string account, string password = null, string abi = null, HexBigInteger gasDeploy = default, object[] values = null)
+        public static async Task<TransactionReceipt> DeployContract(string rpcurl, string bytecode, string account, string privateKey = null, string abi = null, HexBigInteger gasDeploy = default, object[] values = null)
         {
-            var web3 = new Web3(rpcurl);
+            Web3 web3;
+            if (!string.IsNullOrEmpty(privateKey))
+            {
+                // Sign locally with the account's private key. Works against any JSON-RPC endpoint,
+                // including hosted providers that don't expose the node-side personal_* API.
+                var chainId = await new Web3(rpcurl).Eth.ChainId.SendRequestAsync();
+                var signer = new Nethereum.Web3.Accounts.Account(privateKey, chainId.Value);
+                web3 = new Web3(signer, rpcurl);
+                account = signer.Address;
+            }
+            else
+            {
+                // Fall back to a node-managed (unlocked) account, e.g. a local Ganache/Geth node.
+                web3 = new Web3(rpcurl);
+                if (!await web3.Personal.UnlockAccount.SendRequestAsync(account, "", new HexBigInteger(30)))
+                {
+                    throw new Exception("Could not unlock the account on the node. Provide the account's private key in the deploy profile, or deploy to a node that has the account unlocked.");
+                }
+            }
 
             if (gasDeploy == null)
             {
                 gasDeploy = await web3.Eth.DeployContract.EstimateGasAsync(abi, bytecode, account, values);
             }
-         
-            if (!await web3.Personal.UnlockAccount.SendRequestAsync(account, "", new HexBigInteger(30)))
-            {
-                throw new Exception("Could not unlock account using provided password.");
-            }                                    
-            return await web3.Eth.DeployContract.SendRequestAndWaitForReceiptAsync(abi, bytecode, account, gasDeploy, values: values);            
+            return await web3.Eth.DeployContract.SendRequestAndWaitForReceiptAsync(abi, bytecode, account, gasDeploy, values: values);
         }
 
         public static async Task<string> CallContractAsync(string rpcurl, string contractAddress, string abi, string functionName, HexBigInteger gas = null, HexBigInteger value = null, params object[] functionInput)
@@ -55,15 +68,29 @@ namespace VsSolidity.Ethereum
             return await func.CallAsync(func.CreateCallInput(functionInput));
         }
 
-        public static async Task<string> SendContractTransactionAsync(string rpcurl, string contractAddress, string abi, string functionName, string fromAddress = null, HexBigInteger gas = null, HexBigInteger value = null, params object[] functionInput)
+        public static async Task<string> SendContractTransactionAsync(string rpcurl, string contractAddress, string abi, string functionName, string fromAddress = null, string privateKey = null, HexBigInteger gas = null, HexBigInteger value = null, params object[] functionInput)
         {
-            var web3 = new Web3(rpcurl);
-            var func = web3.Eth.GetContract(abi, contractAddress).GetFunction(functionName);
-
-            if (!await web3.Personal.UnlockAccount.SendRequestAsync(fromAddress, "", new HexBigInteger(30)))
+            Web3 web3;
+            if (!string.IsNullOrEmpty(privateKey))
             {
-                throw new Exception("Could not unlock account using provided password.");
+                // Sign locally with the account's private key. Works against any JSON-RPC endpoint,
+                // including hosted providers that don't expose the node-side personal_* API.
+                var chainId = await new Web3(rpcurl).Eth.ChainId.SendRequestAsync();
+                var signer = new Nethereum.Web3.Accounts.Account(privateKey, chainId.Value);
+                web3 = new Web3(signer, rpcurl);
+                fromAddress = signer.Address;
             }
+            else
+            {
+                // Fall back to a node-managed (unlocked) account, e.g. a local Ganache/Geth node.
+                web3 = new Web3(rpcurl);
+                if (!await web3.Personal.UnlockAccount.SendRequestAsync(fromAddress, "", new HexBigInteger(30)))
+                {
+                    throw new Exception("Could not unlock the account on the node. Provide the account's private key, or use a node that has the account unlocked.");
+                }
+            }
+
+            var func = web3.Eth.GetContract(abi, contractAddress).GetFunction(functionName);
             if (gas == null)
             {
                 gas = await func.EstimateGasAsync(functionInput);

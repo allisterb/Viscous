@@ -320,36 +320,29 @@ namespace VsSolidity.UI.ViewModel
             }
         }
 
+        public string TryGetDeployProfilePrivateKey()
+        {
+            if (!Data.ContainsKey("PrivateKey") || Data["PrivateKey"] == null) return null;
+            try { return GetDeployProfilePrivateKey(); }
+            catch { return null; }
+        }
+
         public string GetDeployProfilePrivateKey()
         {
-            var data = (byte[])Data["PrivateKey"];
-            var length = BitConverter.ToInt32(data, 0);
-            var kdata = data.Skip(4).ToArray();
-            ProtectedMemory.Unprotect(kdata, MemoryProtectionScope.SameLogon);
-            return Encoding.UTF8.GetString(kdata.Take(length).ToArray());  
+            // The protected blob is a byte[] in-session, but Newtonsoft returns it as a base64 string
+            // after a JSON save/load round-trip, so accept both forms.
+            var raw = Data["PrivateKey"];
+            var data = raw is byte[] b ? b : Convert.FromBase64String((string)raw);
+            var decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.CurrentUser);
+            return Encoding.UTF8.GetString(decrypted);
         }
 
         public byte[] SetDeployProfilePrivateKey(string pkey)
         {
-            int roundUp(int numToRound, int multiple)
-            {
-                if (multiple == 0)
-                    return numToRound;
-
-                int remainder = numToRound % multiple;
-                if (remainder == 0)
-                    return numToRound;
-
-                return numToRound + multiple - remainder;
-            }
-
-            byte[] pkeydata = UnicodeEncoding.UTF8.GetBytes(pkey);
-            var len = pkeydata.Length;
-            var lb = BitConverter.GetBytes(len);
-            var round = roundUp(pkeydata.Length, 16);
-            Array.Resize(ref pkeydata, round);
-            ProtectedMemory.Protect(pkeydata, MemoryProtectionScope.SameLogon);
-            return lb.Concat(pkeydata).ToArray();
+            // DPAPI, scoped to the Windows user, so the key can still be decrypted across VS sessions and
+            // reboots. (ProtectedMemory/SameLogon only survives within a single logon session and is wrong
+            // for data that gets persisted to disk.)
+            return ProtectedData.Protect(Encoding.UTF8.GetBytes(pkey), null, DataProtectionScope.CurrentUser);
         }
         #endregion
     }

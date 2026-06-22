@@ -152,7 +152,8 @@ namespace VsSolidity.UI
             var bin = "0x" + File.ReadAllText(bo["bin"].FullName);
             var abi = File.ReadAllText(bo["abi"].FullName);
             HexBigInteger gasDeploy = EstimatedGasFeeRadioButton.IsChecked == true ? default : new HexBigInteger(long.TryParse(CustomGasFeeNumberBox.Text, out var customGas) ? customGas : 3000000L);
-            var result = ThreadHelper.JoinableTaskFactory.Run(() => ExecuteAsync(Network.DeployContract(deployProfile.DeployProfileEndpoint, bin, deployProfile.DeployProfileAccount, null, abi, gasDeploy, deployValues)));
+            var deployPrivateKey = deployProfile.TryGetDeployProfilePrivateKey();
+            var result = ThreadHelper.JoinableTaskFactory.Run(() => ExecuteAsync(Network.DeployContract(deployProfile.DeployProfileEndpoint, bin, deployProfile.DeployProfileAccount, deployPrivateKey, abi, gasDeploy, deployValues)));
             if (result.IsSuccess)
             {
                 var deployedOn = DateTime.Now;
