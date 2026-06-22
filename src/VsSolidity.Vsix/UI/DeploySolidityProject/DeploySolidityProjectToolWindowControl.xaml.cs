@@ -82,8 +82,14 @@ namespace VsSolidity.UI
             if (CustomGasFeeNumberBox != null)
             {
                 CustomGasFeeNumberBox.IsEnabled = true;
-            }   
-            
+            }
+
+        }
+
+        // Restrict the gas/value inputs (now plain VS TextBoxes) to digits.
+        private void NumericOnly_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            e.Handled = !e.Text.All(char.IsDigit);
         }
 
         private void DeployContractComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -145,7 +151,7 @@ namespace VsSolidity.UI
             ShowDeployProgress($"Deploying {contract[0]} contract to {network}...");
             var bin = "0x" + File.ReadAllText(bo["bin"].FullName);
             var abi = File.ReadAllText(bo["abi"].FullName);
-            HexBigInteger gasDeploy = EstimatedGasFeeRadioButton.IsChecked == true ? default : new HexBigInteger((long)CustomGasFeeNumberBox.Value);            
+            HexBigInteger gasDeploy = EstimatedGasFeeRadioButton.IsChecked == true ? default : new HexBigInteger(long.TryParse(CustomGasFeeNumberBox.Text, out var customGas) ? customGas : 3000000L);
             var result = ThreadHelper.JoinableTaskFactory.Run(() => ExecuteAsync(Network.DeployContract(deployProfile.DeployProfileEndpoint, bin, deployProfile.DeployProfileAccount, null, abi, gasDeploy, deployValues)));
             if (result.IsSuccess)
             {
@@ -272,6 +278,8 @@ namespace VsSolidity.UI
                 lbl.Inlines.Add(new Run() { Text = p.Key });
                 lbl.Inlines.Add(new Run() { Text = $" ({p.Value})", FontStyle = FontStyles.Italic, FontSize = 10.0 });
                 var tb = new TextBox() { Name = $"Param{p.Key}TextBox", Width = 150, VerticalAlignment = VerticalAlignment.Center, FontSize = 11.0 };
+                // Apply the VS themed-dialog textbox style (theme-aware) so it matches the rest of the form instead of the WPF-UI default.
+                tb.SetResourceReference(FrameworkElement.StyleProperty, VsResourceKeys.ThemedDialogTextBoxStyleKey);
                 sp.Children.Add(lbl);
                 sp.Children.Add(tb);
                 ContractDeployParamsStackPanel.Children.Add(sp);

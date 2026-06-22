@@ -9,7 +9,11 @@
              xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0" 
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="100"
-             Name="RunSmartContract">
+             Name="RunSmartContract"
+             Background="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowBackgroundKey}}"
+             Foreground="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}"
+             FontFamily="{DynamicResource {x:Static vsshell:VsFonts.EnvironmentFontFamilyKey}}"
+             FontSize="{DynamicResource {x:Static vsshell:VsFonts.EnvironmentFontSizeKey}}">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -22,7 +26,16 @@
             <Style x:Key="DialogStyle" TargetType="{x:Type StackPanel}">
                 <Style.Resources>
                     <Style TargetType="{x:Type Label}" BasedOn="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogLabelStyleKey}}" />
-                    <Style TargetType="{x:Type ui:TextBox}" BasedOn="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogTextBoxStyleKey}}" />
+                    <Style TargetType="{x:Type ui:TextBox}" BasedOn="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogTextBoxStyleKey}}">
+                        <!-- Constrain WPF-UI's tall (~32px) Fluent input to the native VS single-line height. -->
+                        <Setter Property="MinHeight" Value="22" />
+                        <Setter Property="Padding" Value="2,1" />
+                        <Setter Property="FontSize" Value="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}" />
+                    </Style>
+                    <Style TargetType="{x:Type ui:TextBlock}">
+                        <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}" />
+                        <Setter Property="FontSize" Value="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}" />
+                    </Style>
                 </Style.Resources>
             </Style>
 

@@ -896,7 +896,7 @@ namespace VsSolidity.UI
                 var fromAddressTextBox = (Wpc.TextBox)((StackPanel)(transactPanel).Children[0]).Children[1];
                 var estimateGasRadioButton = (RadioButton) ((StackPanel)(((StackPanel)transactPanel.Children[0]).Children[4])).Children[1];
                 var customGasRadioButton = (RadioButton) ((StackPanel) (((StackPanel)(((StackPanel)transactPanel.Children[0]).Children[4])).Children[2])).Children[0];
-                var customGasNumberBox = (Wpc.NumberBox)((StackPanel)(((StackPanel)(((StackPanel)transactPanel.Children[0]).Children[4])).Children[2])).Children[1];
+                var customGasNumberBox = (Wpc.TextBox)((StackPanel)(((StackPanel)(((StackPanel)transactPanel.Children[0]).Children[4])).Children[2])).Children[1];
                 fromAddressTextBox.Text = (string)item.Data["Address"];                                
                 transactCheckBox.Checked += (s, ev) =>
                 {
@@ -916,7 +916,7 @@ namespace VsSolidity.UI
                 };  
                 var formPanel = (StackPanel)(_sp).Children[2];
                 var statusPanel = ((StackPanel)(_sp).Children[3]);
-                await CreateRunContractFormAsync(formPanel, statusPanel, item.Data, transactCheckBox, fromAddressTextBox, () => (estimateGasRadioButton.IsChecked ?? false) ? null : new HexBigInteger((long) customGasNumberBox.Value));
+                await CreateRunContractFormAsync(formPanel, statusPanel, item.Data, transactCheckBox, fromAddressTextBox, () => (estimateGasRadioButton.IsChecked ?? false) ? null : new HexBigInteger(long.TryParse(customGasNumberBox.Text, out var cg) ? cg : 3000000L));
                 dw.ButtonClicked += (cd, args) => { };
                 dw.Closing += (d, args) => { };
                 await dw.ShowAsync();                             
@@ -1037,15 +1037,14 @@ namespace VsSolidity.UI
                 {
                     Name = function.Name + "_Button",
                     Content = function.Name,
-                    Width=125.0,
-                    Foreground = System.Windows.Media.Brushes.White,
-                    Background = System.Windows.Media.Brushes.DodgerBlue,
-                    Icon = new SymbolIcon(SymbolRegular.Play12),
+                    MinWidth = 75.0,
                     VerticalAlignment = VerticalAlignment.Center,
                     HorizontalAlignment = HorizontalAlignment.Right,
-                    FontSize =11.0,
-                    Margin = new Thickness(0,4,0,0)
+                    FontSize = 11.0,
+                    Margin = new Thickness(0, 4, 0, 0)
                 };
+                // VS themed-dialog button (theme-aware) instead of the hardcoded DodgerBlue/White Fluent accent button.
+                button.SetResourceReference(FrameworkElement.StyleProperty, Microsoft.VisualStudio.Shell.VsResourceKeys.ThemedDialogButtonStyleKey);
 
                 if (function.InputParameters != null && function.InputParameters.Count() > 0)
                 {
@@ -1061,7 +1060,8 @@ namespace VsSolidity.UI
                         var lbl = new Wpc.TextBlock { Width = 100, VerticalAlignment = VerticalAlignment.Bottom};
                         lbl.Inlines.Add(new Run() { Text = p.Name });
                         lbl.Inlines.Add(new Run() { Text = $" ({p.Type}): ", FontStyle = FontStyles.Italic, FontSize=9.0});
-                        var tb = new Wpc.TextBox() { Name = $"Param{p.Name}TextBox", Width = 150, VerticalAlignment = VerticalAlignment.Bottom};
+                        var tb = new Wpc.TextBox() { Name = $"Param{p.Name}TextBox", Width = 150, VerticalAlignment = VerticalAlignment.Bottom };
+                        tb.SetResourceReference(FrameworkElement.StyleProperty, Microsoft.VisualStudio.Shell.VsResourceKeys.ThemedDialogTextBoxStyleKey);
                         sp.Children.Add(lbl);
                         sp.Children.Add(tb);
                         vsp.Children.Add(sp);

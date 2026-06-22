@@ -794,7 +794,7 @@
     </StackPanel>
 
     <StackPanel x:Key="RunContractDialog" Orientation="Vertical" VerticalAlignment="Top" Style="{DynamicResource DialogStyle}">
-        <CheckBox x:Name="RunContractTransactCheckbox" Content="Transact (requires gas)" VerticalAlignment="Center" Margin="1,0,0,2" IsChecked="False" />
+        <CheckBox x:Name="RunContractTransactCheckbox" Content="Transact (requires gas)" Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogCheckBoxStyleKey}}" VerticalAlignment="Center" Margin="1,0,0,2" IsChecked="False" />
         <StackPanel IsEnabled="False" >
             <StackPanel Orientation="Vertical">
                 <Label Content="Account:" VerticalAlignment="Center"  Margin="1,0,0,2" />
@@ -803,10 +803,10 @@
                 <ui:PasswordBox Name="RunContractAccountPrivateKeyPasswordBox" HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center"/>
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Left">
                     <Label Content="Gas Limit:"  Margin="4,0,0,2" />
-                    <RadioButton Content="Estimated Gas" GroupName="SmartContractGasGroup" IsChecked="True" FontSize="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}" Foreground="{DynamicResource {x:Static VsSolidityui:VSTheme.ToolWindowTextKey}}" />
+                    <RadioButton Content="Estimated Gas" Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogRadioButtonStyleKey}}" GroupName="SmartContractGasGroup" IsChecked="True" FontSize="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}" />
                     <StackPanel Orientation="Horizontal">
-                        <RadioButton Content="Custom"  GroupName="SmartContractGasGroup" FontSize="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}" Foreground="{DynamicResource {x:Static VsSolidityui:VSTheme.ToolWindowTextKey}}"/>
-                        <ui:NumberBox SpinButtonPlacementMode="Inline" Value="3000000" IsEnabled="False" HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center"/>
+                        <RadioButton Content="Custom" Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogRadioButtonStyleKey}}" GroupName="SmartContractGasGroup" FontSize="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}"/>
+                        <ui:TextBox Text="3000000" IsEnabled="False" HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center"/>
                     </StackPanel>
                 </StackPanel>
             </StackPanel>

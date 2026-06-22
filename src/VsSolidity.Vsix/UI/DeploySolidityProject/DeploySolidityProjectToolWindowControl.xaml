@@ -9,7 +9,9 @@
              xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
              xmlns:VsSolidityui="clr-namespace:VsSolidity.UI;assembly="
              Foreground="{DynamicResource {x:Static VsSolidityui:VSTheme.ToolWindowTextKey}}"
-             Background="{DynamicResource {x:Static VsSolidityui:VSTheme.ToolWindowBackgroundKey}}">
+             Background="{DynamicResource {x:Static VsSolidityui:VSTheme.ToolWindowBackgroundKey}}"
+             FontFamily="{DynamicResource {x:Static vsshell:VsFonts.EnvironmentFontFamilyKey}}"
+             FontSize="{DynamicResource {x:Static vsshell:VsFonts.EnvironmentFontSizeKey}}">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -37,7 +39,7 @@
                 </StackPanel>
                 <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left">
                     <Label Content="Select the contract to deploy:"  Margin="4,0,0,2" />
-                    <ComboBox x:Name="DeployContractComboBox"  Margin="4,0,0,2" Width="250" FontSize="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}" SelectionChanged="DeployContractComboBox_SelectionChanged" />
+                    <ComboBox x:Name="DeployContractComboBox" Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogComboBoxStyleKey}}" Margin="4,0,0,2" Width="250" FontSize="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}" SelectionChanged="DeployContractComboBox_SelectionChanged" />
                 </StackPanel>
 
                 <StackPanel x:Name="ContractDeployParamsStackPanel" Orientation="Vertical"  VerticalAlignment="Top" HorizontalAlignment="Left">
@@ -46,23 +48,23 @@
 
                 <StackPanel Orientation="Vertical"  VerticalAlignment="Top" HorizontalAlignment="Left">
                     <Label Content="Select the deploy profile:"  Margin="4,0,0,2" />
-                    <ComboBox x:Name="DeployProfileComboBox" GotFocus="DeployProfileComboBox_GotFocus" Margin="4,0,0,2" Width="200" FontSize="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}" Height="36" />
+                    <ComboBox x:Name="DeployProfileComboBox" Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogComboBoxStyleKey}}" GotFocus="DeployProfileComboBox_GotFocus" Margin="4,0,0,2" Width="200" FontSize="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}" />
                 </StackPanel>
 
                 <Separator />
 
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Left">
                     <Label Content="Gas Limit:"  Margin="4,0,0,2" />
-                    <RadioButton Content="Estimated Gas" Name="EstimatedGasFeeRadioButton" GroupName="SmartContractGasGroup" Checked="EstimatedGasFeeRadioButton_Checked" IsChecked="True" FontSize="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}" Foreground="{DynamicResource {x:Static VsSolidityui:VSTheme.ToolWindowTextKey}}" />
+                    <RadioButton Content="Estimated Gas" Name="EstimatedGasFeeRadioButton" Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogRadioButtonStyleKey}}" GroupName="SmartContractGasGroup" Checked="EstimatedGasFeeRadioButton_Checked" IsChecked="True" FontSize="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}" />
                     <StackPanel Orientation="Horizontal">
-                        <RadioButton Content="Custom"  Name="CustomGasFeeRadioButton" GroupName="SmartContractGasGroup" Checked="CustomGasFeeRadioButton_Checked" FontSize="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}" Foreground="{DynamicResource {x:Static VsSolidityui:VSTheme.ToolWindowTextKey}}"/>
-                        <ui:NumberBox SpinButtonPlacementMode="Inline"  Name="CustomGasFeeNumberBox" Value="3000000" IsEnabled="False" Width="150" Margin="0,2,10,4" VerticalAlignment="Center"/>
+                        <RadioButton Content="Custom"  Name="CustomGasFeeRadioButton" Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogRadioButtonStyleKey}}" GroupName="SmartContractGasGroup" Checked="CustomGasFeeRadioButton_Checked" FontSize="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}"/>
+                        <ui:TextBox Name="CustomGasFeeNumberBox" Text="3000000" IsEnabled="False" Width="150" Margin="0,2,10,4" VerticalAlignment="Center" PreviewTextInput="NumericOnly_PreviewTextInput" />
                     </StackPanel>
                 </StackPanel>
 
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Label Content="Value:"  Margin="4,0,0,2" />
-                    <ui:NumberBox SpinButtonPlacementMode="Inline"  Name="ValueNumberBox" Value="0" Width="150" Margin="0,2,0,4" VerticalAlignment="Center"/>
+                    <ui:TextBox Name="ValueNumberBox" Text="0" Width="150" Margin="0,2,0,4" VerticalAlignment="Center" PreviewTextInput="NumericOnly_PreviewTextInput" />
                 </StackPanel>
             </StackPanel>
 
@@ -89,8 +91,8 @@
             </Grid>
             
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
-                <ui:Button Name="DeployButton" Appearance="Primary" Content="Deploy" Margin="0,10,0,0" Width="100" Height="36" Click="DeployButton_Click" />
-                <ui:Button Name="CancelButton" Appearance="Secondary" Content="Cancel" Margin="0,10,0,0" Width="100" Height="36" Click="CancelButton_Click" />
+                <ui:Button Name="DeployButton" Content="Deploy" Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogButtonStyleKey}}" MinWidth="75" Margin="0,10,8,0" Click="DeployButton_Click" />
+                <ui:Button Name="CancelButton" Content="Cancel" Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogButtonStyleKey}}" MinWidth="75" Margin="0,10,0,0" Click="CancelButton_Click" />
             </StackPanel>
         </StackPanel>
     </Grid>
