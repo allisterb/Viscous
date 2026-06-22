@@ -58,13 +58,13 @@
                     <RadioButton Content="Estimated Gas" Name="EstimatedGasFeeRadioButton" Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogRadioButtonStyleKey}}" GroupName="SmartContractGasGroup" Checked="EstimatedGasFeeRadioButton_Checked" IsChecked="True" FontSize="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}" />
                     <StackPanel Orientation="Horizontal">
                         <RadioButton Content="Custom"  Name="CustomGasFeeRadioButton" Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogRadioButtonStyleKey}}" GroupName="SmartContractGasGroup" Checked="CustomGasFeeRadioButton_Checked" FontSize="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}"/>
-                        <ui:TextBox Name="CustomGasFeeNumberBox" Text="3000000" IsEnabled="False" Width="150" Margin="0,2,10,4" VerticalAlignment="Center" PreviewTextInput="NumericOnly_PreviewTextInput" />
+                        <ui:TextBox Name="CustomGasFeeNumberBox" Text="3000000" IsEnabled="False" Width="150" Margin="4,2,10,4" VerticalAlignment="Center" PreviewTextInput="NumericOnly_PreviewTextInput" />
                     </StackPanel>
                 </StackPanel>
 
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Label Content="Value:"  Margin="4,0,0,2" />
-                    <ui:TextBox Name="ValueNumberBox" Text="0" Width="150" Margin="0,2,0,4" VerticalAlignment="Center" PreviewTextInput="NumericOnly_PreviewTextInput" />
+                    <ui:TextBox Name="ValueNumberBox" Text="0" Width="150" Margin="4,2,0,4" VerticalAlignment="Center" PreviewTextInput="NumericOnly_PreviewTextInput" />
                 </StackPanel>
             </StackPanel>
 
@@ -91,7 +91,7 @@
             </Grid>
             
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
-                <ui:Button Name="DeployButton" Content="Deploy" Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogButtonStyleKey}}" MinWidth="75" Margin="0,10,8,0" Click="DeployButton_Click" />
+                <ui:Button Name="DeployButton" Content="Deploy" Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogButtonStyleKey}}" MinWidth="75" Margin="4,10,8,0" Click="DeployButton_Click" />
                 <ui:Button Name="CancelButton" Content="Cancel" Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogButtonStyleKey}}" MinWidth="75" Margin="0,10,0,0" Click="CancelButton_Click" />
             </StackPanel>
         </StackPanel>

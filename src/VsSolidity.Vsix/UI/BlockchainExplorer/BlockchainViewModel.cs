@@ -212,7 +212,7 @@ namespace VsSolidity.UI.ViewModel
             return GetChildren(BlockchainInfoKind.UserFolder)
                 .SelectMany(f => f.GetChildren(BlockchainInfoKind.Network))
                 .SelectMany(ni => ni.GetChild("Deploy Profiles", BlockchainInfoKind.Folder).GetChildren(BlockchainInfoKind.DeployProfile)
-                .Select(b => (ni.Parent.Name + "\\" + ni.Name + "(" + (long)ni.Data["ChainId"] + ")", b)))
+                .Select(b => (ni.Parent.Name + "\\" + ni.Name + "(" + ni.Data["ChainId"] + ")", b)))
                 .Concat(
                     GetChildren(BlockchainInfoKind.Network)
                     .SelectMany(bi => bi.GetChild("Deploy Profiles", BlockchainInfoKind.Folder).GetChildren(BlockchainInfoKind.DeployProfile))
@@ -226,11 +226,11 @@ namespace VsSolidity.UI.ViewModel
             return GetChildren(BlockchainInfoKind.UserFolder)
                 .SelectMany(f => f.GetChildren(BlockchainInfoKind.Network))
                 .SelectMany(ni => ni.GetChild("Contracts", BlockchainInfoKind.Folder).GetChildren(BlockchainInfoKind.Contract)
-                .Select(b => (ni.Parent.Name + "\\" + ni.Name + "(" + (long)ni.Data["ChainId"] + ")", b)))
+                .Select(b => (ni.Parent.Name + "\\" + ni.Name + "(" + ni.Data["ChainId"] + ")", b)))
                 .Concat(
                     GetChildren(BlockchainInfoKind.Network)
                     .SelectMany(bi => bi.GetChild("Contracts", BlockchainInfoKind.Folder).GetChildren(BlockchainInfoKind.Contract))
-                    .Select(bi => (bi.Name + "(" + (long)bi.Parent.Parent.Data["ChainId"] + ")", bi))
+                    .Select(bi => (bi.Name + "(" + bi.Parent.Parent.Data["ChainId"] + ")", bi))
                 ).ToDictionary(b => b.Item1, b => b.Item2);
         }
 
