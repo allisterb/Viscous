@@ -10,8 +10,8 @@ using VsSolidity.UI;
 
 namespace VsSolidity
 {
-    [Export(typeof(IDeployProvider))]
-    [AppliesTo(SolidityUnconfiguredProject.UniqueCapability)]
+    //[Export(typeof(IDeployProvider))]
+    //[AppliesTo(SolidityUnconfiguredProject.UniqueCapability)]
     internal class SolidityProjectDeployProvider : IDeployProvider
     {
         [ImportingConstructor] 
@@ -21,12 +21,10 @@ namespace VsSolidity
 
         public async Task DeployAsync(CancellationToken cancellationToken, TextWriter outputPaneWriter)
         {
-            ToolWindowPane window = await VsSolidityPackage.Instance.ShowToolWindowAsync(typeof(DeploySolidityProjectToolWindow), 0, true, VsSolidityPackage.Instance.DisposalToken);
-            await outputPaneWriter.WriteLineAsync("Deploying Solidity project...");    
-
-            //window.on
-
-            //UnconfiguredProject.
+            //ToolWindowPane window = await VsSolidityPackage.Instance.ShowToolWindowAsync(typeof(DeploySolidityProjectToolWindow), 0, true, VsSolidityPackage.Instance.DisposalToken);
+            var window = (DeploySolidityProjectToolWindow)await VsSolidityPackage.Instance.ShowToolWindowAsync(typeof(DeploySolidityProjectToolWindow), 0, true, VsSolidityPackage.Instance.DisposalToken);
+            window.control.InitSelectedProject();
+            //await outputPaneWriter.WriteLineAsync("Deploying Solidity project...");    
         }
 
         /// <summary>

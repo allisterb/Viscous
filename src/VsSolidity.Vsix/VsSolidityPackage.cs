@@ -145,7 +145,7 @@ namespace VsSolidity
             ApplicationThemeManager.Apply(UI.VSTheme.ApplicationThemeGuess);
             await SolidityProjectMenuCommands.InitializeAsync(this);
             await UI.BlockchainExplorerToolWindowCommand.InitializeAsync(this);
-            await UI.DeploySolidityProjectToolWindowCommand.InitializeAsync(this); 
+            await UI.DeploySolidityProjectToolWindowCommand.InitializeAsync(this);
             await UI.RunSmartContractToolWindowCommand.InitializeAsync(this);
             await UI.SolidityStaticAnalysisToolWindowCommand.InitializeAsync(this);
             

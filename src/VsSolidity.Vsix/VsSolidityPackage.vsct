@@ -116,7 +116,7 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>AllowParams</CommandFlag>
         <Strings>
-          <ButtonText>Show Deploy tool window...</ButtonText>
+          <ButtonText>Deploy...</ButtonText>
         </Strings>
       </Button>
 
@@ -198,6 +198,8 @@
         </Strings>
       </Button>
       -->
+      <!-- Hidden from View > Other Windows: deploy is launched from the project context menu (SolidityProjectDeployProvider).
+           Uncomment this button and DeploySolidityProjectToolWindowCommand.InitializeAsync in VsSolidityPackage.cs to expose it.
       <Button guid="guidVsSolidityPackageCmdSet" id="cmdidDeploySolidityProjectToolWindowCommand" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
         <Icon guid="guidImages4" id="bmpPic1" />
@@ -205,6 +207,10 @@
           <ButtonText>Deploy Solidity Project</ButtonText>
         </Strings>
       </Button>
+      -->
+      <!-- Hidden from View > Other Windows: the run UI is the Run Contract dialog in the Blockchain Explorer; this
+           separate tab tool window is redundant. Uncomment this button and RunSmartContractToolWindowCommand.InitializeAsync
+           in VsSolidityPackage.cs to expose it again.
       <Button guid="guidVsSolidityPackageCmdSet" id="cmdidRunSmartContractToolWindowCommand" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
         <Icon guid="guidImages5" id="bmpPic1" />
@@ -212,6 +218,7 @@
           <ButtonText>Run Smart Contract</ButtonText>
         </Strings>
       </Button>
+      -->
       <Button guid="guidVsSolidityPackageCmdSet" id="cmdidSolidityAnalysisToolWindowCommand" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
         <Icon guid="guidImages6" id="bmpPic1" />
