@@ -35,9 +35,9 @@ EVM Networks                 ← root folder
 You can also create your own **folders** under **EVM Networks** to group
 networks however you like (for example *Local*, *Testnets*, *Mainnets*).
 
-Accounts and contracts are shown using their **label** if you set one;
-otherwise they appear as a shortened address (e.g. `0x1234…ABCD`). Hover a
-network node to see its chain id.
+An **account** you've labelled shows its label; otherwise accounts and contracts
+appear as a shortened address (e.g. `0x1234…ABCD`). Hover a network node to see
+its chain id.
 
 ## Working with the tree
 
@@ -46,19 +46,21 @@ node you click:
 
 | Right‑click on… | Commands |
 |-----------------|----------|
-| **EVM Networks** (root) or a user folder | **Add Network…**, **Add Folder…** *(folders also have **Delete**)* |
-| A **Network** | **Add Account…**, **Add Deploy Profile…**, **Delete** |
-| **Endpoints** folder | **Add Endpoint…** |
+| **EVM Networks** (root) or a user folder | **Add Network…**, **Add Folder…** *(user folders also have **Delete**)* |
+| A **Network** | **Add Endpoint…**, **Add Account…**, **Add Deploy Profile…**, **Delete** |
 | An **Endpoint** | **Delete** *(disabled if it is the network's only endpoint)* |
-| **Accounts** → an **Account** | **Copy Address**, **Edit…**, **Delete** |
-| **Deploy Profiles** folder | **Add Deploy Profile…** |
+| An **Account** | **Copy Address**, **Edit…**, **Delete** |
 | A **Deploy Profile** | **Edit…**, **Delete** |
-| **Contracts** → a **Contract** | **Edit…**, **Run…**, **Delete** |
+| A **Contract** | **View…**, **Run…**, **Delete** |
+
+> The predefined sub‑folders — **Endpoints**, **Accounts**, **Contracts**, and
+> **Deploy Profiles** — don't have a menu of their own. Every "Add…" action lives
+> on the parent **Network** node.
 
 **Double‑click** shortcuts:
 
 - Double‑click an **account** to open its **Edit Account** dialog.
-- Double‑click a **contract** to open its **Edit contract** dialog.
+- Double‑click a **contract** to open its read‑only **Contract details** view.
 
 ## Adding a network
 
@@ -79,9 +81,9 @@ under **Accounts**.
 
 ## Endpoints
 
-A network can have more than one JSON‑RPC endpoint. Right‑click the
-**Endpoints** folder and choose **Add Endpoint…** to add another URL. You cannot
-delete a network's last remaining endpoint.
+A network can have more than one JSON‑RPC endpoint. Right‑click the **Network**
+and choose **Add Endpoint…** to add another URL. You cannot delete a network's
+last remaining endpoint.
 
 ## Accounts
 
@@ -97,17 +99,23 @@ A **deploy profile** bundles together the **endpoint** and **account** that
 should be used when deploying a contract or sending a transaction, plus an
 optional **private key** to sign with.
 
-1. Right‑click a **Network** (or its **Deploy Profiles** folder) and choose
-   **Add Deploy Profile…**.
+1. Right‑click a **Network** and choose **Add Deploy Profile…**.
 2. Enter a **Name**, pick an **Endpoint** and an **Account** from the network,
-   and optionally supply the account's **Private Key**.
+   and optionally supply the account's **Private Key** (64 hex characters,
+   optionally `0x`‑prefixed).
 3. Click **Save**.
 
 Deploy profiles are what the [Deploy](deploy-smart-contract.md) window lists in
 its profile picker, so you need at least one before you can deploy.
 
-> **Private keys** are held encrypted in memory (protected to your Windows
-> logon) and are only needed for profiles that must sign transactions.
+> **About the private key.** When a profile has a private key, VsSolidity signs
+> deployments and transactions locally with it — this is what lets you deploy to
+> hosted endpoints and public testnets (Infura, Alchemy, Sepolia, …) that won't
+> sign on your behalf. For a local node with unlocked accounts (such as Ganache)
+> you can leave it blank. Keys are stored encrypted on disk using Windows DPAPI,
+> scoped to your user account. To change a saved key, open the profile's
+> **Edit…** dialog and type a new one (leaving the field blank keeps the
+> existing key).
 
 ## Contracts
 
@@ -118,9 +126,10 @@ deploying account, the transaction hash, the deployment time, and its ABI.
 
 For a contract node:
 
-- **Edit…** shows its details — address, label, creator, transaction hash,
-  deployment date, and ABI. From this dialog you can also click **Run** to jump
-  straight to running it.
+- **View…** opens a read‑only **Contract details** view — address, label,
+  creator, transaction hash, deployment date, and ABI. From there you can click
+  **Run** to jump straight to running it, or **Close**. (These details are
+  recorded at deploy time and aren't edited here.)
 - **Run…** opens the **Run Contract** dialog — see
   [Run a Smart Contract](run-smart-contract.md).
 - **Delete** removes the contract from the Explorer. (This only removes it from

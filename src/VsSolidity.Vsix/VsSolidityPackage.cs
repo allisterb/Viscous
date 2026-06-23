@@ -23,7 +23,7 @@ using static Microsoft.VisualStudio.VSConstants.UICONTEXT;
 namespace VsSolidity
 {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [InstalledProductRegistration("#110", "#112", "0.1.5.0", IconResourceID = 400)]
+    [InstalledProductRegistration("#110", "#112", "0.1.0.0", IconResourceID = 400)]
     [Guid(PackageGuidString)]
     [ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideAutoLoad(UIContextGuids.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]

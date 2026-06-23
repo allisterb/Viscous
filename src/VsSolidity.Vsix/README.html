@@ -1,52 +1,54 @@
-<html>
-<body>
-    <h2>About</h2>
-    <p>The VsSolidity extension provides support for developing Ethereum-compatible Solidity smart contracts inside Visual Studio.</p>
-    <h2>Features</h2>
-    <h2>About</h2>
-    <p>
-        The VsSolidity extension provides support for developing Ethereum-compatible Solidity smart contracts inside Visual Studio.
-    
-    </p>
-    <h2>Features</h2>
-    <ul>
-        <li>Solidity project system featuring support for managing smart contract dependencies and Solidity compiler integration with MSBuild</li>
-        <li>Integrates with Visual Studio solutions and &quot;New Project...&quot; dialog</li>
-        <li>Integrates with Visual Studio &quot;Open Folder...&quot; feature</li>
-        <li>Uses <a href="https://github.com/juanfranblanco/vscode-solidity">vscode-solidity</a> language server</li>
-        <li>Syntax highlighting and hover information</li>
-        <li>Intellisense</li>
-        <li>Linting</li>
-        <li>Compile Solidity projects and files from inside Visual Studio or on the command-line using MSBuild with error reporting</li>
-        <li>Generate .NET bindings to Solidity smart contracts from inside Visual Studio</li>
-    </ul>
-    <h2>Requirements</h2>
-    <ul>
-        <li>Visual Studio 2022</li>
-        <li>A recent version of <a href="https://nodejs.org/">Node.js</a></li>
-    </ul>
-    <h2>Usage</h2>
-    <p>
-        Add a Solidity project to your solution using the &quot;New Project...&quot; dialog or use the Visual Studio &quot;Open Folder...&quot; feature to open a folder with Solidity contracts.
-        If using the Open Folder... feature, your folder should contain one of the following files:
-    </p>
-    <ul>
-        <li>remappings.txt</li>
-        <li>foundry.toml</li>
-        <li>brownie-config.yaml</li>
-        <li>truffle-config.js</li>
-        <li>hardhat.config.js</li>
-        <li>hardhat.config.ts</li>
-    </ul>
-    <p>
-        Edit Solidity files as normal. Use Visual Studio's package.json editing support to add your smart contract dependencies and right-click on an existing package.json
-        and select &quot;Install NPM dependencies&quot;. To build a Solidity project use the Build menu commands and shortcuts as usual or run <code>dotnet build MyProj.solproj</code> from the command-line.
-        To compile an individual Solidity file or when using the Open Folder... feature, right-click on the file in Solution Explorer and select 'Compile Solidity File'.
-    </p>
-    <p>
-        The very first time you open a Solidity file the extension will install the necessary Node.js modules in the extension's private <code>node_modules</code> directory.
-        This will take a few seconds to complete so Intellisense won't be available during installation but after the modules are installed the first time,
-        editing Solidity contracts will be as usual.
-    </p>
-</body>
-</html>
+﻿<h1>VsSolidity</h1>
+<p><a href="https://github.com/allisterb/VsSolidity/">VsSolidity</a> is a Visual Studio extension for developing, compiling, and deploying <a href="https://soliditylang.org/">Solidity</a> smart contracts to EVM-compatible blockchain networks.</p>
+<p><img src="https://ajb.nyc3.cdn.digitaloceanspaces.com/vssolidity/docs/images/blockchain-explorer.png" alt="Blockchain Explorer"></p>
+<h2>Features</h2>
+<ul>
+    <li>
+        <p>Solidity project system for Visual Studio featuring Solidity compiler integration and NPM dependency management. Integrates with the Visual Studio <strong>New Project…</strong> and <strong>Open Folder…</strong> dialogs.</p>
+    </li>
+    <li>
+        <p>Uses the  <a href="https://github.com/juanfranblanco/vscode-solidity">vscode‑solidity</a> language server.for syntax highlighting, hover information, IntelliSense, and linting. </p>
+    </li>
+    <li>
+        <p>Solidity compiler integration with MSBuild and the Visual Studio Build command - compile Solidity projects and individual files from the IDE with errors reported in the Errors tool window.</p>
+    </li>
+    <li>
+        <p>Generate .NET bindings to Solidity smart contracts automatically using Nethereum.</p>
+    </li>
+    <li>
+        <p>Manage EVM networks, endpoints, accounts, deploy profiles, and deployed contracts from the <strong>Blockchain Explorer</strong> tool window.</p>
+    </li>
+    <li>
+        <p>Deploy a compiled contract to a blockchain network and call its functions from inside Visual Studio.</p>
+    </li>
+    <li>
+        <p>Find vulnerabilities and code‑quality issues with <a href="https://github.com/crytic/slither">Slither</a> static analysis inside Visual Studio.</p>
+    </li>
+</ul>
+<h2>Requirements</h2>
+<ul>
+    <li>Visual Studio 2022 and above</li>
+    <li>A recent version of <a href="https://nodejs.org/">Node.js</a> or compatible runtime</li>
+</ul>
+<h2>User Guide</h2>
+<ul>
+    <li><a href="https://github.com/allisterb/VsSolidity/blob/master/docs/creating-a-project.md">Creating and Opening Projects</a></li>
+    <li><a href="https://github.com/allisterb/VsSolidity/blob/master/docs/editing-solidity.md">Editing Solidity Code</a></li>
+    <li><a href="https://github.com/allisterb/VsSolidity/blob/master/docs/building-and-compiling.md">Building and Compiiling</a></li>
+    <li><a href="https://github.com/allisterb/VsSolidity/blob/master/docs/dotnet-bindings.md">.NET Bindings</a></li>
+    <li><a href="https://github.com/allisterb/VsSolidity/blob/master/docs/blockchain-explorer.md">Blockchain Explorer</a></li>
+    <li><a href="https://github.com/allisterb/VsSolidity/blob/master/docs/deploy-smart-contract.md">Deploy a Smart Contract</a></li>
+    <li><a href="https://github.com/allisterb/VsSolidity/blob/master/docs/run-smart-contract.md">Run a Smart Contract</a></li>
+    <li><a href="https://github.com/allisterb/VsSolidity/blob/master/docs/static-analysis.md">Static Analysis with Slither</a></li>
+</ul>
+<h2>Getting started</h2>
+<ol>
+    <li>Install the extension and open Visual Studio.</li>
+    <li>Create a new <strong>Solidity Project</strong> (<strong>File → New → Project</strong>, set <em>Solidity</em> as the Language.) Alternatively you can just open a folder of <code>.sol</code> files to edit individual files. See <a href="docs/creating-a-project.md">Creating and Opening Projects</a> </li>
+    <li>Add and edit Solidity smart contract files.  Use Visual Studio&#39;s <code>package.json</code> editing support to add your smart contract dependencies and right-click on an existing package.json and select <strong>Install NPM dependencies</strong>.</li>
+    <li>Build the project to compile your contracts and generate bindings. If you just opened a folder then right-click and compile an individual Solidity contract.  See <a href="docs/building-and-compiling.md">Building and Compiling Projects</a></li>
+    <li>For Solidity projects, configure a network and a deploy profile in the <a href="docs/blockchain-explorer.md">Blockchain Explorer</a>, then <a href="docs/deploy-smart-contract.md">deploy</a> and <a href="docs/run-smart-contract.md">run</a> your Solidity contracts.</li>
+    <li>Right-click on a Solidity contract and click <strong>Analyze Contract</strong> to run <a href="https://github.com/allisterb/VsSolidity/blob/master/docs/static-analysis.md">Slither static analysis</a>.</li>
+</ol>
+<h2>Usage Notes</h2>
+<p>The very first time you open a Solidity file the extension will install the Node.js language server package in the extension&#39;s private <code>node_modules</code> directory. This will take a few seconds to complete and Solidity IntelliSense and hover information etc. won&#39;t be available during this time. Once the language server is installed the first time, editing Solidity contracts will be as usual.</p>

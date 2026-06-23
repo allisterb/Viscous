@@ -14,6 +14,7 @@ using Wpc = Wpf.Ui.Controls;
 using static VsSolidity.Result;
 using VsSolidity.Ethereum;
 using VsSolidity.UI.ViewModel;
+using Org.BouncyCastle.Pkix;
 
 namespace VsSolidity.UI
 {
@@ -98,101 +99,113 @@ namespace VsSolidity.UI
         }
 
         
-        private void DeployButton_Click(object sender, RoutedEventArgs e)
+        private async void DeployButton_Click(object sender, RoutedEventArgs e)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            if (DeployContractComboBox.SelectedItem == null || DeployProfileComboBox.SelectedItem == null)
+            if (!ThreadHelper.CheckAccess()) { return; }
+            try
             {
-                ShowDeployError("Select a Solidity smart contract to deploy from the project and a deploy profile to use.");
-                return;
-            }
-            var project = VSUtil.GetSelectedProjectOrError();
-            var contract = DeployContractComboBox.SelectedItem.ToString().Split(new string[] { " - " }, StringSplitOptions.None);
-            var contractFileName = contract[0] + "." + contract[1];
-            var deployProfileName = DeployProfileComboBox.SelectedItem.ToString();
-            object[] deployValues = null;
-            if (SolidityFileParser.GetConstructorParameters(VSUtil.GetProjectItemFilePath(project, contract[1])).TryGetValue(contract[0], out var deployParamTypes))
-            {
-                deployValues = GetDeployContractParams(deployParamTypes);  
-            }
-            ShowDeployProgress($"Building {project.Name} project...");
-            if (!VSUtil.BuildProject(project))
-            {
-                ShowDeployError("Build failed. Please check the build output for errors.");
-                return;
-            }
-            
-            var bo = VSUtil.GetSmartContractProjectOutput(project, contractFileName);
-            if (!bo.ContainsKey("bin"))
-            {
-                ShowDeployError($"No bin file found for {contractFileName}. Please check the build output.");
-                return;
-            }
-            if (!bo.ContainsKey("abi"))
-            {
-                ShowDeployError($"No bin file found for {contractFileName}. Please check the build output.");
-                return;
-            }
-
-            var b = BlockchainInfo.Load("BlockchainExplorerTree", out var bex);
-            if (bex != null || b == null)
-            {
-                MessageBox.Show($"Error loading blockchain info: {bex?.Message ?? "(null)"}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-            var deployProfile = b.GetDeployProfile(deployProfileName);  
-            if (deployProfile == null)
-            {
-                ShowDeployError($"Could not retrieve deploy profile {deployProfileName}. Please check the deploy profile name.");
-                InitSelectedProject();
-                return;
-            }
-            var network = deployProfile.Parent.Parent;
-            ShowDeployProgress($"Deploying {contract[0]} contract to {network}...");
-            var bin = "0x" + File.ReadAllText(bo["bin"].FullName);
-            var abi = File.ReadAllText(bo["abi"].FullName);
-            HexBigInteger gasDeploy = EstimatedGasFeeRadioButton.IsChecked == true ? default : new HexBigInteger(long.TryParse(CustomGasFeeNumberBox.Text, out var customGas) ? customGas : 3000000L);
-            var deployPrivateKey = deployProfile.TryGetDeployProfilePrivateKey();
-            var result = ThreadHelper.JoinableTaskFactory.Run(() => ExecuteAsync(Network.DeployContract(deployProfile.DeployProfileEndpoint, bin, deployProfile.DeployProfileAccount, deployPrivateKey, abi, gasDeploy, deployValues)));
-            if (result.IsSuccess)
-            {
-                var deployedOn = DateTime.Now;
-                if (BlockchainExplorerToolWindowControl.ControlIsLoaded)
+                if (DeployContractComboBox.SelectedItem == null || DeployProfileComboBox.SelectedItem == null)
                 {
-                    var tree = BlockchainExplorerToolWindowControl.instance.BlockchainExplorerTree.RootItem;
-                    var n = tree.GetDeployProfile(deployProfileName).Parent.Parent;
-                    n.GetChild("Contracts", BlockchainInfoKind.Folder).AddContract(result.Value.ContractAddress, deployProfile, project.Name, contractFileName, abi, result.Value.TransactionHash, deployedOn);
-                    BlockchainExplorerToolWindowControl.instance.BlockchainExplorerTree.Refresh();
-                    tree.Save("BlockchainExplorerTree", out Exception se);
-                    if (se != null)
-                    {
-                        ShowDeployError($"Error saving contract to blockchain tree: {se.Message}");
-                    }
-                    else
-                    {
-                        ShowDeploySuccess();
-                    }
+                    ShowDeployError("Select a Solidity smart contract to deploy from the project and a deploy profile to use.");
+                    return;
+                }
+                var project = VSUtil.GetSelectedProjectOrError();
+                var contract = DeployContractComboBox.SelectedItem.ToString().Split(new string[] { " - " }, StringSplitOptions.None);
+                var contractFileName = contract[0] + "." + contract[1];
+                var deployProfileName = DeployProfileComboBox.SelectedItem.ToString();
+                object[] deployValues = null;
+                if (SolidityFileParser.GetConstructorParameters(VSUtil.GetProjectItemFilePath(project, contract[1])).TryGetValue(contract[0], out var deployParamTypes))
+                {
+                    deployValues = GetDeployContractParams(deployParamTypes);
+                }
+                ShowDeployProgress($"Building {project.Name} project...");                
+                if (!VSUtil.BuildProject(project))
+                {
+                    ShowDeployError("Build failed. Please check the build output for errors.");
+                    return;
                 }
                 else
                 {
-                    var n = b.GetDeployProfile(deployProfileName).Parent.Parent;
-                    n.GetChild("Contracts", BlockchainInfoKind.Folder).AddContract(result.Value.ContractAddress, deployProfile, project.Name, contractFileName, abi, result.Value.TransactionHash, deployedOn);
-                    b.Save("BlockchainExplorerTree", out Exception se);
-                    if (se != null)
+                    ShowDeploySuccess($"{project.Name} project build completed.");
+                }                                
+                var bo = VSUtil.GetSmartContractProjectOutput(project, contractFileName);
+                if (!bo.ContainsKey("bin"))
+                {
+                    ShowDeployError($"No bin file found for {contractFileName}. Please check the build output.");
+                    return;
+                }
+                if (!bo.ContainsKey("abi"))
+                {
+                    ShowDeployError($"No bin file found for {contractFileName}. Please check the build output.");
+                    return;
+                }
+
+                var b = BlockchainInfo.Load("BlockchainExplorerTree", out var bex);
+                if (bex != null || b == null)
+                {
+                    MessageBox.Show($"Error loading blockchain info: {bex?.Message ?? "(null)"}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                var deployProfile = b.GetDeployProfile(deployProfileName);
+                if (deployProfile == null)
+                {
+                    ShowDeployError($"Could not retrieve deploy profile {deployProfileName}. Please check the deploy profile name.");
+                    InitSelectedProject();
+                    return;
+                }
+                var network = deployProfile.Parent.Parent;
+                ShowDeployProgress($"Deploying {contract[0]} contract to {network}...");
+                VSUtil.LogToVsSolidityWindow($"Deploying {contract[0]} contract to {network} using account {deployProfile.DeployProfileAccount} and endpoint {deployProfile.DeployProfileEndpoint}...");
+                var bin = "0x" + File.ReadAllText(bo["bin"].FullName);
+                var abi = File.ReadAllText(bo["abi"].FullName);
+                HexBigInteger gasDeploy = EstimatedGasFeeRadioButton.IsChecked == true ? default : new HexBigInteger(long.TryParse(CustomGasFeeNumberBox.Text, out var customGas) ? customGas : 3000000L);
+                var deployPrivateKey = deployProfile.TryGetDeployProfilePrivateKey();
+                var result = await ThreadHelper.JoinableTaskFactory.RunAsync(() => ExecuteAsync(Network.DeployContract(deployProfile.DeployProfileEndpoint, bin, deployProfile.DeployProfileAccount, deployPrivateKey, abi, gasDeploy, deployValues)));
+                if (result.IsSuccess)
+                {
+                    var deployedOn = DateTime.Now;
+                    if (BlockchainExplorerToolWindowControl.ControlIsLoaded)
                     {
-                        ShowDeployError($"Error saving contract to blockchain tree: {se.Message}");
+                        var tree = BlockchainExplorerToolWindowControl.instance.BlockchainExplorerTree.RootItem;
+                        var n = tree.GetDeployProfile(deployProfileName).Parent.Parent;
+                        n.GetChild("Contracts", BlockchainInfoKind.Folder).AddContract(result.Value.ContractAddress, deployProfile, project.Name, contractFileName, abi, result.Value.TransactionHash, deployedOn);
+                        BlockchainExplorerToolWindowControl.instance.BlockchainExplorerTree.Refresh();
+                        tree.Save("BlockchainExplorerTree", out Exception se);
+                        if (se != null)
+                        {
+                            ShowDeployError($"Error saving contract to blockchain tree: {se.Message}");
+                        }
+                        else
+                        {
+                            ShowDeploySuccess($"{contract[0]} contract deployed successfully to {network}.");
+                        }
                     }
                     else
                     {
-                        ShowDeploySuccess();
+                        var n = b.GetDeployProfile(deployProfileName).Parent.Parent;
+                        n.GetChild("Contracts", BlockchainInfoKind.Folder).AddContract(result.Value.ContractAddress, deployProfile, project.Name, contractFileName, abi, result.Value.TransactionHash, deployedOn);
+                        b.Save("BlockchainExplorerTree", out Exception se);
+                        if (se != null)
+                        {
+                            ShowDeployError($"Error saving contract to blockchain tree: {se.Message}");
+                        }
+                        else
+                        {
+                            ShowDeploySuccess($"{contract[0]} contract deployed successfully to {network}.");
+                        }
                     }
+                    VSUtil.LogToVsSolidityWindow($"\n========== {contract[0]} contract deployed successfully to {network.Name}. ==========\nTransaction Hash: {result.Value.TransactionHash}\nContract Address: {result.Value.ContractAddress}");
                 }
-                VSUtil.LogToVsSolidityWindow($"\n========== {contract[0]} contract deployed successfully to {network.Name}. ==========\nTransaction Hash: {result.Value.TransactionHash}\nContract Address: {result.Value.ContractAddress}");  
+                else
+                {
+                    ShowDeployError($"Error deploying contract: {result.FailureMessage}");
+                    VSUtil.LogToVsSolidityWindow($"\n========== Error deploying {contract[0]} contract to {network.Name}. ==========\n{result.FailureMessage}");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                ShowDeployError($"Error deploying contract: {result.FailureMessage}");
-                VSUtil.LogToVsSolidityWindow($"\n========== Error deploying {contract[0]} contract to {network.Name}. ==========\n{result.FailureMessage}");
+                ShowDeployError($"Error occurred during deploy process: {ex.Message}.");
+                return;
             }
         }
 
@@ -212,12 +225,12 @@ namespace VsSolidity.UI
             DeploySolidityProjectStatusTextBlock.Text = text;
         }
 
-        public void ShowDeploySuccess()
+        public void ShowDeploySuccess(string text)
         {
             this.DeployErrorsStackPanel.Visibility = Visibility.Hidden;
             this.DeployStatusStackPanel.Visibility = Visibility.Hidden;
             this.DeploySuccessStackPanel.Visibility = Visibility.Visible;
-            this.DeploySuccessTextBlock.Text = $"Contract deployed successfully.";
+            this.DeploySuccessTextBlock.Text = text;
         }   
 
         public void ShowDeployError(string text)

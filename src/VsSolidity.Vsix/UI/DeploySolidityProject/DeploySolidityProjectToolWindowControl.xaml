@@ -78,7 +78,7 @@
                 </StackPanel>
 
                 <StackPanel Name="DeploySuccessStackPanel" Grid.Row="0" Orientation="Horizontal" Visibility="Hidden">
-                    <ui:SymbolIcon Symbol="CheckmarkCircle24" VerticalAlignment="Bottom" Foreground="LightGreen" />
+                    <ui:SymbolIcon Symbol="CheckmarkCircle32" VerticalAlignment="Bottom" Foreground="LightGreen" />
                     <ui:TextBlock Name="DeploySuccessTextBlock" Margin="4,0,0,0" VerticalAlignment="Bottom" />
                 </StackPanel>
 

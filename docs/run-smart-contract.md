@@ -16,8 +16,8 @@ In the [Blockchain Explorer](blockchain-explorer.md), expand a network's
 **Contracts** folder, then either:
 
 - right‑click the contract and choose **Run…**, or
-- right‑click the contract, choose **Edit…**, and click **Run** in the contract
-  details dialog.
+- right‑click the contract, choose **View…**, and click **Run** in the
+  **Contract details** view.
 
 The **Run contract** dialog opens for that contract.
 
@@ -51,8 +51,13 @@ requires an account to send from and gas to pay for it.
 
 1. Check **Transact (requires gas)**. This enables the transaction options:
    - **Account** — the address the transaction is sent from. It is pre‑filled
-     from the contract; change it if you want to send from a different account.
-   - **Private Key (optional)** — the key used to sign, if required.
+     with the contract's deployer; change it if you want to send from a different
+     account.
+   - **Private Key (optional)** — the sending account's key, used to sign the
+     transaction locally. Required for hosted endpoints and public testnets that
+     won't sign for you; for a local node with the account unlocked (e.g. Ganache)
+     you can leave it blank. When a key is supplied, the transaction is sent from
+     the address derived from that key.
    - **Gas Limit** — choose **Estimated Gas**, or select **Custom** and enter a
      specific gas limit (default `3000000`).
 2. Fill in the function's parameters.
