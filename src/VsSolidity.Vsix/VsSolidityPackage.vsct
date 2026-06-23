@@ -162,7 +162,7 @@
       -->
       <Button guid="guidVsSolidityPackageCmdSet" id="cmdidSolidityAnalysisToolWindowCommand" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
-        <Icon guid="guidImages6" id="bmpPic1" />
+        <Icon guid="guidSolidityStaticAnalysisIcon" id="pngSolidityStaticAnalysis" />
         <Strings>
           <ButtonText>Solidity Static Analysis</ButtonText>
         </Strings>
@@ -184,7 +184,7 @@
       <Bitmap guid="guidDeploySolidityIcon" href="Resources\DeploySolidity_16x16.png" usedList="pngDeploySolidity" />
       <Bitmap guid="guidSolidityStaticAnalysisIcon" href="Resources\SolidityStaticAnalysis16x16.png" usedList="pngSolidityStaticAnalysis" />
       <Bitmap guid="guidImages1" href="Resources\SolidityProjectMenuCommands.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
-      <Bitmap guid="guidImages2" href="Resources\BlockchainExplorerToolWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
+      <Bitmap guid="guidImages2" href="Resources\BlockchainExplorerToolWindowCommand.png" usedList="bmpPic1" />
       <Bitmap guid="guidImages3" href="Resources\VsSolidityBlockchainDashboardToolWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
       <Bitmap guid="guidImages4" href="Resources\DeploySolidityProjectToolWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
       <Bitmap guid="guidImages6" href="Resources\SolidityAnalysisToolWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />

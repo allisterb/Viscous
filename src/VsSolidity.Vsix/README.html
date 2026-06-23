@@ -44,6 +44,7 @@
 <h2>Getting started</h2>
 <ol>
     <li>Install the extension and open Visual Studio.</li>
+    <li>Edit the %LOCALAPPDATA%\VsSolidity\appsettings.json file to set different paths to the node and npm executables you want to use for the extension&#39;s language server. The extension&#39;s private .npmrc has <code>ignore-scripts=true</code></li>
     <li>Create a new <strong>Solidity Project</strong> (<strong>File → New → Project</strong>, set <em>Solidity</em> as the Language.) Alternatively you can just open a folder of <code>.sol</code> files to edit individual files. See <a href="docs/creating-a-project.md">Creating and Opening Projects</a> </li>
     <li>Add and edit Solidity smart contract files.  Use Visual Studio&#39;s <code>package.json</code> editing support to add your smart contract dependencies and right-click on an existing package.json and select <strong>Install NPM dependencies</strong>.</li>
     <li>Build the project to compile your contracts and generate bindings. If you just opened a folder then right-click and compile an individual Solidity contract.  See <a href="docs/building-and-compiling.md">Building and Compiling Projects</a></li>
@@ -51,4 +52,6 @@
     <li>Right-click on a Solidity contract and click <strong>Analyze Contract</strong> to run <a href="https://github.com/allisterb/VsSolidity/blob/master/docs/static-analysis.md">Slither static analysis</a>.</li>
 </ol>
 <h2>Usage Notes</h2>
-<p>The very first time you open a Solidity file the extension will install the Node.js language server package in the extension&#39;s private <code>node_modules</code> directory. This will take a few seconds to complete and Solidity IntelliSense and hover information etc. won&#39;t be available during this time. Once the language server is installed the first time, editing Solidity contracts will be as usual.</p>
+<ul>
+    <li>The very first time you open a Solidity file the extension will install the Node.js language server package in the extension&#39;s private <code>node_modules</code> directory. This will take a few seconds to complete and Solidity IntelliSense and hover information etc. won&#39;t be available during this time. Once the language server is installed the first time, editing Solidity contracts will be as usual.</li>
+</ul>

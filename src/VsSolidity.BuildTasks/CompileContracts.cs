@@ -93,13 +93,13 @@ namespace VsSolidity
             {
                 if (!p.Start())
                 {
-                    Log.LogError("Could not start npm process", psi.FileName + " " + psi.Arguments);
+                    Log.LogError("Could not run compiler commmand-line", psi.FileName + " " + psi.Arguments);
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                Log.LogErrorFromException(new Exception($"Exception thrown starting process {psi.FileName} {psi.Arguments}", ex));
+                Log.LogErrorFromException(new Exception($"Exception thrown running compiler command-line {psi.FileName} {psi.Arguments}", ex));
                 return false;
             }
 

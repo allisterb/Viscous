@@ -36,15 +36,15 @@ background per solution or open folder.
 
 ### Using a different JavaScript runtime or package manager
 
-By default VsSolidity uses **node** to run the language server and **npm** to
-install it. You can point it at alternatives (for example **pnpm**) through a
+By default VsSolidity uses a globally installed **node** to run the language server and **npm** to
+install it. You can point it at alternatives (for example **pnpm**) at different paths through a
 settings file at:
 
 ```
 %LOCALAPPDATA%\VsSolidity\appsettings.json
 ```
 
-It's created automatically with the defaults the first time it's needed:
+It's created automatically with the defaults the first time the extension is run:
 
 ```json
 {
@@ -55,8 +55,7 @@ It's created automatically with the defaults the first time it's needed:
 
 - **`JSPackageManagerCmd`** — the command used to install the language server,
   and to run **Install NPM packages** for your project. Change it to e.g. `pnpm`.
-- **`JSRuntimeCmd`** — the command used to run the language server, and the
-  command‑line `solc.js` compiler (**Compile Solidity File**).
+- **`JSRuntimeCmd`** — the command used to run the language server, and the command‑line `solc.js` compiler when compiling individual Solidity files (**Compile Solidity File**).
 
 Each value can be a bare command on your `PATH`, or a full path to an executable —
 so you can point `JSRuntimeCmd` at a **local/portable Node** build (for example

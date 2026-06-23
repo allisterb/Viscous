@@ -38,6 +38,7 @@
 ## Getting started
 
 1. Install the extension and open Visual Studio.
+2. Edit the %LOCALAPPDATA%\VsSolidity\appsettings.json file to set different paths to the node and npm executables you want to use for the extension's language server. The extension's private .npmrc has `ignore-scripts=true`
 2. Create a new **Solidity Project** (**File → New → Project**, set *Solidity* as the Language.) Alternatively you can just open a folder of `.sol` files to edit individual files. See [Creating and Opening Projects](docs/creating-a-project.md) 
 3. Add and edit Solidity smart contract files.  Use Visual Studio's `package.json` editing support to add your smart contract dependencies and right-click on an existing package.json and select **Install NPM dependencies**.
 4. Build the project to compile your contracts and generate bindings. If you just opened a folder then right-click and compile an individual Solidity contract.  See [Building and Compiling Projects](docs/building-and-compiling.md)
@@ -45,4 +46,4 @@
 6. Right-click on a Solidity contract and click **Analyze Contract** to run [Slither static analysis](https://github.com/allisterb/VsSolidity/blob/master/docs/static-analysis.md).
 
 ## Usage Notes
-The very first time you open a Solidity file the extension will install the Node.js language server package in the extension's private `node_modules` directory. This will take a few seconds to complete and Solidity IntelliSense and hover information etc. won't be available during this time. Once the language server is installed the first time, editing Solidity contracts will be as usual.
+* The very first time you open a Solidity file the extension will install the Node.js language server package in the extension's private `node_modules` directory. This will take a few seconds to complete and Solidity IntelliSense and hover information etc. won't be available during this time. Once the language server is installed the first time, editing Solidity contracts will be as usual.

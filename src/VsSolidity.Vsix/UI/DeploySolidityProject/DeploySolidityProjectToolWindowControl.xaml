@@ -18,7 +18,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ui:ThemesDictionary Theme="{x:Static VsSolidityui:VSTheme.ApplicationThemeGuess}" />
                 <ui:ControlsDictionary />
-                <ResourceDictionary Source="/VsSolidity.Vsix;component/UI/DialogWindowResources.xaml" />
+                <ResourceDictionary Source="/VsSolidity;component/UI/DialogWindowResources.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
