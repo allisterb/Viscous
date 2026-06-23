@@ -5,7 +5,7 @@
     <Description>A Solidity source code file</Description>
     <Icon>solidity_icon.ico</Icon>
 	<ProjectType>Solidity</ProjectType>
-    <TemplateID>350d4e4a-3ad0-4c56-9a48-b865f1532b9f</TemplateID>
+    <TemplateID>C05A5945-0125-4718-BF25-1C156E70ABB5</TemplateID>
     <NumberOfParentCategoriesToRollUp>2</NumberOfParentCategoriesToRollUp>
 	<ShowByDefault>True</ShowByDefault>
     <DefaultName>SmartContract1.sol</DefaultName>

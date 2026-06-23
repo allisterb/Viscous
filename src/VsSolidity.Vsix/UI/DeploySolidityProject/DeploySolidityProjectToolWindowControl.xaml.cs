@@ -34,18 +34,17 @@ namespace VsSolidity.UI
             VSTheme.WatchThemeChanges(); 
         }
 
-        public void InitSelectedProject()
+        public bool InitSelectedProject()
         {
 #if IS_VSIX
             if (!VSUtil.IsProjectLoaded())
             {
-                return;
+                return false;
             }
-            var project = VSUtil.GetSelectedProjectOrError();
+            var project = VSUtil.GetSelectedProject();
             if (project == null)
-            {
-                MessageBox.Show("No project selected. Please select a Solidity project to deploy.", "Deploy Solidity Project", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
+            {                
+                return false;
             }
             var contracts = VSUtil.GetSolidityProjectContracts(project);
             var profiles = GetDeployProfiles();
@@ -66,8 +65,20 @@ namespace VsSolidity.UI
             this.DeployStatusStackPanel.Visibility = Visibility.Hidden;
             this.DeploySuccessStackPanel.Visibility = Visibility.Hidden; 
             this.DeployErrorsStackPanel.Visibility = Visibility.Hidden; 
+            return true;
         }
-       
+
+        public void HideForm()
+        {
+            DeploySolidityProjectDialogStackPanel.Visibility = Visibility.Hidden;
+        }
+
+        public void ShowForm()
+        {
+            DeploySolidityProjectDialogStackPanel.Visibility = Visibility.Visible;
+        }
+
+
         #region Event Handlers
 
         private void EstimatedGasFeeRadioButton_Checked(object sender, RoutedEventArgs e)
@@ -269,7 +280,8 @@ namespace VsSolidity.UI
             // Clear existing parameters
             ContractDeployParamsStackPanel.Children.Clear();
             if (DeployContractComboBox.SelectedItem == null) return;
-            var project = VSUtil.GetSelectedProjectOrError();
+            var project = VSUtil.GetSelectedProject();
+            if (project == null) return;
             var contract = DeployContractComboBox.SelectedItem.ToString().Split(new string[] { " - " }, StringSplitOptions.None);
             var path = VSUtil.GetProjectItemFilePath(project, contract[1]);
             //var deployParams = SolidityFileParser.GetConstructorParameters(path).tr[contract[0]];
@@ -352,6 +364,7 @@ namespace VsSolidity.UI
         #region Fields
         protected bool projectInitialized = false;
         protected Dictionary<string, BlockchainInfo> deployProfiles = new Dictionary<string, BlockchainInfo>();
+        protected EnvDTE.Project lastProject;
 
         #endregion
 

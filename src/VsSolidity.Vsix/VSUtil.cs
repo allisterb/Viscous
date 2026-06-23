@@ -333,17 +333,19 @@ namespace VsSolidity
             var dte = VsSolidityPackage.Instance.GetService<DTE, EnvDTE80.DTE2>();
             if (dte == null)
             {
-                ShowModalErrorDialogBox("Could not get DTE service.");
+                //ShowModalErrorDialogBox("Could not get DTE service.");
                 return null;
             }
+            Array a = (Array)dte.ActiveSolutionProjects;
             var si = dte.SelectedItems;
-            if (si == null || si.Count == 0 || si.Item(1).ProjectItem == null || si.Item(1).ProjectItem.ContainingProject == null)
-            {                
+            if (si == null || si.Count == 0 || si.Item(1).Project == null)
+            {
+                //ShowModalErrorDialogBox("No project is selected or could not get selected project.");
                 return null;
             }
             else
             {
-                return si.Item(1).ProjectItem.ContainingProject;
+                return si.Item(1).Project;
             }
         }
 

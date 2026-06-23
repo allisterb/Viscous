@@ -9,7 +9,7 @@
 	<PlatformTag>Web3</PlatformTag>
 	<ProjectTypeTag>Blockchain</ProjectTypeTag>
 	<SortOrder>1000</SortOrder>
-    <TemplateID>{05056b37-7356-490b-a12d-72beab514eb4}</TemplateID>
+    <TemplateID>{8B2C63C0-A33A-4285-9F90-7FB691BFBA87}</TemplateID>
     <CreateNewFolder>true</CreateNewFolder>
     <DefaultName>Solidity</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
