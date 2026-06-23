@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-
 using EnvDTE;
+using EnvDTE80;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.ProjectSystem;
@@ -11,7 +8,9 @@ using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell.Settings;
-
+using System;
+using System.Collections.Generic;
+using System.IO;
 using VsSolidity.Ethereum;
 
 namespace VsSolidity
@@ -303,6 +302,75 @@ namespace VsSolidity
                 Array a = (Array)dte.ActiveSolutionProjects;
                 return a != null && a.Length > 0;
             }
+        }
+        
+        public static bool IsProjectInSolution(string projectPathOrName)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            // Get the DTE service
+            DTE2 dte = Package.GetGlobalService(typeof(SDTE)) as DTE2;
+            if (dte?.Solution == null || !dte.Solution.IsOpen)
+            {
+                return false;
+            }
+
+            // Iterate through all projects in the solution
+            foreach (Project project in dte.Solution.Projects)
+            {
+                if (project == null) continue;
+
+                // Solution Folders require special handling as they are also nested 'Project' types
+                if (project.Kind == ProjectKinds.vsProjectKindSolutionFolder)
+                {
+                    if (CheckNestedProjects(project, projectPathOrName))
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    // Match against FullName (File Path) or UniqueName
+                    if (project.FullName.Equals(projectPathOrName, StringComparison.OrdinalIgnoreCase) ||
+                        project.Name.Equals(projectPathOrName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool CheckNestedProjects(Project solutionFolder, string projectPathOrName)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (solutionFolder.ProjectItems == null) return false;
+
+            foreach (ProjectItem item in solutionFolder.ProjectItems)
+            {
+                Project subProject = item.SubProject;
+                if (subProject == null) continue;
+
+                if (subProject.Kind == ProjectKinds.vsProjectKindSolutionFolder)
+                {
+                    if (CheckNestedProjects(subProject, projectPathOrName))
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (subProject.FullName.Equals(projectPathOrName, StringComparison.OrdinalIgnoreCase) ||
+                        subProject.Name.Equals(projectPathOrName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         public static Project GetSelectedProjectOrError()

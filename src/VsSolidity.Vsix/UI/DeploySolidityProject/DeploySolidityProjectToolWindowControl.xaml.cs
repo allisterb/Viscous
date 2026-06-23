@@ -1,3 +1,6 @@
+using Microsoft.VisualStudio.Shell;
+using Nethereum.Hex.HexTypes;
+using Org.BouncyCastle.Pkix;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,15 +9,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 
-using Microsoft.VisualStudio.Shell;
-using Nethereum.Hex.HexTypes;
-
-using Wpc = Wpf.Ui.Controls;
-
-using static VsSolidity.Result;
 using VsSolidity.Ethereum;
 using VsSolidity.UI.ViewModel;
-using Org.BouncyCastle.Pkix;
+using static VsSolidity.Result;
+using Wpc = Wpf.Ui.Controls;
 
 namespace VsSolidity.UI
 {
@@ -39,11 +37,13 @@ namespace VsSolidity.UI
 #if IS_VSIX
             if (!VSUtil.IsProjectLoaded())
             {
+                Initialized = false;
                 return false;
             }
-            var project = VSUtil.GetSelectedProject();
+            project = VSUtil.GetSelectedProject();
             if (project == null)
-            {                
+            {
+                Initialized = false;
                 return false;
             }
             var contracts = VSUtil.GetSolidityProjectContracts(project);
@@ -55,7 +55,9 @@ namespace VsSolidity.UI
             string evmversion = "london"; 
 #endif
 
+            
             this.ProjectEVMVersionStackPanel.Visibility = Visibility.Visible;
+            this.ProjectNameLabel.Content = project.FullName;
             this.ProjectEVMVersionLabel.Content = evmversion;
             this.DeployContractComboBox.ItemsSource = contracts;
             this.DeployContractComboBox.SelectedIndex = 0;  
@@ -64,8 +66,15 @@ namespace VsSolidity.UI
             this.DeploySolidityProjectDialogStackPanel.Visibility = Visibility.Visible;
             this.DeployStatusStackPanel.Visibility = Visibility.Hidden;
             this.DeploySuccessStackPanel.Visibility = Visibility.Hidden; 
-            this.DeployErrorsStackPanel.Visibility = Visibility.Hidden; 
+            this.DeployErrorsStackPanel.Visibility = Visibility.Hidden;
+            Initialized = true;
             return true;
+        }
+
+        public bool IsInitializedWithProject()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            return VSUtil.IsProjectLoaded() && Initialized && VSUtil.IsProjectInSolution(project.FullName);
         }
 
         public void HideForm()
@@ -113,14 +122,18 @@ namespace VsSolidity.UI
         private async void DeployButton_Click(object sender, RoutedEventArgs e)
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            if (!VSUtil.IsProjectInSolution(project.FullName))
+            {
+                VSUtil.ShowModalErrorDialogBox("The selected project to deploy has been unloaded.");
+                return;
+            }
             try
             {
                 if (DeployContractComboBox.SelectedItem == null || DeployProfileComboBox.SelectedItem == null)
                 {
                     ShowDeployError("Select a Solidity smart contract to deploy from the project and a deploy profile to use.");
                     return;
-                }
-                var project = VSUtil.GetSelectedProjectOrError();
+                }  
                 var contract = DeployContractComboBox.SelectedItem.ToString().Split(new string[] { " - " }, StringSplitOptions.None);
                 var contractFileName = contract[0] + "." + contract[1];
                 var deployProfileName = DeployProfileComboBox.SelectedItem.ToString();
@@ -364,7 +377,8 @@ namespace VsSolidity.UI
         #region Fields
         protected bool projectInitialized = false;
         protected Dictionary<string, BlockchainInfo> deployProfiles = new Dictionary<string, BlockchainInfo>();
-        protected EnvDTE.Project lastProject;
+        protected EnvDTE.Project project;
+        public bool Initialized { get; protected set; } = false;
 
         #endregion
 

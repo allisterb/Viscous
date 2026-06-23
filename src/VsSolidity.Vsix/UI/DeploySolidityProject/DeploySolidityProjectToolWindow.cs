@@ -20,21 +20,20 @@ namespace VsSolidity.UI
 
         public int OnShow(int fShow)
         {
-            /*
-            if (!VSUtil.IsProjectLoaded())
-            {
-                control.HideForm();
+            if (fShow == (int) __FRAMESHOW3.FRAMESHOW_WinActivated)
+            {                
+                if (!control.IsInitializedWithProject())
+                {
+                    control.HideForm();
+                }
+                else
+                {
+                    control.ShowForm();
+                }                
             }
-            else
-            {
-                control.ShowForm();
-            }
-            */
             return VSConstants.S_OK;    
         }
-            
-        
-
+                    
         public int OnMove(int x, int y, int w, int h) => VSConstants.S_OK;
 
         public int OnSize(int x, int y, int w, int h) => VSConstants.S_OK;
