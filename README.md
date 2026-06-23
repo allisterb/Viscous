@@ -1,72 +1,48 @@
 # VsSolidity
 
-**VsSolidity** is a Visual Studio extension for developing, compiling, and deploying [Solidity](https://soliditylang.org/) smart contracts to EVM-compatible blockchain networks.
+[VsSolidity](https://github.com/allisterb/VsSolidity/) is a Visual Studio extension for developing, compiling, and deploying [Solidity](https://soliditylang.org/) smart contracts to EVM-compatible blockchain networks.
 
 
 ![Blockchain Explorer](https://ajb.nyc3.cdn.digitaloceanspaces.com/vssolidity/docs/images/blockchain-explorer.png)
 
 ## Features
 
-- **Solidity project system** — First‑class Visual Studio project type with Solidity
-  compiler integration and npm dependency management.
-- Integrates with the Visual Studio **New Project…** and **Open Folder…**
-  experiences.
-- - **Rich editing** — syntax highlighting, hover information, IntelliSense, and
-  linting. Uses the  [vscode‑solidity](https://github.com/juanfranblanco/vscode-solidity) language
-  server.
-- **Integration with Visual Studio Build command and MSBuild** — compile Solidity projects and individual files from the IDE or on
-  the command line with MSBuild, with errors reported in the Error List.
-- **Blockchain Explorer** — manage EVM networks, endpoints, accounts, deploy
-  profiles, and deployed contracts.
-- **Deploy & run** — deploy a compiled contract to a network and call its
-  functions or send transactions, all from the IDE.
-- - **.NET bindings** — strongly‑typed C# contract bindings generated on every
-  build (via Nethereum).
-- **Static analysis** — find vulnerabilities and code‑quality issues with
-  [Slither](https://github.com/crytic/slither), shown inside Visual Studio.
+* Solidity project system for Visual Studio featuring Solidity compiler integration and NPM dependency management. Integrates with the Visual Studio **New Project…** and **Open Folder…** dialogs.
 
-## Documentation
+* Uses the  [vscode‑solidity](https://github.com/juanfranblanco/vscode-solidity) language server.for syntax highlighting, hover information, IntelliSense, and linting. 
 
-Full user documentation lives in the [`docs/`](docs/README.md) folder.
+* Solidity compiler integration with MSBuild and the Visual Studio Build command - compile Solidity projects and individual files from the IDE with errors reported in the Errors tool window.
 
-**Develop**
+* Generate .NET bindings to Solidity smart contracts automatically using Nethereum.
 
-- [Creating and Opening a Project](docs/creating-a-project.md)
-- [Editing Solidity Code](docs/editing-solidity.md)
-- [Building and Compiling](docs/building-and-compiling.md)
-- [.NET Bindings](docs/dotnet-bindings.md)
-- [Static Analysis with Slither](docs/static-analysis.md)
+* Manage EVM networks, endpoints, accounts, deploy profiles, and deployed contracts from the **Blockchain Explorer** tool window.
 
-**Connect, deploy, and run**
+* Deploy a compiled contract to a blockchain network and call its functions from inside Visual Studio.
 
-- [Blockchain Explorer](docs/blockchain-explorer.md)
-- [Deploy a Smart Contract](docs/deploy-smart-contract.md)
-- [Run a Smart Contract](docs/run-smart-contract.md)
+* Find vulnerabilities and code‑quality issues with [Slither](https://github.com/crytic/slither) static analysis inside Visual Studio.
+
+## Requirements
+* Visual Studio 2022 and above
+* A recent version of [Node.js](https://nodejs.org/) or compatible runtime
+
+## User Guide
+- [Creating and Opening Projects](https://github.com/allisterb/VsSolidity/blob/master/docs/creating-a-project.md)
+- [Editing Solidity Code](https://github.com/allisterb/VsSolidity/blob/master/docs/editing-solidity.md)
+- [Building and Compiiling](https://github.com/allisterb/VsSolidity/blob/master/docs/building-and-compiling.md)
+- [.NET Bindings](https://github.com/allisterb/VsSolidity/blob/master/docs/dotnet-bindings.md)
+- [Blockchain Explorer](https://github.com/allisterb/VsSolidity/blob/master/docs/blockchain-explorer.md)
+- [Deploy a Smart Contract](https://github.com/allisterb/VsSolidity/blob/master/docs/deploy-smart-contract.md)
+- [Run a Smart Contract](https://github.com/allisterb/VsSolidity/blob/master/docs/run-smart-contract.md)
+- [Static Analysis with Slither](https://github.com/allisterb/VsSolidity/blob/master/docs/static-analysis.md)
 
 ## Getting started
 
 1. Install the extension and open Visual Studio.
-2. Create a new **Solidity Project** (**File → New → Project**, search
-   *Solidity*) or open a folder of `.sol` files — see
-   [Creating and Opening a Project](docs/creating-a-project.md).
-3. Build the project to compile your contracts and generate bindings — see
-   [Building and Compiling](docs/building-and-compiling.md).
-4. Configure a network and a deploy profile in the
-   [Blockchain Explorer](docs/blockchain-explorer.md), then
-   [deploy](docs/deploy-smart-contract.md) and
-   [run](docs/run-smart-contract.md) your contract.
+2. Create a new **Solidity Project** (**File → New → Project**, set *Solidity* as the Language.) Alternatively you can just open a folder of `.sol` files to edit individual files. See [Creating and Opening Projects](docs/creating-a-project.md) 
+3. Add and edit Solidity smart contract files.  Use Visual Studio's `package.json` editing support to add your smart contract dependencies and right-click on an existing package.json and select **Install NPM dependencies**.
+4. Build the project to compile your contracts and generate bindings. If you just opened a folder then right-click and compile an individual Solidity contract.  See [Building and Compiling Projects](docs/building-and-compiling.md)
+5. For Solidity projects, configure a network and a deploy profile in the [Blockchain Explorer](docs/blockchain-explorer.md), then [deploy](docs/deploy-smart-contract.md) and [run](docs/run-smart-contract.md) your Solidity contracts.
+6. Right-click on a Solidity contract and click **Analyze Contract** to run [Slither static analysis](https://github.com/allisterb/VsSolidity/blob/master/docs/static-analysis.md).
 
-### Prerequisites
-
-- **Visual Studio** with the extension installed.
-- **Node.js** — used for the language server and npm packages.
-- **.NET SDK** (`dotnet`) — used to generate the C# contract bindings.
-- A reachable EVM JSON‑RPC endpoint to deploy/run against (a local
-  [Ganache](https://trufflesuite.com/ganache/) node is detected automatically).
-
-## Building the extension from source
-
-VsSolidity targets **.NET Framework 4.7.2 / C# 7.4** for Visual Studio
-compatibility. The solution is under [`src/`](src/); the main projects are
-described in [CLAUDE.md](CLAUDE.md). Build the VSIX with Visual Studio's
-`MSBuild.exe` (the VSSDK projects don't build with `dotnet build`).
+## Usage Notes
+The very first time you open a Solidity file the extension will install the Node.js language server package in the extension's private `node_modules` directory. This will take a few seconds to complete and Solidity IntelliSense and hover information etc. won't be available during this time. Once the language server is installed the first time, editing Solidity contracts will be as usual.

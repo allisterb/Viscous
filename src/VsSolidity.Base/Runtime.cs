@@ -111,7 +111,11 @@ public abstract class Runtime
         var logger = new LoggerConfiguration()
              .Enrich.FromLogContext()
              .MinimumLevel.Is(debug ? Serilog.Events.LogEventLevel.Verbose : Serilog.Events.LogEventLevel.Information)
-             .WriteTo.File(filePath)            
+             .WriteTo.File(filePath,
+                rollingInterval: RollingInterval.Day,     
+                rollOnFileSizeLimit: true,                 
+                fileSizeLimitBytes: 1 * 1024 * 1024,      
+                retainedFileCountLimit: 7)
              .CreateLogger();
         var lf = new SerilogLoggerFactory(logger);
         var lp = new SerilogLoggerProvider(logger, false);        
@@ -124,7 +128,11 @@ public abstract class Runtime
         var logger = new LoggerConfiguration()
              .Enrich.FromLogContext()
              .MinimumLevel.Is(debug ? Serilog.Events.LogEventLevel.Verbose : Serilog.Events.LogEventLevel.Information)
-             .WriteTo.File(filePath)
+             .WriteTo.File(filePath,
+                rollingInterval: RollingInterval.Day,
+                rollOnFileSizeLimit: true,
+                fileSizeLimitBytes: 1 * 1024 * 1024,
+                retainedFileCountLimit: 7)
              .WriteTo.Console()
              .CreateLogger();
         var lf = new SerilogLoggerFactory(logger);
@@ -634,7 +642,10 @@ public abstract class Runtime
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile(configFilePath, optional: !required, reloadOnChange: true)
                 .Build();
-     
+
+    public static string GetRequiredValue(IConfigurationRoot config, string key) => config[key] ?? throw new Exception($"Configuration key {key} not found.");
+
+    public static string GetRequiredValue(IConfigurationSection config, string key) => config[key] ?? throw new Exception($"Configuration key {key} not found.");
     #endregion
 
     #region Fields

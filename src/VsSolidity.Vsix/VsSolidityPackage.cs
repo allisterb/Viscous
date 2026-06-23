@@ -139,7 +139,7 @@ namespace VsSolidity
           
             await TaskScheduler.Default;
             await InstallBuildSystemAsync();
-
+            AppSettings.EnsureFileExists();
             await JoinableTaskFactory.SwitchToMainThreadAsync();
             ApplicationThemeManager.Apply(UI.VSTheme.ApplicationThemeGuess);
             await SolidityProjectMenuCommands.InitializeAsync(this);

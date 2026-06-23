@@ -288,23 +288,7 @@ namespace VsSolidity
             return (file, line, col);
             */
         }
-
-        protected bool InstallSolidityLanguageServer()
-        {
-            Log.LogMessage(MessageImportance.High, "Installing vscode-solidity language server...");
-            var output = RunCmd("cmd.exe", "/c npm install solidity-0.0.165.tgz --force --quiet --no-progress", ExtDir);
-            if (CheckRunCmdOutput(output, "Run `npm audit` for details."))
-            {
-                Log.LogMessage(MessageImportance.High, "Solidity language server installed.");
-                return true;
-            }
-            else
-            {
-                Log.LogError("Could not install Solidity language server.");
-                return false;
-            }
-        }
-        
+                
         protected bool InstallNethereumGeneratorToolIfNotPresent()
         {
             if (!File.Exists(Path.Combine(ProjectDir, ".config", "dotnet-tools.json")))

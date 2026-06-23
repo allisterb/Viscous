@@ -28,10 +28,49 @@ background per solution or open folder.
 - **Automatic install:** the first time you open a Solidity file, VsSolidity
   checks for the language server and, if it isn't present, installs it
   automatically (`vscode-solidity-server`). Progress is shown in the
-  **VsSolidity** output pane. This one‑time setup needs Node.js available on
-  your machine.
+  **VsSolidity** output pane. This one‑time setup needs a JavaScript runtime and
+  package manager on your machine — **Node.js** and **npm** by default
+  (configurable — see below).
 - **Startup:** once installed, the server starts automatically and attaches to
   your `.sol` files. No configuration is required.
+
+### Using a different JavaScript runtime or package manager
+
+By default VsSolidity uses **node** to run the language server and **npm** to
+install it. You can point it at alternatives (for example **pnpm**) through a
+settings file at:
+
+```
+%LOCALAPPDATA%\VsSolidity\appsettings.json
+```
+
+It's created automatically with the defaults the first time it's needed:
+
+```json
+{
+  "JSPackageManagerCmd": "npm",
+  "JSRuntimeCmd": "node"
+}
+```
+
+- **`JSPackageManagerCmd`** — the command used to install the language server,
+  and to run **Install NPM packages** for your project. Change it to e.g. `pnpm`.
+- **`JSRuntimeCmd`** — the command used to run the language server, and the
+  command‑line `solc.js` compiler (**Compile Solidity File**).
+
+Each value can be a bare command on your `PATH`, or a full path to an executable —
+so you can point `JSRuntimeCmd` at a **local/portable Node** build (for example
+`C:\tools\node-v20\node.exe`) instead of relying on a globally‑installed one.
+Changes take effect the next time the language server is installed or started.
+
+**Supported:** package managers and runtimes that follow the standard
+**`node_modules` / Node** model. **pnpm** is a drop‑in replacement for npm, and
+any Node executable — global or a local/portable build — works.
+
+**Not supported right now:** runtimes that don't use the `node_modules` model,
+such as **Deno**. The install, run, and `solc.js` compile steps assume an
+npm‑style `node_modules` layout and a Node‑compatible runtime, so stick to
+Node‑compatible tooling.
 
 ## Resolving imports
 
@@ -44,8 +83,9 @@ the project context menu — see
 ## Troubleshooting
 
 - **No highlighting or completions:** confirm the file has a `.sol` extension and
-  that Node.js is installed. Check the **VsSolidity** output pane for language
-  server install/startup messages.
+  that your JavaScript runtime/package manager is installed and on your `PATH`
+  (Node.js + npm by default — see above). Check the **VsSolidity** output pane for
+  language server install/startup messages.
 - **Unresolved imports:** run **Install NPM packages** so the libraries are in
   `node_modules`.
 - **Stale diagnostics:** edit and save the file, or reopen it, to prompt the

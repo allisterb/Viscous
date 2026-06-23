@@ -41,6 +41,9 @@ namespace VsSolidity
         #region Properties
         public static string SolutionOpenFolder { get; set; }
 
+        // Entry point of the installed vscode-solidity language server.
+        internal static string LanguageServerPath => Path.Combine(Runtime.AssemblyLocation, "node_modules", "vscode-solidity-server", "dist", "cli", "server.js");
+
         public string Name => "Solidity Language Client";
 
         public IEnumerable<string> ConfigurationSections
@@ -90,7 +93,8 @@ namespace VsSolidity
             var programPath = "cmd.exe";
             info.FileName = programPath;
             //info.Arguments = "/c " + Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "npm", "nomicfoundation-solidity-language-server.cmd") +  " --stdio";
-            info.Arguments = "/c " + "node \"" + Path.Combine(Runtime.AssemblyLocation, "node_modules", "vscode-solidity-server", "dist", "cli", "server.js") + "\" --stdio";
+            // Use the configured JS runtime (default "node"; can be set to e.g. "deno run -A" in appsettings.json).
+            info.Arguments = "/c " + AppSettings.JSRuntimeCmd + " \"" + LanguageServerPath + "\" --stdio";
             info.WorkingDirectory = AssemblyLocation;
             info.RedirectStandardInput = true;
             info.RedirectStandardOutput = true;
@@ -116,14 +120,15 @@ namespace VsSolidity
 
         }
 
+        // Use the configured JS package manager (default "npm"; can be set to e.g. "pnpm" in appsettings.json).
         public static Dictionary<string, object> InstallVSCodeSolidityLanguageServer()
         {
-            return RunCmd("cmd.exe", "/c npm install vscode-solidity-server --quiet --no-progress", AssemblyLocation);
+            return RunCmd("cmd.exe", "/c " + AppSettings.JSPackageManagerCmd + " install vscode-solidity-server", AssemblyLocation);
         }
 
         public static async Task<Dictionary<string, object>> InstallVSCodeSolidityLanguageServerAsync()
         {
-            return await RunCmdAsync("cmd.exe", "/c npm install vscode-solidity-server --quiet --no-progress", AssemblyLocation);
+            return await RunCmdAsync("cmd.exe", "/c " + AppSettings.JSPackageManagerCmd + " install vscode-solidity-server", AssemblyLocation);
         }
 
         #region ILanguageClient, ILanguageClientCustomMessage2 implementation
@@ -142,7 +147,7 @@ namespace VsSolidity
                     return null;
                 }
             }
-            if (Directory.Exists(Path.Combine(Runtime.AssemblyLocation, "node_modules")) && File.Exists(Path.Combine(Runtime.AssemblyLocation, "node_modules", "vscode-solidity-server", "dist", "cli", "server.js")))
+            if (File.Exists(LanguageServerPath))
             {
                VSUtil.LogInfo("VsSolidity", "Solidity language server present.");
             }
@@ -153,13 +158,16 @@ namespace VsSolidity
                 await TaskScheduler.Default;
                 var output = await InstallVSCodeSolidityLanguageServerAsync();
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                if (CheckRunCmdOutput(output, "Run `npm audit` for details."))
+                // Determine success by whether the server is actually present, so this works regardless of which
+                // package manager (npm, pnpm, …) ran and what it printed.
+                if (File.Exists(LanguageServerPath))
                 {
                     VSUtil.LogInfo("VsSolidity", "Solidity language server installed.");
                 }
                 else
                 {
-                    VSUtil.LogError("VsSolidity", "Could not install Solidity language server.");
+                    var err = output.ContainsKey("stderr") ? (string)output["stderr"] : Runtime.GetRunCmdError(output);
+                    VSUtil.LogError("VsSolidity", $"Could not install the Solidity language server using '{AppSettings.JSPackageManagerCmd}'. Check that it is installed and on your PATH. {err}");
                     return null;
                 }
             }

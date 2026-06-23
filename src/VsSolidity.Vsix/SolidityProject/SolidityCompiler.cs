@@ -34,7 +34,8 @@ namespace VsSolidity
             }
             var cmd = "cmd.exe";
             var solcpath = File.Exists(Path.Combine(workspaceDir, "node_modules", "solc", "solc.js")) ? Path.Combine(workspaceDir, "node_modules", "solc", "solc.js") : Path.Combine(AssemblyLocation, "node_modules", "solc", "solc.js");
-            var args = "/c node " + "\"" + solcpath + "\"" + " --base-path=\"" + workspaceDir + "\"" + " \"" + file + "\" --bin";
+            // Use the configured JS runtime (default "node"; configurable in %LOCALAPPDATA%\VsSolidity\appsettings.json).
+            var args = "/c " + AppSettings.JSRuntimeCmd + " " + "\"" + solcpath + "\"" + " --base-path=\"" + workspaceDir + "\"" + " \"" + file + "\" --bin";
             if (Directory.Exists(Path.Combine(workspaceDir, "node_modules")))
             {
                 args += " --include-path=" + Path.Combine(workspaceDir, "node_modules");
@@ -96,9 +97,10 @@ namespace VsSolidity
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             VSUtil.ShowLogOutputWindowPane(ServiceProvider.GlobalProvider, "VsSolidity");
-            VSUtil.LogInfo("VsSolidity", string.Format("Installing NPM dependencies in project directory {0}...", projectDir));
+            VSUtil.LogInfo("VsSolidity", string.Format("Installing JavaScript package dependencies in {0} using {1}...", projectDir, AppSettings.JSPackageManagerCmd));
             await TaskScheduler.Default;
-            var output = await RunCmdAsync("cmd.exe", "/c npm install", projectDir);
+            // Use the configured JS package manager (default "npm"; configurable in %LOCALAPPDATA%\VsSolidity\appsettings.json).
+            var output = await RunCmdAsync("cmd.exe", "/c " + AppSettings.JSPackageManagerCmd + " install", projectDir);
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             if (CheckRunCmdError(output))
             {

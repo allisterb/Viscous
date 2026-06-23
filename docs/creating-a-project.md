@@ -56,6 +56,10 @@ the **VsSolidity** output pane. When you build or compile, the project's
 `node_modules` folder is passed to the compiler as an include path so imports
 like `@openzeppelin/contracts/...` resolve correctly.
 
+> You can use a different package manager (for example **pnpm**) instead of npm
+> by setting `JSPackageManagerCmd` in `%LOCALAPPDATA%\VsSolidity\appsettings.json`
+> — see [Using a different JavaScript runtime or package manager](editing-solidity.md#using-a-different-javascript-runtime-or-package-manager).
+
 ## Next steps
 
 - [Editing Solidity code](editing-solidity.md)
