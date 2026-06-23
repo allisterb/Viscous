@@ -151,7 +151,7 @@ public abstract class Runtime
     public static void Fatal(string messageTemplate, params object[] args) => logger.LogCritical(messageTemplate, args);
 
     [DebuggerStepThrough]
-    public static LoggerOp Begin(string messageTemplate, params object[] args) => new LoggerOp(logger, messageTemplate, args);
+    public static LoggerOp Begin(string messageTemplate) => new LoggerOp(logger, messageTemplate);
 
     [DebuggerStepThrough]
     public static string FailIfFileDoesNotExist(string filePath)
@@ -403,7 +403,7 @@ public abstract class Runtime
 
     public static void CopyDirectory(string sourceDir, string destinationDir, bool recursive = false)
     {
-        using var op = Begin("Copying {0} to {1}", sourceDir, destinationDir);
+        using var op = Begin($"Copying {sourceDir} to {destinationDir}");
         // Get information about the source directory
         var dir = new DirectoryInfo(sourceDir);
 
@@ -438,7 +438,7 @@ public abstract class Runtime
 
     public static async Task CopyDirectoryAsync(string sourceDir, string destinationDir, bool recursive = false)
     {
-        using var op = Begin("Copying {0} to {1}", sourceDir, destinationDir);
+        using var op = Begin($"Copying {sourceDir} to {destinationDir}");
         // Get information about the source directory
         var dir = new DirectoryInfo(sourceDir);
 
@@ -492,7 +492,7 @@ public abstract class Runtime
     public static async Task<bool> DownloadFileAsync(string name, Uri downloadUrl, string downloadPath)
     {
 #pragma warning disable SYSLIB0014 // Type or member is obsolete
-        using (var op = Begin("Downloading {0} from {1} to {2}", name, downloadUrl, downloadPath))
+        using (var op = Begin($"Downloading {name} from {downloadUrl} to {downloadPath}"))
         {
             using (var client = new WebClient())
             {
@@ -574,7 +574,7 @@ public abstract class Runtime
     public static bool DownloadFile(string name, Uri downloadUrl, string downloadPath)
     {
 #pragma warning disable SYSLIB0014 // Type or member is obsolete
-        using (var op = Begin("Downloading {0} from {1} to {2}", name, downloadUrl, downloadPath))
+        using (var op = Begin($"Downloading {name} from {downloadUrl} to {downloadPath}"))
         {
             WarnIfFileExists(downloadPath);
             using (var client = new WebClient())

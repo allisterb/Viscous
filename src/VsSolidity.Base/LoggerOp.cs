@@ -6,12 +6,12 @@ using Microsoft.Extensions.Logging;
 
 public class LoggerOp :  IDisposable
 {
-    public LoggerOp(ILogger l, string opName, params object[] args)
+    public LoggerOp(ILogger l, string opName)
     {
         timer.Start();
         this.l = l;
-        this.opName = opName;   
-        this.l.LogInformation(opName + "...", args);
+        this.opName = opName;          
+        this.l.LogInformation(opName + "...");
     }
 
     public void Complete()
@@ -40,6 +40,8 @@ public class LoggerOp :  IDisposable
     public ILogger l;
 
     public string opName = "";
+
+    public object[] args = [];
 
     public Stopwatch timer = new Stopwatch();
 

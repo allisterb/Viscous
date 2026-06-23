@@ -51,7 +51,7 @@ namespace VsSolidity
         #region Constructors
         static VsSolidityPackage()
         {
-            Runtime.WithFileLogging("VsSolidity", "VS", false);
+            Runtime.WithFileLogging("VsSolidity", "VS", false, Runtime.VsSolidityDir);
         }
         #endregion
 
@@ -153,7 +153,12 @@ namespace VsSolidity
         #region Static Methods
         private static async Task InstallBuildSystemAsync()
         {
+            if (!Directory.Exists(Runtime.LocalAppDataDir.CombinePath("CustomProjectSystems", "Solidity")))
+            {
+                Directory.CreateDirectory(Runtime.LocalAppDataDir.CombinePath("CustomProjectSystems", "Solidity"));
+            }
             await File.WriteAllTextAsync(Runtime.LocalAppDataDir.CombinePath("CustomProjectSystems", "Solidity", "extdir.txt"), Runtime.AssemblyLocation);
+            
             // Always refresh the build system directory and build task assembly so extension upgrades pick up the latest files.
             await Runtime.CopyDirectoryAsync(Runtime.AssemblyLocation.CombinePath("BuildSystem"), Runtime.LocalAppDataDir.CombinePath("CustomProjectSystems", "Solidity"), true);
 
@@ -166,7 +171,6 @@ namespace VsSolidity
             {
                 await Runtime.CopyFileAsync(Runtime.AssemblyLocation.CombinePath("CompactJson.dll"), Runtime.LocalAppDataDir.CombinePath("CustomProjectSystems", "Solidity", "Tools", "CompactJson.dll"));
             }
-
 
             await InstallSolcSelectAsync();
             await InstallSlitherAnalyzerAsync();
