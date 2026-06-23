@@ -913,15 +913,23 @@ namespace VsSolidity.UI
                 };
            
                 var transactCheckBox = (CheckBox)((_sp).Children[0]);
-                var transactPanel = (StackPanel)((_sp).Children[1]);    
-                var fromAddressTextBox = (Wpc.TextBox)((StackPanel)(transactPanel).Children[0]).Children[1];
+                var transactPanel = (StackPanel)((_sp).Children[1]);
+                var fromAccountComboBox = (ComboBox)((StackPanel)(transactPanel).Children[0]).Children[1];
                 var privateKeyPasswordBox = (Wpc.PasswordBox)((StackPanel)(transactPanel).Children[0]).Children[3];
                 var estimateGasRadioButton = (RadioButton) ((StackPanel)(((StackPanel)transactPanel.Children[0]).Children[4])).Children[1];
                 var customGasRadioButton = (RadioButton) ((StackPanel) (((StackPanel)(((StackPanel)transactPanel.Children[0]).Children[4])).Children[2])).Children[0];
                 var customGasNumberBox = (Wpc.TextBox)((StackPanel)(((StackPanel)(((StackPanel)transactPanel.Children[0]).Children[4])).Children[2])).Children[1];
-                // Default the "from" account to the contract's deployer (Creator), not the contract's own
-                // address. The user can change it, and a supplied private key overrides it with the key's address.
-                fromAddressTextBox.Text = item.Data.ContainsKey("Creator") ? (string)item.Data["Creator"] : "";
+                // List the network's saved accounts (item is the contract: Contract -> "Contracts" folder -> Network).
+                var accounts = item.Parent.Parent.GetNetworkAccounts().ToList();
+                fromAccountComboBox.ItemsSource = accounts;
+                // Default the "from" account to the contract's deployer (Creator) when it's one of the saved accounts.
+                // The user can pick another, and a supplied private key overrides it with the key's address.
+                var creator = item.Data.ContainsKey("Creator") ? (string)item.Data["Creator"] : null;
+                fromAccountComboBox.SelectedItem = (creator != null && accounts.Contains(creator)) ? creator
+                    : (accounts.Count > 0 ? accounts[0] : null);
+                // The dialog is a shared resource, so its inputs persist between opens. Clear the private-key box so a
+                // stale value from a previous run can't be silently reused.
+                privateKeyPasswordBox.Password = "";
                 transactCheckBox.Checked += (s, ev) =>
                 {
                     transactPanel.IsEnabled = true;
@@ -940,7 +948,7 @@ namespace VsSolidity.UI
                 };  
                 var formPanel = (StackPanel)(_sp).Children[2];
                 var statusPanel = ((StackPanel)(_sp).Children[3]);
-                await CreateRunContractFormAsync(formPanel, statusPanel, item.Data, transactCheckBox, fromAddressTextBox, () => privateKeyPasswordBox.Password, () => (estimateGasRadioButton.IsChecked ?? false) ? null : new HexBigInteger(long.TryParse(customGasNumberBox.Text, out var cg) ? cg : 3000000L));
+                await CreateRunContractFormAsync(formPanel, statusPanel, item.Data, transactCheckBox, fromAccountComboBox, () => privateKeyPasswordBox.Password, () => (estimateGasRadioButton.IsChecked ?? false) ? null : new HexBigInteger(long.TryParse(customGasNumberBox.Text, out var cg) ? cg : 3000000L));
                 dw.ButtonClicked += (cd, args) => { };
                 dw.Closing += (d, args) => { };
                 await dw.ShowAsync();                             
@@ -1005,6 +1013,15 @@ namespace VsSolidity.UI
             progressRing.Visibility = Visibility.Hidden;
         }
 
+        // Shows the spinning ring + status text while a contract function runs (mirrors the deploy tool window).
+        private void ShowRunProgress(StackPanel progressPanel, Wpc.TextBlock statusText, string text)
+        {
+            statusText.Text = text;
+            progressPanel.Visibility = Visibility.Visible;
+        }
+
+        private void HideRunProgress(StackPanel progressPanel) => progressPanel.Visibility = Visibility.Hidden;
+
         private void ShowValidationSuccess(StackPanel successPanel, Wpc.TextBlock successTextBlock, string message)
         {
             successPanel.Visibility = Visibility.Visible;
@@ -1013,21 +1030,22 @@ namespace VsSolidity.UI
 
         private void HideValidationSuccess(StackPanel successPanel) => successPanel.Visibility = Visibility.Hidden;
 
-        private async Task CreateRunContractFormAsync(StackPanel form, StackPanel statusPanel, Dictionary<string, object> contractData, CheckBox transactCheckBox, Wpc.TextBox fromAddress, Func<string> privateKey, Func<HexBigInteger> gas)
+        private async Task CreateRunContractFormAsync(StackPanel form, StackPanel statusPanel, Dictionary<string, object> contractData, CheckBox transactCheckBox, ComboBox fromAccount, Func<string> privateKey, Func<HexBigInteger> gas)
         {
-            form.Children.Clear();  
+            form.Children.Clear();
             var errors = (Wpc.TextBlock)((Grid)statusPanel.Children[0]).Children[0];
-            var progressring = (ProgressRing)((Grid)statusPanel.Children[0]).Children[1];
+            var progressPanel = (StackPanel)((Grid)statusPanel.Children[0]).Children[1];
+            var statusText = (Wpc.TextBlock)progressPanel.Children[1];
             var successPanel = ((StackPanel)((Grid)statusPanel.Children[0]).Children[2]);
             var successTextBlock = (Wpc.TextBlock) successPanel.Children[1];
             var address = (string)contractData["Address"];
             var rpcurl = (string)contractData["Endpoint"];
             var abi = (string)contractData["Abi"];
             var _abi = Contract.DeserializeABI(abi);
-            
-            ShowProgressRing(progressring);
+
+            ShowRunProgress(progressPanel, statusText, "Loading contract balance…");
             var balr = await ThreadHelper.JoinableTaskFactory.RunAsync(() => ExecuteAsync(Network.GetBalance(rpcurl, address)));
-            HideProgressRing(progressring);
+            HideRunProgress(progressPanel);
             if (balr.IsSuccess)
             {
                 HideValidationErrors(errors);
@@ -1076,8 +1094,9 @@ namespace VsSolidity.UI
                     FontSize = 11.0,
                     Margin = new Thickness(0, 4, 0, 0)
                 };
-                // VS themed-dialog button (theme-aware) instead of the hardcoded DodgerBlue/White Fluent accent button.
-                button.SetResourceReference(FrameworkElement.StyleProperty, Microsoft.VisualStudio.Shell.VsResourceKeys.ThemedDialogButtonStyleKey);
+                // Orange to emphasize that clicking runs the function immediately, matching Remix IDE's run buttons.
+                // The dedicated template keeps the orange through hover/pressed states.
+                button.SetResourceReference(FrameworkElement.StyleProperty, "RunContractFunctionButtonStyle");
 
                 if (function.InputParameters != null && function.InputParameters.Count() > 0)
                 {
@@ -1100,7 +1119,7 @@ namespace VsSolidity.UI
                         vsp.Children.Add(sp);
                     }
 
-                    button.Click += (s, e) =>
+                    button.Click += async (s, e) =>
                     {
                         var paramVals = GetContractFunctionParams(vsp, function.InputParameters.ToDictionary(ip => ip.Name, ip => ip.Type), out string paramError);
                         if (!string.IsNullOrEmpty(paramError))
@@ -1114,33 +1133,39 @@ namespace VsSolidity.UI
                             ShowValidationErrors(errors, $"The {function.Name} function requires {function.InputParameters.Count()} parameters.");
                             VSUtil.LogToVsSolidityWindow($"\n========== Call contract {address} at {rpcurl} failed.==========\nThe {function.Name} function requires {function.InputParameters.Count()} parameters.");
                             return;
-                        }   
+                        }
 
-                        ShowProgressRing(progressring);                        
-                        Result<string> r;
-                      
-                        if (transactCheckBox.IsChecked ?? false)
+                        // view/pure (constant) functions never change state, so always call them (eth_call) to read
+                        // the decoded return value. Sending them as a transaction would only return a tx hash.
+                        bool transact = (transactCheckBox.IsChecked ?? false) && !function.Constant;
+                        if (transact && string.IsNullOrEmpty((string)fromAccount.SelectedItem))
                         {
-                            
-                            if (string.IsNullOrEmpty(fromAddress.Text))
-                            {
-                                HideProgressRing(progressring);
-                                ShowValidationErrors(errors, "Enter a valid from address to send the transaction from.");
-                                return;
-                            }
-                            r = ThreadHelper.JoinableTaskFactory.Run(() => ExecuteAsync(Network.SendContractTransactionAsync(rpcurl, address, abi, function.Name, fromAddress.Text, privateKey: privateKey(), gas:gas(), functionInput: paramVals)));
+                            ShowValidationErrors(errors, "Enter a valid from address to send the transaction from.");
+                            return;
+                        }
+
+                        HideValidationErrors(errors);
+                        HideValidationSuccess(successPanel);
+                        // RunAsync (awaited) keeps the UI thread free so the progress ring actually animates.
+                        ShowRunProgress(progressPanel, statusText, $"Running {function.Name}…");
+                        Result<string> r;
+                        if (transact)
+                        {
+                            r = await ThreadHelper.JoinableTaskFactory.RunAsync(() => ExecuteAsync(Network.SendContractTransactionAsync(rpcurl, address, abi, function.Name, (string)fromAccount.SelectedItem, privateKey: privateKey(), gas:gas(), functionInput: paramVals)));
                         }
                         else
                         {
-                            r = ThreadHelper.JoinableTaskFactory.Run(() => ExecuteAsync(Network.CallContractAsync(rpcurl, address, abi, function.Name, functionInput: paramVals)));
-                        }                        
-                        HideProgressRing(progressring);
-                        string desc = (transactCheckBox.IsChecked == null || transactCheckBox.IsChecked == false) ? "call" : "transaction";
+                            r = await ThreadHelper.JoinableTaskFactory.RunAsync(() => ExecuteAsync(Network.CallContractAsync(rpcurl, address, abi, function.Name, functionInput: paramVals)));
+                        }
+                        HideRunProgress(progressPanel);
+                        string desc = transact ? "transaction" : "call";
                         if (r.IsSuccess)
                         {
+                            // A transaction returns a tx hash, not the function's return value; a call returns the value.
+                            string resultLabel = transact ? "returned transaction hash" : "returned";
                             HideValidationErrors(errors);
-                            ShowValidationSuccess(successPanel, successTextBlock, $"Function {function.Name}({paramVals.Select(v => v.ToString()).JoinWith(",")}) returned: {r.Value}");
-                            VSUtil.LogToVsSolidityWindow($"\n========== Call contract {address} at {rpcurl} succeeded.==========\n[{desc}] {address +":" + function.Name}({function.InputParameters.Select((p,i) =>p.Type + " " + p.Name + ":" +paramVals.ElementAt(i)).JoinWith(", ")}): {r.Value}");
+                            ShowValidationSuccess(successPanel, successTextBlock, $"Function {function.Name}({paramVals.Select(v => v.ToString()).JoinWith(",")}) {resultLabel}: {r.Value}");
+                            VSUtil.LogToVsSolidityWindow($"\n========== Call contract {address} at {rpcurl} succeeded.==========\n[{desc}] {address +":" + function.Name}({function.InputParameters.Select((p,i) =>p.Type + " " + p.Name + ":" +paramVals.ElementAt(i)).JoinWith(", ")}) {resultLabel}: {r.Value}");
                         }
                         else
                         {
@@ -1152,31 +1177,38 @@ namespace VsSolidity.UI
                 }                
                 else
                 {
-                    button.Click += (s, e) =>
-                    {                                                
-                        ShowProgressRing(progressring);
-                        Result<string> r;
-                        if (transactCheckBox.IsChecked ?? false)
+                    button.Click += async (s, e) =>
+                    {
+                        // view/pure (constant) functions never change state, so always call them (eth_call) to read
+                        // the decoded return value. Sending them as a transaction would only return a tx hash.
+                        bool transact = (transactCheckBox.IsChecked ?? false) && !function.Constant;
+                        if (transact && string.IsNullOrEmpty((string)fromAccount.SelectedItem))
                         {
-                            if (string.IsNullOrEmpty(fromAddress.Text))
-                            {
-                                HideProgressRing(progressring);
-                                ShowValidationErrors(errors, "Enter a valid from address to send the transaction from.");
-                                return;
-                            }
-                            r = ThreadHelper.JoinableTaskFactory.Run(() => ExecuteAsync(Network.SendContractTransactionAsync(rpcurl, address, abi, function.Name, fromAddress.Text, privateKey: privateKey(), gas:gas())));
+                            ShowValidationErrors(errors, "Enter a valid from address to send the transaction from.");
+                            return;
+                        }
+
+                        HideValidationErrors(errors);
+                        HideValidationSuccess(successPanel);
+                        ShowRunProgress(progressPanel, statusText, $"Running {function.Name}…");
+                        Result<string> r;
+                        if (transact)
+                        {
+                            r = await ThreadHelper.JoinableTaskFactory.RunAsync(() => ExecuteAsync(Network.SendContractTransactionAsync(rpcurl, address, abi, function.Name, (string)fromAccount.SelectedItem, privateKey: privateKey(), gas:gas())));
                         }
                         else
                         {
-                            r = ThreadHelper.JoinableTaskFactory.Run(() => ExecuteAsync(Network.CallContractAsync(rpcurl, address, abi, function.Name)));
-                        }                        
-                        HideProgressRing(progressring);
-                        string desc = (transactCheckBox.IsChecked == null || transactCheckBox.IsChecked == false) ? "call" : "transaction";
+                            r = await ThreadHelper.JoinableTaskFactory.RunAsync(() => ExecuteAsync(Network.CallContractAsync(rpcurl, address, abi, function.Name)));
+                        }
+                        HideRunProgress(progressPanel);
+                        string desc = transact ? "transaction" : "call";
                         if (r.IsSuccess)
                         {
-                            HideValidationErrors(errors);                            
-                            ShowValidationSuccess(successPanel, successTextBlock, $"Function {function.Name} returned: {r.Value}");
-                            VSUtil.LogToVsSolidityWindow($"\n========== Call contract {address} at {rpcurl} succeeded.==========\n[{desc}] {address + ":" + function.Name}: {r.Value}");
+                            // A transaction returns a tx hash, not the function's return value; a call returns the value.
+                            string resultLabel = transact ? "returned transaction hash" : "returned";
+                            HideValidationErrors(errors);
+                            ShowValidationSuccess(successPanel, successTextBlock, $"Function {function.Name} {resultLabel}: {r.Value}");
+                            VSUtil.LogToVsSolidityWindow($"\n========== Call contract {address} at {rpcurl} succeeded.==========\n[{desc}] {address + ":" + function.Name} {resultLabel}: {r.Value}");
                         }
                         else
                         {

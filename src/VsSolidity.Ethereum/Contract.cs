@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Numerics;
 
 using Nethereum.ABI.Model;
 
@@ -69,11 +70,13 @@ namespace VsSolidity.Ethereum
                     throw new FormatException($"Cannot convert '{value}' to bool.");
                 case "uint":
                 case "uint256":
-                    if (ulong.TryParse(value, out var ul)) return ul;
+                    // Use BigInteger (the type Nethereum's ABI encoder expects for uint256) so the full
+                    // unsigned 256-bit range round-trips correctly instead of overflowing a 64-bit ulong.
+                    if (BigInteger.TryParse(value, out var ui) && ui.Sign >= 0) return ui;
                     throw new FormatException($"Cannot convert '{value}' to uint256.");
                 case "int":
                 case "int256":
-                    if (long.TryParse(value, out var l)) return l;
+                    if (BigInteger.TryParse(value, out var si)) return si;
                     throw new FormatException($"Cannot convert '{value}' to int256.");
                 case "bytes32":
                     // Accept hex string or convert string to bytes32 (padded/truncated)
