@@ -23,7 +23,7 @@ namespace VsSolidity
     [ProjectTypeRegistration(ProjectTypeGuid, "Solidity", "#2", ProjectExtension, Language, resourcePackageGuid: VsSolidityPackage.PackageGuidString, PossibleProjectExtensions = ProjectExtension, Capabilities = UniqueCapability)]
     internal class SolidityUnconfiguredProject
     {
-        internal const string ProjectTypeGuid = "4FC4544B-041A-41FD-B858-024E6755305D";
+        internal const string ProjectTypeGuid = "27802562-3F4B-47E1-9053-2202345D9D3A";
         
         /// <summary>
         /// The file extension used by your project type.

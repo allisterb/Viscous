@@ -24,6 +24,7 @@ using VsSolidity.Ethereum;
 using VsSolidity.UI.ViewModel;
 using static VsSolidity.Result;
 using Nethereum.Hex.HexTypes;
+using Nethereum.ABI.Model;
 
 namespace VsSolidity.UI
 {
@@ -1086,13 +1087,13 @@ namespace VsSolidity.UI
 
         private void HideRunProgress(StackPanel progressPanel) => progressPanel.Visibility = Visibility.Hidden;
 
-        private void ShowValidationSuccess(StackPanel successPanel, Wpc.TextBlock successTextBlock, string message)
+        private void ShowValidationSuccess(Panel successPanel, Wpc.TextBlock successTextBlock, string message)
         {
             successPanel.Visibility = Visibility.Visible;
             successTextBlock.Text = message;
-        }   
+        }
 
-        private void HideValidationSuccess(StackPanel successPanel) => successPanel.Visibility = Visibility.Hidden;
+        private void HideValidationSuccess(Panel successPanel) => successPanel.Visibility = Visibility.Hidden;
 
         private async Task CreateRunContractFormAsync(StackPanel form, StackPanel statusPanel, Dictionary<string, object> contractData, CheckBox transactCheckBox, ComboBox fromAccount, Func<string> privateKey, Func<HexBigInteger> gas)
         {
@@ -1100,7 +1101,7 @@ namespace VsSolidity.UI
             var errors = (Wpc.TextBlock)((Grid)statusPanel.Children[0]).Children[0];
             var progressPanel = (StackPanel)((Grid)statusPanel.Children[0]).Children[1];
             var statusText = (Wpc.TextBlock)progressPanel.Children[1];
-            var successPanel = ((StackPanel)((Grid)statusPanel.Children[0]).Children[2]);
+            var successPanel = ((Panel)((Grid)statusPanel.Children[0]).Children[2]);
             var successTextBlock = (Wpc.TextBlock) successPanel.Children[1];
             var address = (string)contractData["Address"];
             var rpcurl = (string)contractData["Endpoint"];
@@ -1136,156 +1137,154 @@ namespace VsSolidity.UI
                 return;
             }
                        
-            foreach (var function in _abi.Functions)
+            // Remix-style function picker: choose one function from a combo box, its parameter inputs appear below,
+            // and a single Run button executes it. Scales far better than listing every function inline.
+            var functionsBySig = new Dictionary<string, FunctionABI>();
+            var signatures = new List<string>();
+            foreach (var f in _abi.Functions)
             {
-                var vsp = new StackPanel()
-                {
-                    Orientation = Orientation.Vertical,
-                };
-                vsp.Children.Add(new Separator()
-                {
-                    Margin = new Thickness(0, 8, 0, 8),
-                    Height = 1
-                });
+                var inputs = (f.InputParameters ?? Array.Empty<Parameter>()).Select(p => string.IsNullOrEmpty(p.Name) ? p.Type : $"{p.Type} {p.Name}");
+                var sig = $"{f.Name}({string.Join(", ", inputs)})";
+                if (!functionsBySig.ContainsKey(sig)) { functionsBySig[sig] = f; signatures.Add(sig); }
+            }
 
-                var button = new Wpc.Button()
-                {
-                    Name = function.Name + "_Button",
-                    Content = function.Name,
-                    MinWidth = 75.0,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    HorizontalAlignment = HorizontalAlignment.Right,
-                    FontSize = 11.0,
-                    Margin = new Thickness(0, 4, 0, 0)
-                };
-                // Orange to emphasize that clicking runs the function immediately, matching Remix IDE's run buttons.
-                // The dedicated template keeps the orange through hover/pressed states.
-                button.SetResourceReference(FrameworkElement.StyleProperty, "RunContractFunctionButtonStyle");
+            form.Children.Add(new Separator() { Margin = new Thickness(0, 8, 0, 8), Height = 1 });
+            form.Children.Add(new Label() { Content = "Function:", Margin = new Thickness(1, 0, 0, 2) });
+            var functionCombo = new ComboBox()
+            {
+                Name = "RunContractFunctionComboBox",
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                Margin = new Thickness(0, 2, 10, 4),
+                ItemsSource = signatures,
+            };
+            form.Children.Add(functionCombo);
 
-                if (function.InputParameters != null && function.InputParameters.Count() > 0)
+            var paramsPanel = new StackPanel() { Orientation = Orientation.Vertical, Margin = new Thickness(0, 2, 0, 2) };
+            form.Children.Add(paramsPanel);
+
+            var runButton = new Wpc.Button()
+            {
+                Name = "RunFunctionButton",
+                Content = "Run",
+                MinWidth = 75.0,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                FontSize = 11.0,
+                Margin = new Thickness(0, 4, 0, 0),
+                IsEnabled = false,
+            };
+            // Orange to emphasize that clicking runs the function immediately, matching Remix IDE's run buttons.
+            runButton.SetResourceReference(FrameworkElement.StyleProperty, "RunContractFunctionButtonStyle");
+            form.Children.Add(runButton);
+
+            // Rebuild the parameter inputs whenever the selected function changes.
+            functionCombo.SelectionChanged += (s, e) =>
+            {
+                paramsPanel.Children.Clear();
+                HideValidationErrors(errors);
+                HideValidationSuccess(successPanel);
+                var selected = functionCombo.SelectedItem as string;
+                runButton.IsEnabled = selected != null;
+                if (selected == null || !functionsBySig.TryGetValue(selected, out var fn)) return;
+                // Remix-style colour cue: blue for view/pure (a read-only call), orange for state-changing functions.
+                runButton.SetResourceReference(FrameworkElement.StyleProperty, fn.Constant ? "RunContractCallButtonStyle" : "RunContractFunctionButtonStyle");
+                foreach (var p in fn.InputParameters ?? Array.Empty<Parameter>())
                 {
-                    foreach (var p in function.InputParameters)
+                    var sp = new StackPanel()
                     {
-                        var sp = new StackPanel()
-                        {
-                            Orientation = Orientation.Horizontal,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            Margin = new Thickness(4, 4, 0, 2)
-                        };
-                        var lbl = new Wpc.TextBlock { Width = 100, VerticalAlignment = VerticalAlignment.Bottom};
-                        lbl.Inlines.Add(new Run() { Text = p.Name });
-                        lbl.Inlines.Add(new Run() { Text = $" ({p.Type}): ", FontStyle = FontStyles.Italic, FontSize=9.0});
-                        var tb = new Wpc.TextBox() { Name = $"Param{p.Name}TextBox", Width = 150, VerticalAlignment = VerticalAlignment.Bottom };
-                        tb.SetResourceReference(FrameworkElement.StyleProperty, Microsoft.VisualStudio.Shell.VsResourceKeys.ThemedDialogTextBoxStyleKey);
-                        sp.Children.Add(lbl);
-                        sp.Children.Add(tb);
-                        vsp.Children.Add(sp);
+                        Orientation = Orientation.Horizontal,
+                        VerticalAlignment = VerticalAlignment.Top,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        Margin = new Thickness(4, 4, 0, 2)
+                    };
+                    var lbl = new Wpc.TextBlock { Width = 100, VerticalAlignment = VerticalAlignment.Bottom };
+                    lbl.Inlines.Add(new Run() { Text = p.Name });
+                    lbl.Inlines.Add(new Run() { Text = $" ({p.Type}): ", FontStyle = FontStyles.Italic, FontSize = 9.0 });
+                    var tb = new Wpc.TextBox() { Name = $"Param{p.Name}TextBox", Width = 150, VerticalAlignment = VerticalAlignment.Bottom };
+                    tb.SetResourceReference(FrameworkElement.StyleProperty, Microsoft.VisualStudio.Shell.VsResourceKeys.ThemedDialogTextBoxStyleKey);
+                    sp.Children.Add(lbl);
+                    sp.Children.Add(tb);
+                    paramsPanel.Children.Add(sp);
+                }
+            };
+
+            runButton.Click += async (s, e) =>
+            {
+                try
+                {
+                    var selected = functionCombo.SelectedItem as string;
+                    if (selected == null || !functionsBySig.TryGetValue(selected, out var function))
+                    {
+                        ShowValidationErrors(errors, "Select a function to run.");
+                        return;
                     }
-
-                    button.Click += async (s, e) =>
+                    var inputCount = function.InputParameters?.Count() ?? 0;
+                    object[] paramVals = Array.Empty<object>();
+                    if (inputCount > 0)
                     {
-                        var paramVals = GetContractFunctionParams(vsp, function.InputParameters.ToDictionary(ip => ip.Name, ip => ip.Type), out string paramError);
+                        paramVals = GetContractFunctionParams(paramsPanel, function.InputParameters.ToDictionary(ip => ip.Name, ip => ip.Type), out string paramError);
                         if (!string.IsNullOrEmpty(paramError))
                         {
                             ShowValidationErrors(errors, $"Error parsing function parameters: \n{paramError}");
                             VSUtil.LogToVsSolidityWindow($"\n========== Call contract {address} at {rpcurl} failed.==========\nError parsing function parameters: {paramError}");
                             return;
                         }
-                        else if (paramVals.Length != function.InputParameters.Count())
+                        if (paramVals.Length != inputCount)
                         {
-                            ShowValidationErrors(errors, $"The {function.Name} function requires {function.InputParameters.Count()} parameters.");
-                            VSUtil.LogToVsSolidityWindow($"\n========== Call contract {address} at {rpcurl} failed.==========\nThe {function.Name} function requires {function.InputParameters.Count()} parameters.");
+                            ShowValidationErrors(errors, $"The {function.Name} function requires {inputCount} parameter(s).");
+                            VSUtil.LogToVsSolidityWindow($"\n========== Call contract {address} at {rpcurl} failed.==========\nThe {function.Name} function requires {inputCount} parameter(s).");
                             return;
                         }
+                    }
 
-                        // view/pure (constant) functions never change state, so always call them (eth_call) to read
-                        // the decoded return value. Sending them as a transaction would only return a tx hash.
-                        bool transact = (transactCheckBox.IsChecked ?? false) && !function.Constant;
-                        if (transact && string.IsNullOrEmpty((string)fromAccount.SelectedItem))
-                        {
-                            ShowValidationErrors(errors, "Enter a valid from address to send the transaction from.");
-                            return;
-                        }
-
-                        HideValidationErrors(errors);
-                        HideValidationSuccess(successPanel);
-                        // RunAsync (awaited) keeps the UI thread free so the progress ring actually animates.
-                        ShowRunProgress(progressPanel, statusText, $"Running {function.Name}…");
-                        Result<string> r;
-                        if (transact)
-                        {
-                            r = await ThreadHelper.JoinableTaskFactory.RunAsync(() => ExecuteAsync(Network.SendContractTransactionAsync(rpcurl, address, abi, function.Name, (string)fromAccount.SelectedItem, privateKey: privateKey(), gas:gas(), functionInput: paramVals)));
-                        }
-                        else
-                        {
-                            r = await ThreadHelper.JoinableTaskFactory.RunAsync(() => ExecuteAsync(Network.CallContractAsync(rpcurl, address, abi, function.Name, functionInput: paramVals)));
-                        }
-                        HideRunProgress(progressPanel);
-                        string desc = transact ? "transaction" : "call";
-                        if (r.IsSuccess)
-                        {
-                            // A transaction returns a tx hash, not the function's return value; a call returns the value.
-                            string resultLabel = transact ? "returned transaction hash" : "returned";
-                            HideValidationErrors(errors);
-                            ShowValidationSuccess(successPanel, successTextBlock, $"Function {function.Name}({paramVals.Select(v => v.ToString()).JoinWith(",")}) {resultLabel}: {r.Value}");
-                            VSUtil.LogToVsSolidityWindow($"\n========== Call contract {address} at {rpcurl} succeeded.==========\n[{desc}] {address +":" + function.Name}({function.InputParameters.Select((p,i) =>p.Type + " " + p.Name + ":" +paramVals.ElementAt(i)).JoinWith(", ")}) {resultLabel}: {r.Value}");
-                        }
-                        else
-                        {
-                            HideValidationSuccess(successPanel);
-                            ShowValidationErrors(errors, $"Error calling function {function.Name}({paramVals.Select(v => v.ToString()).JoinWith(",")}): {r.FailureMessage}");
-                            VSUtil.LogToVsSolidityWindow($"\n========== Call contract {address} at {rpcurl} failed.==========\n[{desc}] {address + ":" + function.Name}({function.InputParameters.Select((p, i) => p.Type + " " + p.Name + ":" + paramVals.ElementAt(i)).JoinWith(", ")}): {r.FailureMessage}");
-                        }
-                    };
-                }                
-                else
-                {
-                    button.Click += async (s, e) =>
+                    // view/pure (constant) functions never change state, so always call them (eth_call) to read the
+                    // decoded return value. Sending them as a transaction would only return a tx hash.
+                    bool transact = (transactCheckBox.IsChecked ?? false) && !function.Constant;
+                    if (transact && string.IsNullOrEmpty((string)fromAccount.SelectedItem))
                     {
-                        // view/pure (constant) functions never change state, so always call them (eth_call) to read
-                        // the decoded return value. Sending them as a transaction would only return a tx hash.
-                        bool transact = (transactCheckBox.IsChecked ?? false) && !function.Constant;
-                        if (transact && string.IsNullOrEmpty((string)fromAccount.SelectedItem))
-                        {
-                            ShowValidationErrors(errors, "Enter a valid from address to send the transaction from.");
-                            return;
-                        }
+                        ShowValidationErrors(errors, "Select an account to send the transaction from.");
+                        return;
+                    }
 
+                    HideValidationErrors(errors);
+                    HideValidationSuccess(successPanel);
+                    // RunAsync (awaited) keeps the UI thread free so the progress ring actually animates.
+                    ShowRunProgress(progressPanel, statusText, $"Running {function.Name}…");
+                    Result<string> r;
+                    if (transact)
+                    {
+                        r = await ThreadHelper.JoinableTaskFactory.RunAsync(() => ExecuteAsync(Network.SendContractTransactionAsync(rpcurl, address, abi, function.Name, (string)fromAccount.SelectedItem, privateKey: privateKey(), gas: gas(), functionInput: paramVals)));
+                    }
+                    else
+                    {
+                        r = await ThreadHelper.JoinableTaskFactory.RunAsync(() => ExecuteAsync(Network.CallContractAsync(rpcurl, address, abi, function.Name, functionInput: paramVals)));
+                    }
+                    HideRunProgress(progressPanel);
+                    string desc = transact ? "transaction" : "call";
+                    string argsText = inputCount > 0 ? function.InputParameters.Select((p, i) => p.Type + " " + p.Name + ":" + paramVals.ElementAt(i)).JoinWith(", ") : "";
+                    if (r.IsSuccess)
+                    {
+                        // A transaction returns a tx hash, not the function's return value; a call returns the value.
+                        string resultLabel = transact ? "returned transaction hash" : "returned";
                         HideValidationErrors(errors);
+                        ShowValidationSuccess(successPanel, successTextBlock, $"Function {selected} {resultLabel}: {r.Value}");
+                        VSUtil.LogToVsSolidityWindow($"\n========== Call contract {address} at {rpcurl} succeeded.==========\n[{desc}] {address + ":" + function.Name}({argsText}) {resultLabel}: {r.Value}");
+                    }
+                    else
+                    {
                         HideValidationSuccess(successPanel);
-                        ShowRunProgress(progressPanel, statusText, $"Running {function.Name}…");
-                        Result<string> r;
-                        if (transact)
-                        {
-                            r = await ThreadHelper.JoinableTaskFactory.RunAsync(() => ExecuteAsync(Network.SendContractTransactionAsync(rpcurl, address, abi, function.Name, (string)fromAccount.SelectedItem, privateKey: privateKey(), gas:gas())));
-                        }
-                        else
-                        {
-                            r = await ThreadHelper.JoinableTaskFactory.RunAsync(() => ExecuteAsync(Network.CallContractAsync(rpcurl, address, abi, function.Name)));
-                        }
-                        HideRunProgress(progressPanel);
-                        string desc = transact ? "transaction" : "call";
-                        if (r.IsSuccess)
-                        {
-                            // A transaction returns a tx hash, not the function's return value; a call returns the value.
-                            string resultLabel = transact ? "returned transaction hash" : "returned";
-                            HideValidationErrors(errors);
-                            ShowValidationSuccess(successPanel, successTextBlock, $"Function {function.Name} {resultLabel}: {r.Value}");
-                            VSUtil.LogToVsSolidityWindow($"\n========== Call contract {address} at {rpcurl} succeeded.==========\n[{desc}] {address + ":" + function.Name} {resultLabel}: {r.Value}");
-                        }
-                        else
-                        {
-                            HideValidationSuccess(successPanel);
-                            ShowValidationErrors(errors, $"Error calling function: {r.FailureMessage}");
-                            VSUtil.LogToVsSolidityWindow($"\n========== Call contract {address} at {rpcurl} failed.==========\n[{desc}] {address + ":" + function.Name}: {r.FailureMessage}");
-                        }
-                        
-                    };
+                        ShowValidationErrors(errors, $"Error running {function.Name}: {r.FailureMessage}");
+                        VSUtil.LogToVsSolidityWindow($"\n========== Call contract {address} at {rpcurl} failed.==========\n[{desc}] {address + ":" + function.Name}({argsText}): {r.FailureMessage}");
+                    }
                 }
-                vsp.Children.Add(button);
-                form.Children.Add(vsp);               
-            }
+                catch (Exception exc)
+                {
+                    VSUtil.LogVsSolidityError(exc.Message);
+                }
+            };
+
+            // Preselect the first function for convenience.
+            if (signatures.Count > 0) functionCombo.SelectedIndex = 0;
         }
 
         private object[] GetContractFunctionParams(StackPanel form, Dictionary<string, string> paramTypes, out string error)

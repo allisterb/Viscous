@@ -68,10 +68,19 @@ namespace VsSolidity.Ethereum
         public static async Task<string> CallContractAsync(string rpcurl, string contractAddress, string abi, string functionName, HexBigInteger gas = null, HexBigInteger value = null, params object[] functionInput)
         {
             var func = new Web3(rpcurl).Eth.GetContract(abi, contractAddress).GetFunction(functionName);
-            // Decode the result against the function's output ABI. The bare CallAsync(CallInput) overload returns the
-            // raw 32-byte hex of eth_call (e.g. "0x000...02a"), which displays as a meaningless value to the user.
-            var outputs = await func.CallDecodingToDefaultAsync(functionInput);
-            return outputs == null ? "" : string.Join(", ", outputs.Select(o => FormatCallResult(o.Result)));
+            try
+            {
+                // Decode the result against the function's output ABI. The bare CallAsync(CallInput) overload returns
+                // the raw 32-byte hex of eth_call (e.g. "0x000...02a"), which displays as a meaningless value.
+                var outputs = await func.CallDecodingToDefaultAsync(functionInput);
+                return outputs == null ? "" : string.Join(", ", outputs.Select(o => FormatCallResult(o.Result)));
+            }
+            catch (SmartContractCustomErrorRevertException ce)
+            {
+                // A reverted call surfaces here with a terse "Smart contract error" message; decode the revert data
+                // so the caller sees the actual reason (require string, panic code, or custom error).
+                throw new Exception(DescribeContractError(ce), ce);
+            }
         }
 
         // Renders a decoded ABI output value as a human-readable string. byte/bytesN values come back as byte[] and
@@ -80,6 +89,62 @@ namespace VsSolidity.Ethereum
         {
             if (value is byte[] bytes) return "0x" + bytes.ToHex();
             return value?.ToString() ?? "";
+        }
+
+        // Builds a readable message from a reverted call/transaction. Nethereum reports these with a terse
+        // "Smart contract error"; the real detail is the encoded revert data.
+        private static string DescribeContractError(SmartContractCustomErrorRevertException ce)
+        {
+            var decoded = DecodeRevertData(ce.ExceptionEncodedData);
+            if (!string.IsNullOrEmpty(decoded)) return decoded;
+            return string.IsNullOrWhiteSpace(ce.ExceptionEncodedData) ? ce.Message : $"{ce.Message} (revert data: {ce.ExceptionEncodedData})";
+        }
+
+        // Decodes standard Solidity revert payloads: Error(string) (selector 0x08c379a0) and Panic(uint256)
+        // (0x4e487b71). Anything else is reported as a custom error with its selector and raw data.
+        private static string DecodeRevertData(string data)
+        {
+            if (string.IsNullOrWhiteSpace(data)) return null;
+            var hex = data.StartsWith("0x") || data.StartsWith("0X") ? data.Substring(2) : data;
+            if (hex.Length < 8) return null;
+            var selector = hex.Substring(0, 8).ToLowerInvariant();
+            var body = hex.Substring(8);
+            try
+            {
+                if (selector == "08c379a0" && body.Length >= 128) // Error(string)
+                {
+                    var len = (int)System.Numerics.BigInteger.Parse("0" + body.Substring(64, 64), System.Globalization.NumberStyles.HexNumber);
+                    var strHex = body.Substring(128, Math.Min(len * 2, body.Length - 128));
+                    var bytes = Enumerable.Range(0, strHex.Length / 2).Select(i => System.Convert.ToByte(strHex.Substring(i * 2, 2), 16)).ToArray();
+                    return $"reverted: {System.Text.Encoding.UTF8.GetString(bytes)}";
+                }
+                if (selector == "4e487b71" && body.Length >= 64) // Panic(uint256)
+                {
+                    var code = (int)System.Numerics.BigInteger.Parse("0" + body.Substring(0, 64), System.Globalization.NumberStyles.HexNumber);
+                    return $"reverted with panic 0x{code:X2} ({PanicReason(code)})";
+                }
+            }
+            catch { return null; }
+            return $"reverted with custom error 0x{selector} (data: 0x{hex})";
+        }
+
+        // Solidity panic codes (https://docs.soliditylang.org/en/latest/control-structures.html#panic-via-assert-and-error-via-require).
+        private static string PanicReason(int code)
+        {
+            switch (code)
+            {
+                case 0x00: return "generic compiler panic";
+                case 0x01: return "assert(false)";
+                case 0x11: return "arithmetic overflow or underflow";
+                case 0x12: return "division or modulo by zero";
+                case 0x21: return "conversion to an invalid enum value";
+                case 0x22: return "incorrectly encoded storage byte array";
+                case 0x31: return "pop() on an empty array";
+                case 0x32: return "array index out of bounds";
+                case 0x41: return "out of memory / oversized allocation";
+                case 0x51: return "call to an uninitialized internal function";
+                default: return "unknown panic code";
+            }
         }
 
         public static async Task<string> SendContractTransactionAsync(string rpcurl, string contractAddress, string abi, string functionName, string fromAddress = null, string privateKey = null, HexBigInteger gas = null, HexBigInteger value = null, params object[] functionInput)
@@ -105,17 +170,26 @@ namespace VsSolidity.Ethereum
             }
 
             var func = web3.Eth.GetContract(abi, contractAddress).GetFunction(functionName);
-            if (gas == null)
+            TransactionReceipt receipt;
+            try
             {
-                // Estimate against the actual sender (eth_estimateGas returns the minimum that just passes), then
-                // pad by 50%. Some nodes (notably Ganache) revert/run out of gas at the bare estimate, which surfaces
-                // as a generic "VM Exception ... revert".
-                var estimate = await func.EstimateGasAsync(fromAddress, null, value, functionInput);
-                gas = new HexBigInteger(estimate.Value * 3 / 2);
+                if (gas == null)
+                {
+                    // Estimate against the actual sender (eth_estimateGas returns the minimum that just passes), then
+                    // pad by 50%. Some nodes (notably Ganache) revert/run out of gas at the bare estimate, which
+                    // surfaces as a generic "VM Exception ... revert".
+                    var estimate = await func.EstimateGasAsync(fromAddress, null, value, functionInput);
+                    gas = new HexBigInteger(estimate.Value * 3 / 2);
+                }
+                // Wait for the receipt so we can report real success/failure instead of just a tx hash. A reverted
+                // transaction has Status 0; pull its on-chain reason so the caller sees *why* it failed.
+                receipt = await func.SendTransactionAndWaitForReceiptAsync(fromAddress, gas, value, CancellationToken.None, functionInput);
             }
-            // Wait for the receipt so we can report real success/failure instead of just a tx hash. A reverted
-            // transaction has Status 0; pull its on-chain reason so the caller sees *why* it failed.
-            var receipt = await func.SendTransactionAndWaitForReceiptAsync(fromAddress, gas, value, CancellationToken.None, functionInput);
+            catch (SmartContractCustomErrorRevertException ce)
+            {
+                // Gas estimation (or the send) reverted; decode the revert data into a readable reason.
+                throw new Exception(DescribeContractError(ce), ce);
+            }
             if (receipt.HasErrors() == true)
             {
                 string reason = null;

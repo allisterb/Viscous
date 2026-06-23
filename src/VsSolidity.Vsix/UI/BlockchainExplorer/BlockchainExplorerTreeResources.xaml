@@ -799,7 +799,7 @@
 
     <StackPanel x:Key="EditAccountDialog" Orientation="Vertical" VerticalAlignment="Top" Style="{DynamicResource DialogStyle}">
         <StackPanel Orientation="Vertical" >
-            <ui:TextBlock Text="Account Public Key:" VerticalAlignment="Center" Margin="1,0,0,2" />
+            <ui:TextBlock Text="Account Address:" VerticalAlignment="Center" Margin="1,0,0,2" />
             <ui:TextBlock x:Name="EditAccountPublicKeyTextBox" TextWrapping="Wrap" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True"  Width="160" Height="75" VerticalAlignment="Center" Margin="1,0,0,2"   />
             <ui:TextBlock Text="Account Label:" VerticalAlignment="Center" Margin="1,0,0,2" />
             <ui:TextBox x:Name="EditAccountLabelTextBox"  HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center" />
@@ -813,7 +813,7 @@
 
     <StackPanel x:Key="AddAccountDialog" Orientation="Vertical" VerticalAlignment="Top" Style="{DynamicResource DialogStyle}">
         <StackPanel Orientation="Vertical" >
-            <ui:TextBlock Text="Account Public Key:" VerticalAlignment="Center" Margin="1,0,0,2" />
+            <ui:TextBlock Text="Account Address:" VerticalAlignment="Center" Margin="1,0,0,2" />
             <ui:TextBox x:Name="AddAccountPublicKeyTextBox" TextWrapping="Wrap" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True"  Width="160" Height="75" VerticalAlignment="Center" Margin="1,0,0,2"   />
             <ui:TextBlock Text="Account Label:" VerticalAlignment="Center" Margin="1,0,0,2" />
             <ui:TextBox x:Name="AddAccountLabelTextBox"  HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center" />
@@ -903,6 +903,37 @@
         </Setter>
     </Style>
 
+    <!-- Blue "call" button (Remix-style) for view/pure functions, which only read state. -->
+    <Style x:Key="RunContractCallButtonStyle" TargetType="{x:Type ui:Button}">
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Background" Value="#2E86C1" />
+        <Setter Property="BorderBrush" Value="#266FA0" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="8,3" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ui:Button}">
+                    <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#2877AD" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#226A99" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <StackPanel x:Key="RunContractDialog" Orientation="Vertical" VerticalAlignment="Top" Style="{DynamicResource DialogStyle}">
         <CheckBox x:Name="RunContractTransactCheckbox" Content="Transact (requires gas)" Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogCheckBoxStyleKey}}" VerticalAlignment="Center" Margin="1,0,0,2" IsChecked="False" />
         <StackPanel IsEnabled="False" >
@@ -915,8 +946,8 @@
                     <Label Content="Gas Limit:"  Margin="4,0,0,2" />
                     <RadioButton Content="Estimated Gas" Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogRadioButtonStyleKey}}" GroupName="SmartContractGasGroup" IsChecked="True" FontSize="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}" />
                     <StackPanel Orientation="Horizontal">
-                        <RadioButton Content="Custom" Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogRadioButtonStyleKey}}" GroupName="SmartContractGasGroup" FontSize="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}"/>
-                        <ui:TextBox Text="3000000" IsEnabled="False" HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center"/>
+                        <RadioButton Content="Custom" VerticalAlignment="Center" Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogRadioButtonStyleKey}}" GroupName="SmartContractGasGroup" FontSize="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}"/>
+                        <ui:TextBox Text="3000000" IsEnabled="False" MinWidth="120" Margin="6,0,10,0" VerticalAlignment="Center"/>
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
@@ -931,11 +962,11 @@
                     <ui:ProgressRing Name="RunContractDialogProgressRing" IsIndeterminate="True" IsEnabled="True" Width="16" Height="16" VerticalAlignment="Center" />
                     <ui:TextBlock Name="RunContractStatusTextBlock" Margin="6,0,0,0" VerticalAlignment="Center" TextWrapping="WrapWithOverflow" />
                 </StackPanel>
-                <StackPanel Name="RunContractSuccessStackPanel" Grid.Row="0" Orientation="Horizontal" Visibility="Hidden">
-                    <ui:SymbolIcon Symbol="CheckmarkCircle24" VerticalAlignment="Bottom" Foreground="LightGreen" />
-                    <ui:TextBlock Name="RunContractSuccessTextBlock" Margin="4,0,0,0" VerticalAlignment="Bottom" TextWrapping="WrapWithOverflow" 
+                <DockPanel Name="RunContractSuccessStackPanel" Grid.Row="0" Visibility="Hidden" LastChildFill="True">
+                    <ui:SymbolIcon Symbol="CheckmarkCircle24" VerticalAlignment="Top" Foreground="LightGreen" DockPanel.Dock="Left" />
+                    <ui:TextBlock Name="RunContractSuccessTextBlock" Margin="4,0,0,0" VerticalAlignment="Top" TextWrapping="Wrap"
                 ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"/>
-                </StackPanel>
+                </DockPanel>
             </Grid>
         </StackPanel>
     </StackPanel>

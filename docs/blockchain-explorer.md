@@ -88,7 +88,7 @@ last remaining endpoint.
 ## Accounts
 
 Right‑click a **Network** and choose **Add Account…** to add an account by its
-public key, with an optional **label** to make it easy to recognize and an
+address, with an optional **label** to make it easy to recognize and an
 optional **private key** (64 hex characters, optionally `0x`‑prefixed) to sign
 with.
 

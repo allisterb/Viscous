@@ -25,24 +25,27 @@ The **Run contract** dialog opens for that contract.
 
 - **Contract balance** — the contract's current balance (in ETH) is fetched and
   displayed at the top.
-- **A button for every function** in the contract's ABI. Functions that take
-  arguments show one input box per parameter, each labelled with its name and
-  Solidity type.
+- **A Function picker** — choose a function from the **Function** combo box. Its
+  parameters then appear below as one input box each, labelled with the
+  parameter name and Solidity type.
+- **A single Run button** — executes the selected function.
 
 ## Calling a function (read‑only)
 
 By default the dialog is in **call** mode — the **Transact (requires gas)**
 checkbox is unchecked.
 
-1. Fill in any parameters for the function.
-2. Click the function's button.
+1. Pick the function from the **Function** combo box.
+2. Fill in any parameters that appear.
+3. Click **Run**.
 
 The function is executed as a read‑only **call**: it returns a value without
 changing on‑chain state and without costing gas. The return value is shown in
 the dialog and written to the **VsSolidity** output pane.
 
 This is the right mode for `view` / `pure` functions and for reading public
-state.
+state. `view` / `pure` functions are always executed as a call (and return their
+decoded value) even when **Transact** is checked.
 
 ## Sending a transaction (state‑changing)
 
@@ -60,11 +63,14 @@ requires an account to send from and gas to pay for it.
      key is used automatically; otherwise you can type one for this transaction.
    - **Gas Limit** — choose **Estimated Gas**, or select **Custom** and enter a
      specific gas limit (default `3000000`).
-2. Fill in the function's parameters.
-3. Click the function's button.
+2. Pick the function from the **Function** combo box and fill in its parameters.
+3. Click **Run**.
 
-The transaction is submitted to the network. The result (or any error) is shown
-in the dialog and logged to the **VsSolidity** output pane.
+The transaction is submitted to the network. Because a transaction returns a
+**transaction hash** rather than the function's return value, the result line
+shows the hash; read‑backs of stored values should be done with a `view`
+function in call mode. The result (or any error) is shown in the dialog and
+logged to the **VsSolidity** output pane.
 
 ## Reading the results
 

@@ -97,32 +97,6 @@ namespace VsSolidity.Ethereum
 
                     throw new NotSupportedException($"Solidity type '{solidityType}' is not supported.");
             }
-        }
-
-        private static object[] ParseCommaDelimitedArray(string input)
-        {
-            if (string.IsNullOrWhiteSpace(input))
-                return Array.Empty<object>();
-
-            var items = input.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                             .Select(s => s.Trim())
-                             .Select(s =>
-                             {
-                                 // Try to parse as int
-                                 if (int.TryParse(s, out int i))
-                                     return (object)i;
-                                 // Try to parse as double
-                                 if (double.TryParse(s, out double d))
-                                     return (object)d;
-                                 // Try to parse as bool
-                                 if (bool.TryParse(s, out bool b))
-                                     return (object)b;
-                                 // Otherwise, treat as string
-                                 return (object)s;
-                             })
-                             .ToArray();
-            return items;
-        }
-
+        }       
     }
 }
