@@ -38,7 +38,7 @@ VsSolidity is a Visual Studio extension for developing, compiling, and deploying
 
 1. Build the extension inside Visual Studio
 2. Run the extension in the Visual Studio Experimental Instance
-3. Edit the %LOCALAPPDATA%\VsSolidity\appsettings.json file to set different paths to the node or npm executables you want to use with the extension.
+3. Edit the %LOCALAPPDATA%\VsSolidity\appsettings.json file to set different paths to the node and npm executables you want to use for the extension's language server. The extension's private .npmrc has `ignore-scripts=true`
 
 ## Usage Notes
 The very first time you open a Solidity file the extension will install the Node.js language server package in the extension's private `node_modules` directory. This will take a few seconds to complete and Solidity IntelliSense and hover information etc. won't be available during this time. Once the language server is installed the first time, editing Solidity contracts will be as usual.
