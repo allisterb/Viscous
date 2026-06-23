@@ -180,7 +180,7 @@ namespace VsSolidity
 
             }
             var output = await RunCmdAsync("cmd.exe", $"/c solc-select.exe install {compilerVersion}", TaskToolsDir);
-            if (CheckRunCmdOutput(output, $"Version '{compilerVersion}' installed") && File.Exists(solcPath))
+            if ((CheckRunCmdOutput(output, $"Version '{compilerVersion}' installed", true) || (CheckRunCmdOutput(output, $"Version '{compilerVersion}' is already installed, skipping...")) && File.Exists(solcPath)))
             {
                 VSUtil.LogInfo("VsSolidity", $"solc {compilerVersion} compiler installed at {solcPath}.");
                 return true;

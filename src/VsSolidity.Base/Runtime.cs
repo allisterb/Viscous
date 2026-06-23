@@ -368,32 +368,42 @@ public abstract class Runtime
     public static string GetRunCmdError(Dictionary<string, object> output) => (output.ContainsKey("error") ? (string)output["error"] : "")
         + (output.ContainsKey("exception") ? (string)output["exception"] : "");
 
-    public static bool CheckRunCmdOutput(Dictionary<string, object> output, string checktext)
-    {
-        if (output.ContainsKey("error") || output.ContainsKey("exception"))
+    public static bool CheckRunCmdOutput(Dictionary<string, object> output, string checktext, bool ignoreErrors = false)
         {
-            if (output.ContainsKey("error"))
+            if (!ignoreErrors && (output.ContainsKey("error") || output.ContainsKey("exception")))
             {
-                Error((string)output["error"]);
+                if (output.ContainsKey("error"))
+                {
+                    Error((string)output["error"]);
+                }
+                if (output.ContainsKey("exception"))
+                {
+                    Error((Exception)output["exception"], "");
+                }
+                return false;
             }
-            if (output.ContainsKey("exception"))
+            else
             {
-                Error((Exception)output["exception"], "Exception thrown during process execution.");
-            }
-            return false;
-        }
-        else
-        {
-            if (output.ContainsKey("stderr"))
-            {
-                var stderr = (string)output["stderr"];
-                Info(stderr);
-            }
-            if (output.ContainsKey("stdout"))
-            {
-                var stdout = (string)output["stdout"];
-                Info(stdout);
-                if (stdout.Contains(checktext))
+                if (!ignoreErrors && output.ContainsKey("stderr"))
+                {
+                    var stderr = (string)output["stderr"];
+                    Error(stderr);
+                    return false;
+                }
+                else if (output.ContainsKey("stdout"))
+                {
+                    var stdout = (string)output["stdout"];
+                    Info(stdout);
+                    if (stdout.Contains(checktext))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else if (checktext == "" && !output.ContainsKey("stdout"))
                 {
                     return true;
                 }
@@ -402,12 +412,7 @@ public abstract class Runtime
                     return false;
                 }
             }
-            else
-            {
-                return false;
-            }
         }
-    }
 
     public static void CopyDirectory(string sourceDir, string destinationDir, bool recursive = false)
     {

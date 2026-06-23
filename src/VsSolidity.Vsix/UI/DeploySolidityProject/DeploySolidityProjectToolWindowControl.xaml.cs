@@ -101,7 +101,7 @@ namespace VsSolidity.UI
         
         private async void DeployButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!ThreadHelper.CheckAccess()) { return; }
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             try
             {
                 if (DeployContractComboBox.SelectedItem == null || DeployProfileComboBox.SelectedItem == null)
@@ -154,8 +154,8 @@ namespace VsSolidity.UI
                     return;
                 }
                 var network = deployProfile.Parent.Parent;
-                ShowDeployProgress($"Deploying {contract[0]} contract to {network}...");
-                VSUtil.LogToVsSolidityWindow($"Deploying {contract[0]} contract to {network} using account {deployProfile.DeployProfileAccount} and endpoint {deployProfile.DeployProfileEndpoint}...");
+                ShowDeployProgress($"Deploying {contract[0]} contract to {network.Name}({network.NetworkChainId})...");
+                VSUtil.LogToVsSolidityWindow($"Deploying {contract[0]} contract to {network.Name}({network.NetworkChainId}) using account {deployProfile.DeployProfileAccount.Substring(0, 6) + "..."} and endpoint {deployProfile.DeployProfileEndpoint}...");
                 var bin = "0x" + File.ReadAllText(bo["bin"].FullName);
                 var abi = File.ReadAllText(bo["abi"].FullName);
                 HexBigInteger gasDeploy = EstimatedGasFeeRadioButton.IsChecked == true ? default : new HexBigInteger(long.TryParse(CustomGasFeeNumberBox.Text, out var customGas) ? customGas : 3000000L);
@@ -191,7 +191,7 @@ namespace VsSolidity.UI
                         }
                         else
                         {
-                            ShowDeploySuccess($"{contract[0]} contract deployed successfully to {network}.");
+                            ShowDeploySuccess($"{contract[0]} contract deployed successfully to {network.Name}.");
                         }
                     }
                     VSUtil.LogToVsSolidityWindow($"\n========== {contract[0]} contract deployed successfully to {network.Name}. ==========\nTransaction Hash: {result.Value.TransactionHash}\nContract Address: {result.Value.ContractAddress}");
