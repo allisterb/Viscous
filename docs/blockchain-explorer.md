@@ -88,34 +88,40 @@ last remaining endpoint.
 ## Accounts
 
 Right‑click a **Network** and choose **Add Account…** to add an account by its
-public key, with an optional **label** to make it easy to recognize.
+public key, with an optional **label** to make it easy to recognize and an
+optional **private key** (64 hex characters, optionally `0x`‑prefixed) to sign
+with.
 
 - **Copy Address** copies the account's address to the clipboard.
-- **Edit…** lets you change the label.
+- **Edit…** lets you change the label or set/replace the private key.
+
+> **About the private key.** When an account has a private key, VsSolidity signs
+> deployments and transactions locally with it — this is what lets you deploy to
+> hosted endpoints and public testnets (Infura, Alchemy, Sepolia, …) that won't
+> sign on your behalf. For a local node with unlocked accounts (such as Ganache)
+> you can leave it blank and still transact. Keys are stored encrypted on disk
+> using Windows DPAPI, scoped to your user account. To change a saved key, open
+> the account's **Edit…** dialog and type a new one (leaving the field blank
+> keeps the existing key). In the **Deploy Profile** and **Run contract**
+> dialogs the private‑key box is read‑only when the selected account already has
+> a stored key — that key is used automatically.
 
 ## Deploy profiles
 
 A **deploy profile** bundles together the **endpoint** and **account** that
-should be used when deploying a contract or sending a transaction, plus an
-optional **private key** to sign with.
+should be used when deploying a contract or sending a transaction. The signing
+key comes from the selected **account** (see [Accounts](#accounts)) — profiles
+don't store a key of their own.
 
 1. Right‑click a **Network** and choose **Add Deploy Profile…**.
-2. Enter a **Name**, pick an **Endpoint** and an **Account** from the network,
-   and optionally supply the account's **Private Key** (64 hex characters,
-   optionally `0x`‑prefixed).
+2. Enter a **Name**, pick an **Endpoint** and an **Account** from the network.
+   The **Private Key** box is read‑only and shows the selected account's stored
+   key (masked), or is blank when the account has none — to change it, edit the
+   account.
 3. Click **Save**.
 
 Deploy profiles are what the [Deploy](deploy-smart-contract.md) window lists in
 its profile picker, so you need at least one before you can deploy.
-
-> **About the private key.** When a profile has a private key, VsSolidity signs
-> deployments and transactions locally with it — this is what lets you deploy to
-> hosted endpoints and public testnets (Infura, Alchemy, Sepolia, …) that won't
-> sign on your behalf. For a local node with unlocked accounts (such as Ganache)
-> you can leave it blank. Keys are stored encrypted on disk using Windows DPAPI,
-> scoped to your user account. To change a saved key, open the profile's
-> **Edit…** dialog and type a new one (leaving the field blank keeps the
-> existing key).
 
 ## Contracts
 

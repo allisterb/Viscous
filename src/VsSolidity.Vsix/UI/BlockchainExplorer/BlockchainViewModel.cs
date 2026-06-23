@@ -129,26 +129,27 @@ namespace VsSolidity.UI.ViewModel
             return network;
         }
 
-        public BlockchainInfo AddAccount(string pubkey, string label = null)
+        public BlockchainInfo AddAccount(string pubkey, string label = null, string pkey = null)
         {
             var data = new Dictionary<string, object>()
             {
                 {"Label",  label}
             };
-            return AddChild(pubkey, BlockchainInfoKind.Account,  data);  
+            if (!string.IsNullOrEmpty(pkey))
+            {
+                data["PrivateKey"] = SetPrivateKey(pkey);
+            }
+            return AddChild(pubkey, BlockchainInfoKind.Account,  data);
         }
 
-        public BlockchainInfo AddDeployProfile(string name, string endpoint, string account, string pkey = null)
+        public BlockchainInfo AddDeployProfile(string name, string endpoint, string account)
         {
+            // A deploy profile only references an account; the private key (if any) is stored on the account.
             var data = new Dictionary<string, object>()
             {
                 {"Endpoint",  endpoint},
                 {"Account",  account},
             };
-            if (!string.IsNullOrEmpty(pkey))
-            {
-                data["PrivateKey"] = SetDeployProfilePrivateKey(pkey);
-            }
             return AddChild(name, BlockchainInfoKind.DeployProfile, data);
         }
 
@@ -323,14 +324,17 @@ namespace VsSolidity.UI.ViewModel
             }
         }
 
-        public string TryGetDeployProfilePrivateKey()
+        // True when this node (account or deploy profile) has a private key stored on disk.
+        public bool HasPrivateKey => Data != null && Data.ContainsKey("PrivateKey") && Data["PrivateKey"] != null;
+
+        public string TryGetPrivateKey()
         {
-            if (!Data.ContainsKey("PrivateKey") || Data["PrivateKey"] == null) return null;
-            try { return GetDeployProfilePrivateKey(); }
+            if (!HasPrivateKey) return null;
+            try { return GetPrivateKey(); }
             catch { return null; }
         }
 
-        public string GetDeployProfilePrivateKey()
+        public string GetPrivateKey()
         {
             // The protected blob is a byte[] in-session, but Newtonsoft returns it as a base64 string
             // after a JSON save/load round-trip, so accept both forms.
@@ -340,13 +344,20 @@ namespace VsSolidity.UI.ViewModel
             return Encoding.UTF8.GetString(decrypted);
         }
 
-        public byte[] SetDeployProfilePrivateKey(string pkey)
+        public byte[] SetPrivateKey(string pkey)
         {
             // DPAPI, scoped to the Windows user, so the key can still be decrypted across VS sessions and
             // reboots. (ProtectedMemory/SameLogon only survives within a single logon session and is wrong
             // for data that gets persisted to disk.)
             return ProtectedData.Protect(Encoding.UTF8.GetBytes(pkey.Trim()), null, DataProtectionScope.CurrentUser);
         }
+
+        // The saved account node (by address) under this network, or null. Defensive against networks persisted
+        // without an "Accounts" folder.
+        public BlockchainInfo GetNetworkAccount(string address) =>
+            HasChild("Accounts", BlockchainInfoKind.Folder)
+                ? GetChild("Accounts", BlockchainInfoKind.Folder).GetChildren(BlockchainInfoKind.Account).FirstOrDefault(bi => bi.Name == address)
+                : null;
         #endregion
     }
 

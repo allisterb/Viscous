@@ -183,7 +183,9 @@ namespace VsSolidity.UI
                 var bin = "0x" + File.ReadAllText(bo["bin"].FullName);
                 var abi = File.ReadAllText(bo["abi"].FullName);
                 HexBigInteger gasDeploy = EstimatedGasFeeRadioButton.IsChecked == true ? default : new HexBigInteger(long.TryParse(CustomGasFeeNumberBox.Text, out var customGas) ? customGas : 3000000L);
-                var deployPrivateKey = deployProfile.TryGetDeployProfilePrivateKey();
+                // The signing key lives on the account, not the profile. If the account has none, deploy without one
+                // (the node may manage the account, e.g. a local simulator).
+                var deployPrivateKey = network.GetNetworkAccount(deployProfile.DeployProfileAccount)?.TryGetPrivateKey();
                 var result = await ThreadHelper.JoinableTaskFactory.RunAsync(() => ExecuteAsync(Network.DeployContract(deployProfile.DeployProfileEndpoint, bin, deployProfile.DeployProfileAccount, deployPrivateKey, abi, gasDeploy, deployValues)));
                 if (result.IsSuccess)
                 {

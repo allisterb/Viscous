@@ -50,14 +50,14 @@ To call a function that changes state, you must send a **transaction**, which
 requires an account to send from and gas to pay for it.
 
 1. Check **Transact (requires gas)**. This enables the transaction options:
-   - **Account** — the address the transaction is sent from. It is pre‑filled
-     with the contract's deployer; change it if you want to send from a different
-     account.
+   - **Account** — pick the address to send from, from the network's saved
+     accounts. It defaults to the contract's deployer.
    - **Private Key (optional)** — the sending account's key, used to sign the
      transaction locally. Required for hosted endpoints and public testnets that
      won't sign for you; for a local node with the account unlocked (e.g. Ganache)
-     you can leave it blank. When a key is supplied, the transaction is sent from
-     the address derived from that key.
+     you can leave it blank. If the selected account already has a stored key (see
+     [accounts](blockchain-explorer.md#accounts)) this box is read‑only and that
+     key is used automatically; otherwise you can type one for this transaction.
    - **Gas Limit** — choose **Estimated Gas**, or select **Custom** and enter a
      specific gas limit (default `3000000`).
 2. Fill in the function's parameters.

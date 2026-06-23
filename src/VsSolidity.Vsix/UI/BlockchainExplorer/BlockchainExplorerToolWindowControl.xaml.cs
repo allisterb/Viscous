@@ -463,10 +463,26 @@ namespace VsSolidity.UI
                 acctpubkey.Text = item.Name;
                 var acctlabel = (Wpc.TextBox)((StackPanel)sp.Children[0]).Children[3];
                 acctlabel.Text = (string)item.Data["Label"];
+                var acctpkey = (Wpc.PasswordBox)((StackPanel)sp.Children[0]).Children[5];
+                var errors = (Wpc.TextBlock)((StackPanel)sp.Children[1]).Children[0];
+                // Show the account's existing key (masked); a blank box means the account has no key.
+                acctpkey.Password = item.TryGetPrivateKey() ?? "";
+                acctpkey.IsReadOnly = false;
+                acctpkey.PlaceholderText = "";
+                errors.Visibility = Visibility.Hidden;
                 var validForClose = false;
                 dw.ButtonClicked += (cd, args) =>
                 {
-                    validForClose = true;
+                    validForClose = false;
+                    errors.Visibility = Visibility.Hidden;
+                    if (!IsValidPrivateKey(acctpkey.Password))
+                    {
+                        ShowValidationErrors(errors, "Enter a valid private key: 64 hex characters, optionally 0x-prefixed.");
+                    }
+                    else
+                    {
+                        validForClose = true;
+                    }
                 };
                 dw.Closing += (d, args) =>
                 {
@@ -479,6 +495,16 @@ namespace VsSolidity.UI
                     return;
                 }
                 item.Data["Label"] = acctlabel.Text;
+                // The box is authoritative (pre-filled with the existing key): store what's there, or drop the key
+                // if the user cleared it.
+                if (!string.IsNullOrEmpty(acctpkey.Password))
+                {
+                    item.Data["PrivateKey"] = item.SetPrivateKey(acctpkey.Password);
+                }
+                else
+                {
+                    item.Data.Remove("PrivateKey");
+                }
                 if (!tree.RootItem.Save("BlockchainExplorerTree", out var ex))
                 {
 #if IS_VSIX
@@ -530,10 +556,12 @@ namespace VsSolidity.UI
                 endpoint.ItemsSource = item.GetNetworkEndPoints();
                 endpoint.SelectedIndex = 0;
                 accounts.ItemsSource = item.GetNetworkAccounts();
-                // The dialog is a shared resource, so its inputs keep their values between opens. Clear the name
-                // and (especially) the private-key box so a stale value can't concatenate with a freshly entered one.
+                // The dialog is a shared resource, so its inputs keep their values between opens. Clear the name.
                 name.Text = "";
+                // The private-key box is a read-only display of the selected account's stored key (accounts own keys).
                 pkey.Password = "";
+                SelectionChangedEventHandler onAcctChanged = (s, ev) => ApplyAccountKeyState(item, (string)accounts.SelectedValue, pkey, editableWhenNoKey: false);
+                accounts.SelectionChanged += onAcctChanged;
                 var validForClose = false;
 
                 dw.ButtonClicked += (cd, args) =>
@@ -549,10 +577,6 @@ namespace VsSolidity.UI
                             if (dp.Contains(name.Text))
                             {
                                 ShowValidationErrors(errors, "The " + name.Text + " deploy profile already exists.");
-                            }
-                            else if (!IsValidPrivateKey(pkey.Password))
-                            {
-                                ShowValidationErrors(errors, "Enter a valid private key: 64 hex characters, optionally 0x-prefixed.");
                             }
                             else
                             {
@@ -576,6 +600,7 @@ namespace VsSolidity.UI
                 };
 
                 var r = await dw.ShowAsync();
+                accounts.SelectionChanged -= onAcctChanged;
                 if (r != ContentDialogResult.Primary)
                 {
                     name.Text = "";
@@ -583,9 +608,10 @@ namespace VsSolidity.UI
                     accounts.ItemsSource = null;
                     return;
                 }
-                else 
+                else
                 {
-                    item.GetChild("Deploy Profiles", BlockchainInfoKind.Folder).AddDeployProfile(name.Text, (string)endpoint.SelectedValue, (string)accounts.SelectedValue, pkey.Password);
+                    // The profile only references an account; the private key (if any) lives on the account.
+                    item.GetChild("Deploy Profiles", BlockchainInfoKind.Folder).AddDeployProfile(name.Text, (string)endpoint.SelectedValue, (string)accounts.SelectedValue);
                 }
               
                 if (!tree.RootItem.Save("BlockchainExplorerTree", out var ex))
@@ -636,10 +662,12 @@ namespace VsSolidity.UI
                 endpoint.ItemsSource = item.Parent.Parent.GetNetworkEndPoints();
                 endpoint.SelectedValue = item.Data["Endpoint"];
                 accounts.ItemsSource = item.Parent.Parent.GetNetworkAccounts();
-                accounts.SelectedValue = item.Data["Account"];
-                // Don't pre-fill the secret into the shared box (avoids exposing it and prevents a stale value from
-                // concatenating with a new entry). Blank on save keeps the existing key; typing a new one replaces it.
+                // Read-only display of the selected account's stored key (accounts own keys, not profiles).
                 pkey.Password = "";
+                SelectionChangedEventHandler onAcctChanged = (s, ev) => ApplyAccountKeyState(item.Parent.Parent, (string)accounts.SelectedValue, pkey, editableWhenNoKey: false);
+                accounts.SelectionChanged += onAcctChanged;
+                accounts.SelectedValue = item.Data["Account"];
+                ApplyAccountKeyState(item.Parent.Parent, (string)accounts.SelectedValue, pkey, editableWhenNoKey: false);
                 var validForClose = false;
 
                 dw.ButtonClicked += (cd, args) =>
@@ -655,10 +683,6 @@ namespace VsSolidity.UI
                             if (name.Text != item.Name && dp.Contains(name.Text))
                             {
                                 ShowValidationErrors(errors, "The " + name.Text + " deploy profile already exists.");
-                            }
-                            else if (!IsValidPrivateKey(pkey.Password))
-                            {
-                                ShowValidationErrors(errors, "Enter a valid private key: 64 hex characters, optionally 0x-prefixed.");
                             }
                             else
                             {
@@ -682,6 +706,7 @@ namespace VsSolidity.UI
                 };
 
                 var r = await dw.ShowAsync();
+                accounts.SelectionChanged -= onAcctChanged;
                 if (r != ContentDialogResult.Primary)
                 {
                     name.Text = "";
@@ -689,14 +714,10 @@ namespace VsSolidity.UI
                     accounts.ItemsSource = null;
                     return;
                 }
-                               
+
                 item.Name = name.Text;
                 item.Data["Account"] = accounts.SelectedValue;
                 item.Data["Endpoint"] = endpoint.SelectedValue;
-                if (!string.IsNullOrEmpty(pkey.Password))
-                {
-                    item.Data["PrivateKey"] = item.SetDeployProfilePrivateKey(pkey.Password);
-                }
                 if (!tree.RootItem.Save("BlockchainExplorerTree", out var ex))
                 {
 #if IS_VSIX
@@ -767,20 +788,29 @@ namespace VsSolidity.UI
                 var sp = (StackPanel)dw.Content;
                 var acctpubkey = (Wpc.TextBox)((StackPanel)sp.Children[0]).Children[1];
                 var acctlabel = (Wpc.TextBox)((StackPanel)sp.Children[0]).Children[3];
+                var acctpkey = (Wpc.PasswordBox)((StackPanel)sp.Children[0]).Children[5];
                 var errors = (Wpc.TextBlock)((StackPanel)sp.Children[1]).Children[0];
                 // Shared dialog resource: clear values retained from a previous open.
                 acctpubkey.Text = "";
                 acctlabel.Text = "";
+                acctpkey.Password = "";
+                acctpkey.IsReadOnly = false;
                 var validForClose = false;
                 dw.ButtonClicked += (cd, args) =>
                 {
-                    if (!string.IsNullOrEmpty(acctpubkey.Text))
+                    validForClose = false;
+                    errors.Visibility = Visibility.Hidden;
+                    if (string.IsNullOrEmpty(acctpubkey.Text))
                     {
-                        validForClose = true;
+                        ShowValidationErrors(errors, "Enter a valid account public key.");
+                    }
+                    else if (!IsValidPrivateKey(acctpkey.Password))
+                    {
+                        ShowValidationErrors(errors, "Enter a valid private key: 64 hex characters, optionally 0x-prefixed.");
                     }
                     else
                     {
-                        ShowValidationErrors(errors, "Enter a valid account public key.");
+                        validForClose = true;
                     }
                 };
                 dw.Closing += (d, args) =>
@@ -792,7 +822,7 @@ namespace VsSolidity.UI
                 {
                     return;
                 }
-                item.AddAccount(acctpubkey.Text, acctlabel.Text);   
+                item.AddAccount(acctpubkey.Text, acctlabel.Text, acctpkey.Password);
                 if (!tree.RootItem.Save("BlockchainExplorerTree", out var ex))
                 {
 #if IS_VSIX
@@ -930,6 +960,10 @@ namespace VsSolidity.UI
                 // The dialog is a shared resource, so its inputs persist between opens. Clear the private-key box so a
                 // stale value from a previous run can't be silently reused.
                 privateKeyPasswordBox.Password = "";
+                // Read-only when the chosen account has a stored key (it's used); otherwise the user can type one.
+                SelectionChangedEventHandler onAcctChanged = (s, ev) => ApplyAccountKeyState(item.Parent.Parent, (string)fromAccountComboBox.SelectedItem, privateKeyPasswordBox, editableWhenNoKey: true);
+                fromAccountComboBox.SelectionChanged += onAcctChanged;
+                ApplyAccountKeyState(item.Parent.Parent, (string)fromAccountComboBox.SelectedItem, privateKeyPasswordBox, editableWhenNoKey: true);
                 transactCheckBox.Checked += (s, ev) =>
                 {
                     transactPanel.IsEnabled = true;
@@ -948,10 +982,19 @@ namespace VsSolidity.UI
                 };  
                 var formPanel = (StackPanel)(_sp).Children[2];
                 var statusPanel = ((StackPanel)(_sp).Children[3]);
-                await CreateRunContractFormAsync(formPanel, statusPanel, item.Data, transactCheckBox, fromAccountComboBox, () => privateKeyPasswordBox.Password, () => (estimateGasRadioButton.IsChecked ?? false) ? null : new HexBigInteger(long.TryParse(customGasNumberBox.Text, out var cg) ? cg : 3000000L));
+                // Effective key for a transaction: the selected account's stored key takes precedence; otherwise the
+                // key typed into the box (which is empty/disabled when a stored key exists). May be empty — that's
+                // allowed, since the node may manage the account (e.g. a local simulator).
+                Func<string> resolveKey = () =>
+                {
+                    var stored = item.Parent.Parent.GetNetworkAccount((string)fromAccountComboBox.SelectedItem)?.TryGetPrivateKey();
+                    return !string.IsNullOrEmpty(stored) ? stored : privateKeyPasswordBox.Password;
+                };
+                await CreateRunContractFormAsync(formPanel, statusPanel, item.Data, transactCheckBox, fromAccountComboBox, resolveKey, () => (estimateGasRadioButton.IsChecked ?? false) ? null : new HexBigInteger(long.TryParse(customGasNumberBox.Text, out var cg) ? cg : 3000000L));
                 dw.ButtonClicked += (cd, args) => { };
                 dw.Closing += (d, args) => { };
-                await dw.ShowAsync();                             
+                await dw.ShowAsync();
+                fromAccountComboBox.SelectionChanged -= onAcctChanged;
             }
             catch (Exception ex)
             {
@@ -991,6 +1034,27 @@ namespace VsSolidity.UI
             var k = s.Trim();
             if (k.StartsWith("0x") || k.StartsWith("0X")) k = k.Substring(2);
             return k.Length == 64 && k.All(Uri.IsHexDigit);
+        }
+
+        // Reflects the selected account's stored key into a deploy/run dialog's private-key box: when a key exists the
+        // box shows it (masked) and is read-only; when none exists the box is blank. With editableWhenNoKey (the run
+        // dialog) a keyless account leaves the box editable so a transient key can be typed for the transaction;
+        // otherwise (deploy profile) the box stays read-only and informational. Returns true when a key is stored.
+        private static bool ApplyAccountKeyState(BlockchainInfo network, string accountAddress, Wpc.PasswordBox pkey, bool editableWhenNoKey)
+        {
+            var stored = network?.GetNetworkAccount(accountAddress)?.TryGetPrivateKey();
+            if (!string.IsNullOrEmpty(stored))
+            {
+                pkey.Password = stored;
+                pkey.IsReadOnly = true;
+            }
+            else
+            {
+                pkey.Password = "";
+                pkey.IsReadOnly = !editableWhenNoKey;
+            }
+            pkey.PlaceholderText = "";
+            return !string.IsNullOrEmpty(stored);
         }
 
         private void ShowValidationErrors(Wpc.TextBlock textBlock, string message)

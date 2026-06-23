@@ -60,7 +60,6 @@
     <VSTemplate Include="Solidity.vstemplate" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Ethereum_32x32.png" />
     <Content Include="Ethereum_32x32_black.png" />
     <None Include="remappings.txt" />
   </ItemGroup>

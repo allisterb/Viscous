@@ -48,11 +48,11 @@ VsSolidity then:
 2. Reads the contract's compiled bytecode (`bin`) and ABI from the build output.
 3. **Deploys** the contract using the deploy profile's endpoint and account.
 
-> **Signing:** if the deploy profile has a **private key**, the deployment is
-> signed locally with it, so you can deploy to hosted endpoints and public
-> testnets (Infura, Alchemy, Sepolia, …). Without a key, VsSolidity asks the node
-> to sign with an unlocked account — which works for a local node like Ganache.
-> See [deploy profiles](blockchain-explorer.md#deploy-profiles).
+> **Signing:** if the profile's **account** has a stored **private key**, the
+> deployment is signed locally with it, so you can deploy to hosted endpoints and
+> public testnets (Infura, Alchemy, Sepolia, …). Without a key, VsSolidity asks
+> the node to sign with an unlocked account — which works for a local node like
+> Ganache. See [accounts](blockchain-explorer.md#accounts).
 
 A status line at the bottom of the window shows progress, then either a success
 message or an error. Click **Cancel** to dismiss the current status.

@@ -803,6 +803,11 @@
             <ui:TextBlock x:Name="EditAccountPublicKeyTextBox" TextWrapping="Wrap" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True"  Width="160" Height="75" VerticalAlignment="Center" Margin="1,0,0,2"   />
             <ui:TextBlock Text="Account Label:" VerticalAlignment="Center" Margin="1,0,0,2" />
             <ui:TextBox x:Name="EditAccountLabelTextBox"  HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center" />
+            <ui:TextBlock Text="Private Key (optional):" VerticalAlignment="Center" Margin="1,0,0,2" />
+            <ui:PasswordBox x:Name="EditAccountPrivateKeyPasswordBox" HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center" />
+        </StackPanel>
+        <StackPanel Orientation="Vertical">
+            <ui:TextBlock Name="EditAccountDialogValidationErrors" Foreground="Red" Visibility="Hidden" VerticalAlignment="Center" TextWrapping="WrapWithOverflow" />
         </StackPanel>
     </StackPanel>
 
@@ -812,6 +817,8 @@
             <ui:TextBox x:Name="AddAccountPublicKeyTextBox" TextWrapping="Wrap" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True"  Width="160" Height="75" VerticalAlignment="Center" Margin="1,0,0,2"   />
             <ui:TextBlock Text="Account Label:" VerticalAlignment="Center" Margin="1,0,0,2" />
             <ui:TextBox x:Name="AddAccountLabelTextBox"  HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center" />
+            <ui:TextBlock Text="Private Key (optional):" VerticalAlignment="Center" Margin="1,0,0,2" />
+            <ui:PasswordBox x:Name="AddAccountPrivateKeyPasswordBox" HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center" />
         </StackPanel>
         <StackPanel Orientation="Vertical">
             <ui:TextBlock Name = "AddAccountDialogValidationErrors" Foreground="Red" Visibility="Hidden" VerticalAlignment="Center" TextWrapping="WrapWithOverflow" />
@@ -832,11 +839,11 @@
             <ComboBox x:Name="DeployProfileAccountListView" HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center"/>
         </StackPanel>
         <StackPanel Orientation="Vertical">
-            <ui:TextBlock Text="Private Key (optional):" VerticalAlignment="Center" Margin="1,0,0,2" />
-            <ui:PasswordBox Name="DeployProfileAccountPrivateKeyPasswordBox" HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center"/>
+            <ui:TextBlock Text="Private Key:" VerticalAlignment="Center" Margin="1,0,0,2" />
+            <ui:PasswordBox x:Name="DeployProfileAccountPrivateKeyPasswordBox" IsReadOnly="True" HorizontalAlignment="Stretch" MinWidth="120" Margin="0,2,10,4" VerticalAlignment="Center"/>
         </StackPanel>
         <StackPanel Orientation="Vertical">
-            <ui:TextBlock Name = "AddDeployProfileDialogValidationErrors" Grid.Row="0" Foreground="Red" Visibility="Hidden" VerticalAlignment="Center" TextWrapping="WrapWithOverflow" 
+            <ui:TextBlock Name = "AddDeployProfileDialogValidationErrors" Grid.Row="0" Foreground="Red" Visibility="Hidden" VerticalAlignment="Center" TextWrapping="WrapWithOverflow"
                         ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"/>
         </StackPanel>
     </StackPanel>
