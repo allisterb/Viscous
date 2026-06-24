@@ -1,8 +1,8 @@
 # About
 
-VsSolidity is a Visual Studio extension for developing, compiling, and deploying [Solidity](https://soliditylang.org/) smart contracts to EVM-compatible blockchain networks.
+Viscous is a Visual Studio extension for developing, compiling, and deploying [Solidity](https://soliditylang.org/) smart contracts to EVM-compatible blockchain networks.
 
-![Blockchain Explorer](https://ajb.nyc3.cdn.digitaloceanspaces.com/vssolidity/docs/images/blockchain-explorer.png)
+![Blockchain Explorer](https://ajb.nyc3.cdn.digitaloceanspaces.com/Viscous/docs/images/blockchain-explorer.png)
 
 ## Features
 
@@ -25,20 +25,20 @@ VsSolidity is a Visual Studio extension for developing, compiling, and deploying
 * A recent version of [Node.js](https://nodejs.org/) or compatible runtime
 
 ## User Guide
-- [Creating and Opening Projects](https://github.com/allisterb/VsSolidity/blob/master/docs/creating-a-project.md)
-- [Editing Solidity Code](https://github.com/allisterb/VsSolidity/blob/master/docs/editing-solidity.md)
-- [Building and Compiiling](https://github.com/allisterb/VsSolidity/blob/master/docs/building-and-compiling.md)
-- [.NET Bindings](https://github.com/allisterb/VsSolidity/blob/master/docs/dotnet-bindings.md)
-- [Blockchain Explorer](https://github.com/allisterb/VsSolidity/blob/master/docs/blockchain-explorer.md)
-- [Deploy a Smart Contract](https://github.com/allisterb/VsSolidity/blob/master/docs/deploy-smart-contract.md)
-- [Run a Smart Contract](https://github.com/allisterb/VsSolidity/blob/master/docs/run-smart-contract.md)
-- [Static Analysis with Slither](https://github.com/allisterb/VsSolidity/blob/master/docs/static-analysis.md)
+- [Creating and Opening Projects](https://github.com/allisterb/Viscous/blob/master/docs/creating-a-project.md)
+- [Editing Solidity Code](https://github.com/allisterb/Viscous/blob/master/docs/editing-solidity.md)
+- [Building and Compiiling](https://github.com/allisterb/Viscous/blob/master/docs/building-and-compiling.md)
+- [.NET Bindings](https://github.com/allisterb/Viscous/blob/master/docs/dotnet-bindings.md)
+- [Blockchain Explorer](https://github.com/allisterb/Viscous/blob/master/docs/blockchain-explorer.md)
+- [Deploy a Smart Contract](https://github.com/allisterb/Viscous/blob/master/docs/deploy-smart-contract.md)
+- [Run a Smart Contract](https://github.com/allisterb/Viscous/blob/master/docs/run-smart-contract.md)
+- [Static Analysis with Slither](https://github.com/allisterb/Viscous/blob/master/docs/static-analysis.md)
 
 ## Getting started
 
 1. Build the extension inside Visual Studio
 2. Run the extension in the Visual Studio Experimental Instance
-3. Edit the %LOCALAPPDATA%\VsSolidity\appsettings.json file to set different paths to the node and npm executables you want to use for the extension's language server. The extension's private .npmrc has `ignore-scripts=true`
+3. Edit the %LOCALAPPDATA%\Viscous\appsettings.json file to set different paths to the node and npm executables you want to use for the extension's language server. The extension's private .npmrc has `ignore-scripts=true`
 
 ## Usage Notes
 The very first time you open a Solidity file the extension will install the Node.js language server package in the extension's private `node_modules` directory. This will take a few seconds to complete and Solidity IntelliSense and hover information etc. won't be available during this time. Once the language server is installed the first time, editing Solidity contracts will be as usual.

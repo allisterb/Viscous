@@ -1,6 +1,6 @@
-# VsSolidity User Guide
+# Viscous User Guide
 
-VsSolidity is a Visual Studio extension for developing, building, and deploying
+Viscous is a Visual Studio extension for developing, building, and deploying
 Solidity smart contracts to EVM‑compatible blockchains without leaving the IDE.
 
 This guide covers the tool windows, project features, and context‑menu commands
@@ -40,7 +40,7 @@ A typical end‑to‑end workflow looks like this:
 
 ## Before you start
 
-- **Node.js** must be installed. VsSolidity uses it to run the Solidity language
+- **Node.js** must be installed. Viscous uses it to run the Solidity language
   server (editor features) and to install npm packages; it is fetched/installed
   on first use into your local app data.
 - The **.NET SDK** (`dotnet`) is needed to generate the C# contract
@@ -48,12 +48,12 @@ A typical end‑to‑end workflow looks like this:
 - To deploy or run a contract you need a running EVM node or a reachable
   JSON‑RPC endpoint. You can use [Ganache](https://trufflesuite.com/ganache/) node
   with endpoint typically at `http://127.0.0.1:7545`
-- To deploy, your Solidity project must build successfully — VsSolidity compiles
+- To deploy, your Solidity project must build successfully — Viscous compiles
   it as part of the deploy step.
 
 ## Where output goes
 
 Deployments and contract calls write their results — transaction hashes,
-contract addresses, return values, and errors — to the **VsSolidity** pane of
-the Visual Studio **Output** window (**View → Output**, then pick *VsSolidity*
+contract addresses, return values, and errors — to the **Viscous** pane of
+the Visual Studio **Output** window (**View → Output**, then pick *Viscous*
 in the *Show output from* list). Keep it open while you deploy or run contracts.

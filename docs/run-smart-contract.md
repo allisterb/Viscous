@@ -5,7 +5,7 @@ Once a contract is deployed and listed in the
 from Visual Studio — calling its read‑only functions to inspect state, or
 sending transactions to functions that change state.
 
-![The Run Contract dialog](https://ajb.nyc3.cdn.digitaloceanspaces.com/vssolidity/docs/images/run-contract-dialog.png)
+![The Run Contract dialog](https://ajb.nyc3.cdn.digitaloceanspaces.com/Viscous/docs/images/run-contract-dialog.png)
 
 > **Where to run a contract:** running a contract is done from the
 > **Blockchain Explorer**, using the **Run Contract** dialog described below.
@@ -41,7 +41,7 @@ checkbox is unchecked.
 
 The function is executed as a read‑only **call**: it returns a value without
 changing on‑chain state and without costing gas. The return value is shown in
-the dialog and written to the **VsSolidity** output pane.
+the dialog and written to the **Viscous** output pane.
 
 This is the right mode for `view` / `pure` functions and for reading public
 state. `view` / `pure` functions are always executed as a call (and return their
@@ -70,12 +70,12 @@ The transaction is submitted to the network. Because a transaction returns a
 **transaction hash** rather than the function's return value, the result line
 shows the hash; read‑backs of stored values should be done with a `view`
 function in call mode. The result (or any error) is shown in the dialog and
-logged to the **VsSolidity** output pane.
+logged to the **Viscous** output pane.
 
 ## Reading the results
 
-Every call and transaction is recorded in the **VsSolidity** pane of the
-**Output** window (**View → Output → Show output from: VsSolidity**), including:
+Every call and transaction is recorded in the **Viscous** pane of the
+**Output** window (**View → Output → Show output from: Viscous**), including:
 
 - the contract address and endpoint,
 - the function name and the arguments you passed,

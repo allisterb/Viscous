@@ -1,6 +1,6 @@
 # Building and Compiling
 
-VsSolidity compiles Solidity through a custom **MSBuild task**, so building a
+Viscous compiles Solidity through a custom **MSBuild task**, so building a
 Solidity project works exactly like building any other project in Visual Studio —
 and the same build works on the command line and in CI.
 
@@ -31,7 +31,7 @@ On build, the MSBuild task:
 
 Compiler diagnostics are surfaced as native Visual Studio build messages:
 
-![Compiler diagnostics in the Output window and Error List](https://ajb.nyc3.cdn.digitaloceanspaces.com/vssolidity/docs/images/build-errors.png)
+![Compiler diagnostics in the Output window and Error List](https://ajb.nyc3.cdn.digitaloceanspaces.com/Viscous/docs/images/build-errors.png)
 
 - **Errors** and **warnings** appear in the **Error List** and the **Output**
   window, each with the **file, line, and column** of the offending source so you
@@ -60,7 +60,7 @@ produced here, which is why it builds the project before deploying.
 
 To compile just one contract without a full project build, right‑click a `.sol`
 file and choose **Compile Solidity File**. This runs the `solc` compiler over
-that file and writes the result to the **VsSolidity** output pane. It's a quick
+that file and writes the result to the **Viscous** output pane. It's a quick
 way to check that a single file compiles.
 
 ## Building from the command line / CI
@@ -77,7 +77,7 @@ and Slither analysis run as they do inside the IDE, which makes Solidity project
 straightforward to build in an automated pipeline.
 
 > The build relies on a few external tools (Node.js for the language server and
-> npm packages, and the `solc`/Slither tooling VsSolidity manages under your
+> npm packages, and the `solc`/Slither tooling Viscous manages under your
 > local app data). Make sure Node.js is available on the build machine.
 
 ## Related

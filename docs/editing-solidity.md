@@ -1,12 +1,12 @@
 # Editing Solidity Code
 
 When you open a `.sol` file — whether it's part of a
-[Solidity project](creating-a-project.md) or in a folder you opened — VsSolidity
+[Solidity project](creating-a-project.md) or in a folder you opened — Viscous
 gives you a rich editing experience backed by the
 [vscode‑solidity](https://github.com/juanfranblanco/vscode-solidity) language
 server.
 
-![The Solidity editor with highlighting and IntelliSense](https://ajb.nyc3.cdn.digitaloceanspaces.com/vssolidity/docs/images/editor.png)
+![The Solidity editor with highlighting and IntelliSense](https://ajb.nyc3.cdn.digitaloceanspaces.com/Viscous/docs/images/editor.png)
 
 ## What you get in the editor
 
@@ -22,13 +22,13 @@ These features work on any file Visual Studio recognizes as Solidity content
 
 ## The Solidity language server
 
-The editor features are provided by a language server that VsSolidity runs in the
+The editor features are provided by a language server that Viscous runs in the
 background per solution or open folder.
 
-- **Automatic install:** the first time you open a Solidity file, VsSolidity
+- **Automatic install:** the first time you open a Solidity file, Viscous
   checks for the language server and, if it isn't present, installs it
   automatically (`vscode-solidity-server`). Progress is shown in the
-  **VsSolidity** output pane. This one‑time setup needs a JavaScript runtime and
+  **Viscous** output pane. This one‑time setup needs a JavaScript runtime and
   package manager on your machine — **Node.js** and **npm** by default
   (configurable — see below).
 - **Startup:** once installed, the server starts automatically and attaches to
@@ -36,12 +36,12 @@ background per solution or open folder.
 
 ### Using a different JavaScript runtime or package manager
 
-By default VsSolidity uses a globally installed **node** to run the language server and **npm** to
+By default Viscous uses a globally installed **node** to run the language server and **npm** to
 install it. You can point it at alternatives (for example **pnpm**) at different paths through a
 settings file at:
 
 ```
-%LOCALAPPDATA%\VsSolidity\appsettings.json
+%LOCALAPPDATA%\Viscous\appsettings.json
 ```
 
 It's created automatically with the defaults the first time the extension is run:
@@ -83,7 +83,7 @@ the project context menu — see
 
 - **No highlighting or completions:** confirm the file has a `.sol` extension and
   that your JavaScript runtime/package manager is installed and on your `PATH`
-  (Node.js + npm by default — see above). Check the **VsSolidity** output pane for
+  (Node.js + npm by default — see above). Check the **Viscous** output pane for
   language server install/startup messages.
 - **Unresolved imports:** run **Install NPM packages** so the libraries are in
   `node_modules`.

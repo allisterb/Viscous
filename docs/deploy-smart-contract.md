@@ -4,7 +4,7 @@ The **Deploy** tool window builds your Solidity project and deploys one of its
 compiled contracts to a network, using a **deploy profile** you have configured
 in the [Blockchain Explorer](blockchain-explorer.md).
 
-![The Deploy Solidity Project tool window](https://ajb.nyc3.cdn.digitaloceanspaces.com/vssolidity/docs/images/deploy-window.png)
+![The Deploy Solidity Project tool window](https://ajb.nyc3.cdn.digitaloceanspaces.com/Viscous/docs/images/deploy-window.png)
 
 ## Before you deploy
 
@@ -43,7 +43,7 @@ already targeting that project.
 3. Pick a **gas** option and set a **value** if needed.
 4. Click **Deploy**.
 
-VsSolidity then:
+Viscous then:
 
 1. **Builds** the project. If the build fails, deployment stops — check the
    build output for errors.
@@ -53,7 +53,7 @@ VsSolidity then:
 > **Signing:** the key is taken from the profile's **account** if it has a stored
 > one, otherwise from the **Private Key** box in the deploy dialog. With a key the
 > deployment is signed locally, so you can deploy to hosted endpoints and public
-> testnets (Infura, Alchemy, Sepolia, …). Without any key, VsSolidity asks the
+> testnets (Infura, Alchemy, Sepolia, …). Without any key, Viscous asks the
 > node to sign with an unlocked account — which works for a local node like
 > Ganache. See [accounts](blockchain-explorer.md#accounts).
 
@@ -66,7 +66,7 @@ message or an error. Click **Cancel** to dismiss the current status.
   [Blockchain Explorer](blockchain-explorer.md) under the target network's
   **Contracts** folder, together with its address, creator account, transaction
   hash, deployment time, and ABI.
-- The transaction hash and contract address are written to the **VsSolidity**
+- The transaction hash and contract address are written to the **Viscous**
   pane of the **Output** window.
 
 From there you can [run the contract](run-smart-contract.md) to call its
@@ -80,7 +80,7 @@ functions or send it transactions.
 | *Build failed. Please check the build output for errors.* | The project did not compile. Fix the build errors and try again. |
 | *No bin/abi file found…* | The compiler output is missing the bytecode/ABI for the contract. Confirm the contract compiles and produces output. |
 | *Could not retrieve deploy profile…* | The selected profile could not be found. Re‑check it in the Blockchain Explorer. |
-| *Error deploying contract: …* | The network rejected the deployment (for example, out of gas, unsupported EVM version, or a connection problem). The detailed reason is in the **VsSolidity** output pane. |
+| *Error deploying contract: …* | The network rejected the deployment (for example, out of gas, unsupported EVM version, or a connection problem). The detailed reason is in the **Viscous** output pane. |
 
 ## See also
 

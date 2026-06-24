@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
+  <TemplateData>
+    <Name>Solidity Project</Name>
+    <Description>A project for creating Ethereum-compatible Solidity smart contracts.</Description>
+    <Icon>Ethereum_32x32_black.png</Icon>
+    <ProjectType>Solidity</ProjectType>
+	<LanguageTag>Solidity</LanguageTag>
+	<PlatformTag>Web3</PlatformTag>
+	<ProjectTypeTag>Blockchain</ProjectTypeTag>
+	<SortOrder>1000</SortOrder>
+    <TemplateID>{8B2C63C0-A33A-4285-9F90-7FB691BFBA87}</TemplateID>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>Solidity</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+	<CreateInPlace>true</CreateInPlace>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="ProjectType1.ProjectType.solproj" ReplaceParameters="true">
+      <ProjectItem ReplaceParameters="true" OpenInEditor="false">package.json</ProjectItem>
+      <ProjectItem ReplaceParameters="true" OpenInEditor="false">remappings.txt</ProjectItem>
+      <ProjectItem ReplaceParameters="true" OpenInEditor="true">SmartContract1.sol</ProjectItem>
+      <Folder Name="bindings" TargetFolderName="bindings" />
+    </Project>
+  </TemplateContent>
+  <WizardExtension>
+	<Assembly>Viscous, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null</Assembly>
+	<FullClassName>Viscous.UI.SolidityProjectWizard</FullClassName>
+  </WizardExtension>
+</VSTemplate>

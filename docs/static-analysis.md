@@ -1,6 +1,6 @@
 # Static Analysis with Slither
 
-VsSolidity integrates the [Slither](https://github.com/crytic/slither) static
+Viscous integrates the [Slither](https://github.com/crytic/slither) static
 analyzer so you can find common vulnerabilities and code‑quality issues in your
 contracts and review the findings inside Visual Studio.
 
@@ -15,7 +15,7 @@ There are two ways Slither runs:
   Slither over the whole project and writes the raw findings to
   `slither-analysis.json` in the output directory.
 
-VsSolidity manages the Slither tool and the matching `solc` compiler version for
+Viscous manages the Slither tool and the matching `solc` compiler version for
 you; the analyzer uses the compiler version detected from your project (falling
 back to a recent version if it can't be determined).
 
@@ -27,7 +27,7 @@ The **Solidity Static Analysis** window opens automatically when you run
 
 ## Reading the results
 
-![The Solidity Static Analysis window with Slither findings](https://ajb.nyc3.cdn.digitaloceanspaces.com/vssolidity/docs/images/static-analysis-window.png)
+![The Solidity Static Analysis window with Slither findings](https://ajb.nyc3.cdn.digitaloceanspaces.com/Viscous/docs/images/static-analysis-window.png)
 
 Findings are organized in a tree, grouped into folders by **impact**:
 

@@ -1,0 +1,68 @@
+<UserControl x:Class="Viscous.UI.BlockchainExplorerToolWindowControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:Viscousui="clr-namespace:Viscous.UI;assembly="
+             xmlns:vm="clr-namespace:Viscous.UI.ViewModel;assembly=" 
+             xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300"
+             Name="BlockchainExplorerToolWindow"
+             Background="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowBackgroundKey}}"
+             Foreground="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}"
+             FontFamily="{DynamicResource {x:Static vsshell:VsFonts.EnvironmentFontFamilyKey}}"
+             FontSize="{DynamicResource {x:Static vsshell:VsFonts.EnvironmentFontSizeKey}}"
+>
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ui:ThemesDictionary Theme="{x:Static Viscousui:VSTheme.ApplicationThemeGuess}" />
+                <ui:ControlsDictionary />
+                <ResourceDictionary Source="BlockchainExplorerTreeResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <!-- The view model that provides the data for the trees -->
+            <vm:BlockchainViewModel x:Key="Blockchains" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Vertical" Grid.Row="0">
+            <!-- Items, TreeNodeStyle, TreeStyle, NodeSortDescriptions, SelectNodesOnRightClick and IsLazyLoading are
+                 declared on the generic base TreeViewBase<BlockchainInfo>. Setting them in XAML makes WPF BAML resolve
+                 the generic base type and throw NotImplementedException (Baml2006SchemaContext.ResolveBamlType), so they
+                 are assigned in the BlockchainExplorerToolWindowControl constructor instead. -->
+            <Viscousui:BlockchainExplorerTree x:Name="BlockchainExplorerTree"
+                    SelectedItemChanged="OnSelectedItemChanged"
+                    MouseDoubleClick="OnMouseDoubleClick"
+                    Margin="0,0,0,10" />
+        </StackPanel>
+        <ContentPresenter x:Name="RootContentDialog" Grid.Row="0"/>
+    </Grid>
+
+    <UserControl.CommandBindings>
+        <!-- bindings for context menu commands -->
+        <CommandBinding Command="{x:Static Viscousui:BlockchainExplorerTree.NewNetworkCmd}" Executed="NewNetworkCmd_Executed" />
+        <CommandBinding Command="{x:Static Viscousui:BlockchainExplorerTree.DeleteNetworkCmd}" Executed="DeleteNetworkCmd_Executed" CanExecute="DeleteNetworkCmd_CanExecute" />
+        <CommandBinding Command="{x:Static Viscousui:BlockchainExplorerTree.NewFolderCmd}" Executed="NewFolderCmd_Executed" />
+        <CommandBinding Command="{x:Static Viscousui:BlockchainExplorerTree.PropertiesCmd}" Executed="PropertiesCmd_Executed" />
+        <CommandBinding Command="{x:Static Viscousui:BlockchainExplorerTree.DeleteFolderCmd}" Executed="DeleteFolderCmd_Executed" />
+        <CommandBinding Command="{x:Static Viscousui:BlockchainExplorerTree.NewEndpointCmd}" Executed="NewEndpointCmd_Executed" />
+        <CommandBinding Command="{x:Static Viscousui:BlockchainExplorerTree.DeleteEndpointCmd}" Executed="DeleteEndpointCmd_Executed" CanExecute="DeleteEndpointCmd_CanExecute" />
+        <CommandBinding Command="{x:Static Viscousui:BlockchainExplorerTree.EditAccountCmd}" Executed="EditAccountCmd_Executed" />
+        <CommandBinding Command="{x:Static Viscousui:BlockchainExplorerTree.NewDeployProfileCmd}" Executed="NewDeployProfileCmd_Executed" />
+        <CommandBinding Command="{x:Static Viscousui:BlockchainExplorerTree.DeleteDeployProfileCmd}" Executed="DeleteDeployProfileCmd_Executed" />
+        <CommandBinding Command="{x:Static Viscousui:BlockchainExplorerTree.EditDeployProfileCmd}" Executed="EditDeployProfileCmd_Executed" />
+        <CommandBinding Command="{x:Static Viscousui:BlockchainExplorerTree.CopyAccountAddressCmd}" Executed="CopyAccountAddressCmd_Executed" />
+        <CommandBinding Command="{x:Static Viscousui:BlockchainExplorerTree.NewAccountCmd}" Executed="NewAccountCmd_Executed" />
+        <CommandBinding Command="{x:Static Viscousui:BlockchainExplorerTree.DeleteAccountCmd}" Executed="DeleteAccountCmd_Executed" />
+        <CommandBinding Command="{x:Static Viscousui:BlockchainExplorerTree.EditContractCmd}" Executed="EditContractCmd_Executed" />
+        <CommandBinding Command="{x:Static Viscousui:BlockchainExplorerTree.DeleteContractCmd}" Executed="DeleteContractCmd_Executed" />
+        <CommandBinding Command="{x:Static Viscousui:BlockchainExplorerTree.RunContractCmd}" Executed="RunContractCmd_Executed" />
+    </UserControl.CommandBindings>
+
+</UserControl>

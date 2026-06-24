@@ -1,0 +1,15 @@
+<Project DefaultTargets="Build">
+	<UsingTask  TaskName="CompileContracts" AssemblyFile="C:\\Projects\\Viscous\\tests\\Viscous.Tests.BuildTasks\\bin\\Debug\\net472\\Viscous.BuildTasks.dll"/>
+	<ItemGroup>
+		<Compile Include="SmartContract1.sol" />
+	</ItemGroup>
+  <PropertyGroup>
+    <BindingsNS>TestNS</BindingsNS>
+    <CompilerVersion>0.8.30</CompilerVersion>
+    <EVMVersion>london</EVMVersion>
+    <OutputDir>bin/solidity</OutputDir>
+  </PropertyGroup>
+	<Target Name="Build">
+		<CompileContracts Contracts="@(Compile)" ExtDir="C:\Users\Allister\AppData\Local\Microsoft\VisualStudio\17.0_c69ae1a2Exp\Extensions\Allister Beharry\Viscous\0.1.0.0" ProjectDir="$(MSBuildProjectDirectory)" OutputPath="bin\solidity" BindingsNS="$(BindingsNS)" CompilerVersion="$(CompilerVersion)" EVMVersion="$(EVMVersion)"/>
+	</Target>
+</Project>

@@ -1,0 +1,57 @@
+﻿<h1>Viscous</h1>
+<p><a href="https://github.com/allisterb/Viscous/">Viscous</a> is a Visual Studio extension for developing, compiling, and deploying <a href="https://soliditylang.org/">Solidity</a> smart contracts to EVM-compatible blockchain networks.</p>
+
+<h2>Features</h2>
+<ul>
+    <li>
+        <p>Solidity project system for Visual Studio featuring Solidity compiler integration and NPM dependency management. Integrates with the Visual Studio <strong>New Project…</strong> and <strong>Open Folder…</strong> dialogs.</p>
+    </li>
+    <li>
+        <p>Uses the  <a href="https://github.com/juanfranblanco/vscode-solidity">vscode‑solidity</a> language server.for syntax highlighting, hover information, IntelliSense, and linting. </p>
+    </li>
+    <li>
+        <p>Solidity compiler integration with MSBuild and the Visual Studio Build command - compile Solidity projects and individual files from the IDE with errors reported in the Errors tool window.</p>
+    </li>
+    <li>
+        <p>Generate .NET bindings to Solidity smart contracts automatically using Nethereum.</p>
+    </li>
+    <li>
+        <p>Manage EVM networks, endpoints, accounts, deploy profiles, and deployed contracts from the <strong>Blockchain Explorer</strong> tool window.</p>
+    </li>
+    <li>
+        <p>Deploy a compiled contract to a blockchain network and call its functions from inside Visual Studio.</p>
+    </li>
+    <li>
+        <p>Find vulnerabilities and code‑quality issues with <a href="https://github.com/crytic/slither">Slither</a> static analysis inside Visual Studio.</p>
+    </li>
+</ul>
+<h2>Requirements</h2>
+<ul>
+    <li>Visual Studio 2022 and above</li>
+    <li>A recent version of <a href="https://nodejs.org/">Node.js</a> or compatible runtime</li>
+</ul>
+<h2>User Guide</h2>
+<ul>
+    <li><a href="https://github.com/allisterb/Viscous/blob/master/docs/creating-a-project.md">Creating and Opening Projects</a></li>
+    <li><a href="https://github.com/allisterb/Viscous/blob/master/docs/editing-solidity.md">Editing Solidity Code</a></li>
+    <li><a href="https://github.com/allisterb/Viscous/blob/master/docs/building-and-compiling.md">Building and Compiiling</a></li>
+    <li><a href="https://github.com/allisterb/Viscous/blob/master/docs/dotnet-bindings.md">.NET Bindings</a></li>
+    <li><a href="https://github.com/allisterb/Viscous/blob/master/docs/blockchain-explorer.md">Blockchain Explorer</a></li>
+    <li><a href="https://github.com/allisterb/Viscous/blob/master/docs/deploy-smart-contract.md">Deploy a Smart Contract</a></li>
+    <li><a href="https://github.com/allisterb/Viscous/blob/master/docs/run-smart-contract.md">Run a Smart Contract</a></li>
+    <li><a href="https://github.com/allisterb/Viscous/blob/master/docs/static-analysis.md">Static Analysis with Slither</a></li>
+</ul>
+<h2>Getting started</h2>
+<ol>
+    <li>Install the extension and open Visual Studio.</li>
+    <li>Edit the %LOCALAPPDATA%\Viscous\appsettings.json file to set different paths to the node and npm executables you want to use for the extension&#39;s language server. The extension&#39;s private .npmrc has <code>ignore-scripts=true</code></li>
+    <li>Create a new <strong>Solidity Project</strong> (<strong>File → New → Project</strong>, set <em>Solidity</em> as the Language.) Alternatively you can just open a folder of <code>.sol</code> files to edit individual files. See <a href="docs/creating-a-project.md">Creating and Opening Projects</a> </li>
+    <li>Add and edit Solidity smart contract files.  Use Visual Studio&#39;s <code>package.json</code> editing support to add your smart contract dependencies and right-click on an existing package.json and select <strong>Install NPM dependencies</strong>.</li>
+    <li>Build the project to compile your contracts and generate bindings. If you just opened a folder then right-click and compile an individual Solidity contract.  See <a href="docs/building-and-compiling.md">Building and Compiling Projects</a></li>
+    <li>For Solidity projects, configure a network and a deploy profile in the <a href="docs/blockchain-explorer.md">Blockchain Explorer</a>, then <a href="docs/deploy-smart-contract.md">deploy</a> and <a href="docs/run-smart-contract.md">run</a> your Solidity contracts.</li>
+    <li>Right-click on a Solidity contract and click <strong>Analyze Contract</strong> to run <a href="https://github.com/allisterb/Viscous/blob/master/docs/static-analysis.md">Slither static analysis</a>.</li>
+</ol>
+<h2>Usage Notes</h2>
+<ul>
+    <li>The very first time you open a Solidity file the extension will install the Node.js language server package in the extension&#39;s private <code>node_modules</code> directory. This will take a few seconds to complete and Solidity IntelliSense and hover information etc. won&#39;t be available during this time. Once the language server is installed the first time, editing Solidity contracts will be as usual.</li>
+</ul>

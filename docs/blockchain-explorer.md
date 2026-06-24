@@ -1,6 +1,6 @@
 # Blockchain Explorer
 
-The **Blockchain Explorer** is the central place where VsSolidity stores
+The **Blockchain Explorer** is the central place where Viscous stores
 everything it needs to talk to a blockchain: the **networks** you connect to,
 their **RPC endpoints**, the **accounts** you transact with, the **deploy
 profiles** used to sign and pay for transactions, and the **contracts** you have
@@ -9,13 +9,13 @@ deployed.
 Your configuration is saved per user and persists between Visual Studio
 sessions, so you only need to set up a network once.
 
-![The Blockchain Explorer tool window](https://ajb.nyc3.cdn.digitaloceanspaces.com/vssolidity/docs/images/blockchain-explorer.png)
+![The Blockchain Explorer tool window](https://ajb.nyc3.cdn.digitaloceanspaces.com/Viscous/docs/images/blockchain-explorer.png)
 
 ## Opening the Blockchain Explorer
 
 Choose **View → Other Windows → Blockchain Explorer**.
 
-The window shows a tree. The first time you open it, VsSolidity tries to reach a
+The window shows a tree. The first time you open it, Viscous tries to reach a
 local [Ganache](https://trufflesuite.com/ganache/) node at
 `http://127.0.0.1:7545`. If the node responds, a **Ganache** network (chain id
 `1337`) is created for you, pre‑populated with the node's accounts and a
@@ -64,12 +64,12 @@ node you click:
 
 ## Adding a network
 
-![The Add EVM Network dialog](https://ajb.nyc3.cdn.digitaloceanspaces.com/vssolidity/docs/images/add-network-dialog.png)
+![The Add EVM Network dialog](https://ajb.nyc3.cdn.digitaloceanspaces.com/Viscous/docs/images/add-network-dialog.png)
 
 1. Right‑click **EVM Networks** (or a folder) and choose **Add Network…**.
 2. Enter a **Name**, the network's **JSON‑RPC URL**, and optionally a
    **chain id**.
-3. Click **Save**. VsSolidity connects to the endpoint to confirm it is
+3. Click **Save**. Viscous connects to the endpoint to confirm it is
    reachable and reads back the network's chain id, network id, and accounts.
    - If you left the chain id blank, it is filled in automatically.
    - If you entered a chain id that does not match what the endpoint reports,
@@ -95,7 +95,7 @@ with.
 - **Copy Address** copies the account's address to the clipboard.
 - **Edit…** lets you change the label or set/replace the private key.
 
-> **About the private key.** When an account has a private key, VsSolidity signs
+> **About the private key.** When an account has a private key, Viscous signs
 > deployments and transactions locally with it — this is what lets you deploy to
 > hosted endpoints and public testnets (Infura, Alchemy, Sepolia, …) that won't
 > sign on your behalf. For a local node with unlocked accounts (such as Ganache)
