@@ -291,7 +291,7 @@ namespace VsSolidity
                 
         protected bool InstallNethereumGeneratorToolIfNotPresent()
         {
-            if (!File.Exists(Path.Combine(ProjectDir, ".config", "dotnet-tools.json")))
+            if (!File.Exists(Path.Combine(ProjectDir, ".config", "dotnet-tools.json")) && !File.Exists(Path.Combine(ProjectDir, "dotnet-tools.json")))
             {
                 Log.LogMessage(MessageImportance.High, $"Installing .NET tool manifest...");
                 if (!CheckRunCmdOutput(RunCmd("cmd.exe", "/c dotnet new tool-manifest", ProjectDir), "was created successfully"))

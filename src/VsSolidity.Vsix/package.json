@@ -1,11 +1,11 @@
 {
-  "name": "VsSolidity-vs",
+  "name": "VsSolidity",
   "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Allister Beharry",
   "license": "MIT"
 }

@@ -1,9 +1,6 @@
 # VsSolidity
 
-[VsSolidity](https://github.com/allisterb/VsSolidity/) is a Visual Studio extension for developing, compiling, and deploying [Solidity](https://soliditylang.org/) smart contracts to EVM-compatible blockchain networks.
-
-
-![Blockchain Explorer](https://ajb.nyc3.cdn.digitaloceanspaces.com/vssolidity/docs/images/blockchain-explorer.png)
+VsSolidity is a Visual Studio extension for developing, compiling, and deploying [Solidity](https://soliditylang.org/) smart contracts to EVM-compatible blockchain networks.
 
 ## Features
 
