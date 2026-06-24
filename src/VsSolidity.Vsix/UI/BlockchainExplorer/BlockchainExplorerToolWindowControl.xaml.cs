@@ -1210,6 +1210,10 @@ namespace VsSolidity.UI
 
             runButton.Click += async (s, e) =>
             {
+                // Disable Run (and the function picker, whose SelectionChanged would otherwise re-enable Run) while the
+                // call/transaction is in flight, so a second click can't start a concurrent op.
+                runButton.IsEnabled = false;
+                functionCombo.IsEnabled = false;
                 try
                 {
                     var selected = functionCombo.SelectedItem as string;
@@ -1280,6 +1284,11 @@ namespace VsSolidity.UI
                 catch (Exception exc)
                 {
                     VSUtil.LogVsSolidityError(exc.Message);
+                }
+                finally
+                {
+                    runButton.IsEnabled = true;
+                    functionCombo.IsEnabled = true;
                 }
             };
 

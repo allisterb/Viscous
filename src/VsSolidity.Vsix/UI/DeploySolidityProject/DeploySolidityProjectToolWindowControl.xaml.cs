@@ -166,6 +166,8 @@ namespace VsSolidity.UI
                 VSUtil.ShowModalErrorDialogBox("The selected project to deploy has been unloaded.");
                 return;
             }
+            // Disable Deploy while the build/deploy runs so a second click can't start a concurrent deploy.
+            DeployButton.IsEnabled = false;
             try
             {
                 if (DeployContractComboBox.SelectedItem == null || DeployProfileComboBox.SelectedItem == null)
@@ -278,7 +280,10 @@ namespace VsSolidity.UI
             catch (Exception ex)
             {
                 ShowDeployError($"Error occurred during deploy process: {ex.Message}.");
-                return;
+            }
+            finally
+            {
+                DeployButton.IsEnabled = true;
             }
         }
 
