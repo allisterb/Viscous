@@ -31,13 +31,15 @@ already targeting that project.
 | **Select the contract to deploy** | The contract from your project to deploy. |
 | **Constructor parameters** | Appears only when the selected contract's constructor takes arguments. One input is shown per parameter, labelled with its name and Solidity type. Fill these in before deploying. |
 | **Select the deploy profile** | The [deploy profile](blockchain-explorer.md#deploy-profiles) to deploy with. The list contains every profile defined across your networks in the Blockchain Explorer. |
+| **Private Key (optional)** | The signing key for the profile's account. If that [account](blockchain-explorer.md#accounts) already has a stored key, this box shows it (masked) and is read‑only; otherwise you can type a key to sign this deployment, or leave it blank for a node‑managed account. |
 | **Gas Limit** | Choose **Estimated Gas** to let the network estimate the gas, or **Custom** to enter a specific gas limit. |
 | **Value** | An optional amount (in wei) to send with the deployment, for contracts whose constructor is payable. Leave it `0` otherwise. |
 
 ## Deploying
 
 1. Choose the **contract** and fill in any **constructor parameters**.
-2. Choose the **deploy profile** for the target network.
+2. Choose the **deploy profile** for the target network. If its account has no
+   stored key, optionally type a **private key** to sign with.
 3. Pick a **gas** option and set a **value** if needed.
 4. Click **Deploy**.
 
@@ -48,10 +50,11 @@ VsSolidity then:
 2. Reads the contract's compiled bytecode (`bin`) and ABI from the build output.
 3. **Deploys** the contract using the deploy profile's endpoint and account.
 
-> **Signing:** if the profile's **account** has a stored **private key**, the
-> deployment is signed locally with it, so you can deploy to hosted endpoints and
-> public testnets (Infura, Alchemy, Sepolia, …). Without a key, VsSolidity asks
-> the node to sign with an unlocked account — which works for a local node like
+> **Signing:** the key is taken from the profile's **account** if it has a stored
+> one, otherwise from the **Private Key** box in the deploy dialog. With a key the
+> deployment is signed locally, so you can deploy to hosted endpoints and public
+> testnets (Infura, Alchemy, Sepolia, …). Without any key, VsSolidity asks the
+> node to sign with an unlocked account — which works for a local node like
 > Ganache. See [accounts](blockchain-explorer.md#accounts).
 
 A status line at the bottom of the window shows progress, then either a success

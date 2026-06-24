@@ -52,7 +52,12 @@
 
                 <StackPanel Orientation="Vertical"  VerticalAlignment="Top" HorizontalAlignment="Left">
                     <Label Content="Select the deploy profile:"  Margin="4,0,0,2" />
-                    <ComboBox x:Name="DeployProfileComboBox" Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogComboBoxStyleKey}}" GotFocus="DeployProfileComboBox_GotFocus" Margin="4,0,0,2" Width="200" FontSize="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}" />
+                    <ComboBox x:Name="DeployProfileComboBox" Style="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogComboBoxStyleKey}}" GotFocus="DeployProfileComboBox_GotFocus" SelectionChanged="DeployProfileComboBox_SelectionChanged" Margin="4,0,0,2" Width="200" FontSize="{DynamicResource {x:Static vsshell:VsFonts.CaptionFontSizeKey}}" />
+                </StackPanel>
+
+                <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left">
+                    <Label Content="Private Key (optional):"  Margin="4,0,0,2" />
+                    <ui:PasswordBox x:Name="DeployPrivateKeyPasswordBox" Width="200" Margin="4,0,0,2" VerticalAlignment="Center" />
                 </StackPanel>
 
                 <Separator />
@@ -81,16 +86,16 @@
                     </StackPanel>
                 </StackPanel>
 
-                <StackPanel Name="DeploySuccessStackPanel" Grid.Row="0" Orientation="Horizontal" Visibility="Hidden">
-                    <ui:SymbolIcon Symbol="CheckmarkCircle32" VerticalAlignment="Bottom" Foreground="LightGreen" />
-                    <ui:TextBlock Name="DeploySuccessTextBlock" Margin="4,0,0,0" VerticalAlignment="Bottom" />
-                </StackPanel>
+                <DockPanel Name="DeploySuccessStackPanel" Grid.Row="0" Visibility="Hidden" LastChildFill="True">
+                    <ui:SymbolIcon Symbol="CheckmarkCircle32" VerticalAlignment="Top" Foreground="LightGreen" DockPanel.Dock="Left" />
+                    <ui:TextBlock Name="DeploySuccessTextBlock" Margin="4,0,0,0" VerticalAlignment="Top" TextWrapping="Wrap" />
+                </DockPanel>
 
-                <StackPanel Name="DeployErrorsStackPanel" Grid.Row="0" Orientation="Horizontal" Visibility="Hidden">
-                    <ui:SymbolIcon Symbol="ErrorCircle24" VerticalAlignment="Bottom" Foreground="Red" />
-                    <ui:TextBlock Name = "DeployErrorsTextBlock" Grid.Row="0" VerticalAlignment="Center" TextWrapping="WrapWithOverflow" 
+                <DockPanel Name="DeployErrorsStackPanel" Grid.Row="0" Visibility="Hidden" LastChildFill="True">
+                    <ui:SymbolIcon Symbol="ErrorCircle24" VerticalAlignment="Top" Foreground="Red" DockPanel.Dock="Left" />
+                    <ui:TextBlock Name = "DeployErrorsTextBlock" VerticalAlignment="Top" TextWrapping="Wrap"
                         ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"/>
-                </StackPanel>
+                </DockPanel>
             
             </Grid>
             

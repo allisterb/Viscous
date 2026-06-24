@@ -54,7 +54,7 @@ namespace VsSolidity.Ethereum
                 web3 = new Web3(rpcurl);
                 if (!await web3.Personal.UnlockAccount.SendRequestAsync(account, "", new HexBigInteger(30)))
                 {
-                    throw new Exception("Could not unlock the account on the node. Provide the account's private key in the deploy profile, or deploy to a node that has the account unlocked.");
+                    throw new Exception("Could not unlock the account on the node. Provide the account's private key, or deploy to a node that has the account unlocked.");
                 }
             }
 

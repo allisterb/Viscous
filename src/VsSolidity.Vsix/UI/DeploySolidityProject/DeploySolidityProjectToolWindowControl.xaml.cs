@@ -1,4 +1,5 @@
 using Microsoft.VisualStudio.Shell;
+using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.Hex.HexTypes;
 using Org.BouncyCastle.Pkix;
 using System;
@@ -118,6 +119,44 @@ namespace VsSolidity.UI
             CreateDeployContractParamsInputElements();
         }
 
+        private void DeployProfileComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ApplyDeployProfileKeyState();
+        }
+
+        // A secp256k1 private key is 64 hex chars, optionally 0x-prefixed. Empty is allowed (the field is optional).
+        private static bool IsValidPrivateKey(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return true;
+            var k = s.Trim();
+            if (k.StartsWith("0x") || k.StartsWith("0X")) k = k.Substring(2);
+            return k.Length == 64 && k.All(Uri.IsHexDigit);
+        }
+
+        // Reflects the selected profile's account key into the private-key box: when the account already has a stored
+        // key, show it (masked) and lock the box; otherwise leave it blank and writeable so the user can supply one
+        // for this deploy (which is also fine to leave empty for a node-managed/simulator account).
+        private void ApplyDeployProfileKeyState()
+        {
+            if (DeployPrivateKeyPasswordBox == null) return;
+            string stored = null;
+            var name = DeployProfileComboBox.SelectedItem?.ToString();
+            if (!string.IsNullOrEmpty(name) && deployProfiles != null && deployProfiles.TryGetValue(name, out var profile))
+            {
+                stored = profile.Parent.Parent.GetNetworkAccount(profile.DeployProfileAccount)?.TryGetPrivateKey();
+            }
+            if (!string.IsNullOrEmpty(stored))
+            {
+                DeployPrivateKeyPasswordBox.Password = stored;
+                DeployPrivateKeyPasswordBox.IsReadOnly = true;
+            }
+            else
+            {
+                DeployPrivateKeyPasswordBox.Password = "";
+                DeployPrivateKeyPasswordBox.IsReadOnly = false;
+            }
+        }
+
         
         private async void DeployButton_Click(object sender, RoutedEventArgs e)
         {
@@ -133,7 +172,14 @@ namespace VsSolidity.UI
                 {
                     ShowDeployError("Select a Solidity smart contract to deploy from the project and a deploy profile to use.");
                     return;
-                }  
+                }
+                // When the box is writeable (the account has no stored key), a typed key must be valid — but empty is
+                // allowed (the node may manage the account).
+                if (!DeployPrivateKeyPasswordBox.IsReadOnly && !IsValidPrivateKey(DeployPrivateKeyPasswordBox.Password))
+                {
+                    ShowDeployError("Enter a valid private key: 64 hex characters, optionally 0x-prefixed.");
+                    return;
+                }
                 var contract = DeployContractComboBox.SelectedItem.ToString().Split(new string[] { " - " }, StringSplitOptions.None);
                 var contractFileName = contract[0] + "." + contract[1];
                 var deployProfileName = DeployProfileComboBox.SelectedItem.ToString();
@@ -179,13 +225,14 @@ namespace VsSolidity.UI
                 }
                 var network = deployProfile.Parent.Parent;
                 ShowDeployProgress($"Deploying {contract[0]} contract to {network.Name}({network.NetworkChainId})...");
-                VSUtil.LogToVsSolidityWindow($"Deploying {contract[0]} contract to {network.Name}({network.NetworkChainId}) using account {deployProfile.DeployProfileAccount.Substring(0, 6) + "..."} and endpoint {deployProfile.DeployProfileEndpoint}...");
+                VSUtil.LogToVsSolidityWindow($"Deploying {contract[0]} contract to {network.Name}({network.NetworkChainId}) using account {deployProfile.DeployProfileAccount.ToHexCompact()} and endpoint {deployProfile.DeployProfileEndpoint}...");
                 var bin = "0x" + File.ReadAllText(bo["bin"].FullName);
                 var abi = File.ReadAllText(bo["abi"].FullName);
                 HexBigInteger gasDeploy = EstimatedGasFeeRadioButton.IsChecked == true ? default : new HexBigInteger(long.TryParse(CustomGasFeeNumberBox.Text, out var customGas) ? customGas : 3000000L);
-                // The signing key lives on the account, not the profile. If the account has none, deploy without one
-                // (the node may manage the account, e.g. a local simulator).
-                var deployPrivateKey = network.GetNetworkAccount(deployProfile.DeployProfileAccount)?.TryGetPrivateKey();
+                // Signing key: prefer the account's stored key; otherwise use whatever was typed into the deploy
+                // dialog's private-key box. Both empty is allowed — the node may manage the account (e.g. a simulator).
+                var storedKey = network.GetNetworkAccount(deployProfile.DeployProfileAccount)?.TryGetPrivateKey();
+                var deployPrivateKey = !string.IsNullOrEmpty(storedKey) ? storedKey : DeployPrivateKeyPasswordBox.Password;
                 var result = await ThreadHelper.JoinableTaskFactory.RunAsync(() => ExecuteAsync(Network.DeployContract(deployProfile.DeployProfileEndpoint, bin, deployProfile.DeployProfileAccount, deployPrivateKey, abi, gasDeploy, deployValues)));
                 if (result.IsSuccess)
                 {
@@ -203,7 +250,7 @@ namespace VsSolidity.UI
                         }
                         else
                         {
-                            ShowDeploySuccess($"{contract[0]} contract deployed successfully to {network}.");
+                            ShowDeploySuccess($"{contract[0]} contract deployed successfully to {network.Name}.");
                         }
                     }
                     else
