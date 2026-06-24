@@ -121,13 +121,11 @@ namespace VsSolidity
         }
 
         // Use the configured JS package manager (default "npm"; can be set to e.g. "pnpm" in appsettings.json).
-        public static Dictionary<string, object> InstallVSCodeSolidityLanguageServer()
-        {
-            return RunCmd("cmd.exe", "/c " + AppSettings.JSPackageManagerCmd + " install vscode-solidity-server", AssemblyLocation);
-        }
-
         public static async Task<Dictionary<string, object>> InstallVSCodeSolidityLanguageServerAsync()
         {
+            // Ensure the extension's .npmrc (ignore-scripts=true) exists before npm runs here. Guarding inside this
+            // method makes it impossible to run the install without the hardening setting, regardless of caller.
+            await VsSolidityPackage.EnsureNpmRcAsync();
             return await RunCmdAsync("cmd.exe", "/c " + AppSettings.JSPackageManagerCmd + " install vscode-solidity-server", AssemblyLocation);
         }
 

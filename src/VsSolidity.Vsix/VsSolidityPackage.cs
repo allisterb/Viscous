@@ -23,7 +23,7 @@ using static Microsoft.VisualStudio.VSConstants.UICONTEXT;
 namespace VsSolidity
 {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [InstalledProductRegistration("#110", "#112", "0.1.0.2", IconResourceID = 400)]
+    [InstalledProductRegistration("#110", "#112", "0.1.0.4", IconResourceID = 400)]
     [Guid(PackageGuidString)]
     [ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideAutoLoad(UIContextGuids.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
@@ -138,6 +138,7 @@ namespace VsSolidity
             solution.AdviseSolutionEvents(this, out var c);
           
             await TaskScheduler.Default;
+            await EnsureNpmRcAsync();
             await InstallBuildSystemAsync();
             AppSettings.EnsureFileExists();
             await JoinableTaskFactory.SwitchToMainThreadAsync();
@@ -151,6 +152,26 @@ namespace VsSolidity
         #endregion
 
         #region Static Methods
+        // Writes the extension's private .npmrc (ignore-scripts=true) into the extension directory, where the language
+        // server's npm install runs. It is created at runtime rather than shipped in the VSIX, because a bundled
+        // .npmrc is flagged by marketplace secret scanners (they normally hold auth tokens). A failure here only
+        // weakens an npm hardening setting, so it is logged rather than allowed to break package initialization.
+        internal static async Task EnsureNpmRcAsync()
+        {
+            var path = Path.Combine(Runtime.AssemblyLocation, ".npmrc");
+            try
+            {
+                if (!File.Exists(path))
+                {
+                    await File.WriteAllTextAsync(path, "ignore-scripts=true\n");
+                }
+            }
+            catch (Exception ex)
+            {
+                Runtime.Error(ex, "Could not write the extension's .npmrc (ignore-scripts).");
+            }
+        }
+
         private static async Task InstallBuildSystemAsync()
         {
             if (!Directory.Exists(Runtime.LocalAppDataDir.CombinePath("CustomProjectSystems", "Solidity")))
