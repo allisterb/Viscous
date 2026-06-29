@@ -27,7 +27,7 @@ The **Solidity Static Analysis** window opens automatically when you run
 
 ## Reading the results
 
-![The Solidity Static Analysis window with Slither findings](https://ajb.nyc3.cdn.digitaloceanspaces.com/Viscous/docs/images/static-analysis-window.png)
+![The Solidity Static Analysis window with Slither findings](https://ajb.nyc3.cdn.digitaloceanspaces.com/viscous/docs/images/static-analysis-window.png)
 
 Findings are organized in a tree, grouped into folders by **impact**:
 

@@ -31,7 +31,7 @@ On build, the MSBuild task:
 
 Compiler diagnostics are surfaced as native Visual Studio build messages:
 
-![Compiler diagnostics in the Output window and Error List](https://ajb.nyc3.cdn.digitaloceanspaces.com/Viscous/docs/images/build-errors.png)
+![Compiler diagnostics in the Output window and Error List](https://ajb.nyc3.cdn.digitaloceanspaces.com/viscous/docs/images/build-errors.png)
 
 - **Errors** and **warnings** appear in the **Error List** and the **Output**
   window, each with the **file, line, and column** of the offending source so you

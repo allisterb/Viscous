@@ -9,7 +9,7 @@ deployed.
 Your configuration is saved per user and persists between Visual Studio
 sessions, so you only need to set up a network once.
 
-![The Blockchain Explorer tool window](https://ajb.nyc3.cdn.digitaloceanspaces.com/Viscous/docs/images/blockchain-explorer.png)
+![The Blockchain Explorer tool window](https://ajb.nyc3.cdn.digitaloceanspaces.com/viscous/docs/images/blockchain-explorer.png)
 
 ## Opening the Blockchain Explorer
 
@@ -64,7 +64,7 @@ node you click:
 
 ## Adding a network
 
-![The Add EVM Network dialog](https://ajb.nyc3.cdn.digitaloceanspaces.com/Viscous/docs/images/add-network-dialog.png)
+![The Add EVM Network dialog](https://ajb.nyc3.cdn.digitaloceanspaces.com/viscous/docs/images/add-network-dialog.png)
 
 1. Right‑click **EVM Networks** (or a folder) and choose **Add Network…**.
 2. Enter a **Name**, the network's **JSON‑RPC URL**, and optionally a

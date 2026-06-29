@@ -7,7 +7,7 @@ file.
 
 ## Creating a new Solidity project
 
-![The New Project dialog with the Solidity Project template](https://ajb.nyc3.cdn.digitaloceanspaces.com/Viscous/docs/images/new-project-dialog.png)
+![The New Project dialog with the Solidity Project template](https://ajb.nyc3.cdn.digitaloceanspaces.com/viscous/docs/images/new-project-dialog.png)
 
 1. Choose **File → New → Project**.
 2. In the *Create a new project* dialog, search for **Solidity** (or filter by
@@ -32,7 +32,7 @@ IntelliSense, linting), and starts the Solidity language server for that folder.
 Right‑click the project in Solution Explorer and choose **Properties** to open
 the **General** page. The settings that affect building and deployment are:
 
-![The project Properties General page](https://ajb.nyc3.cdn.digitaloceanspaces.com/Viscous/docs/images/project-properties.png)
+![The project Properties General page](https://ajb.nyc3.cdn.digitaloceanspaces.com/viscous/docs/images/project-properties.png)
 
 | Property | Meaning |
 |----------|---------|

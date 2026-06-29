@@ -5,7 +5,7 @@ bindings** for your contracts — strongly‑typed classes that let you deploy a
 call your contracts from .NET code (via [Nethereum](https://nethereum.com/))
 without hand‑writing ABI plumbing.
 
-![The generated bindings folder](https://ajb.nyc3.cdn.digitaloceanspaces.com/Viscous/docs/images/dotnet-bindings.png)
+![The generated bindings folder](https://ajb.nyc3.cdn.digitaloceanspaces.com/viscous/docs/images/dotnet-bindings.png)
 
 ## How bindings are generated
 

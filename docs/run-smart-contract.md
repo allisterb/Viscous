@@ -5,7 +5,7 @@ Once a contract is deployed and listed in the
 from Visual Studio — calling its read‑only functions to inspect state, or
 sending transactions to functions that change state.
 
-![The Run Contract dialog](https://ajb.nyc3.cdn.digitaloceanspaces.com/Viscous/docs/images/run-contract-dialog.png)
+![The Run Contract dialog](https://ajb.nyc3.cdn.digitaloceanspaces.com/viscous/docs/images/run-contract-dialog.png)
 
 > **Where to run a contract:** running a contract is done from the
 > **Blockchain Explorer**, using the **Run Contract** dialog described below.

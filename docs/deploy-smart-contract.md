@@ -4,7 +4,7 @@ The **Deploy** tool window builds your Solidity project and deploys one of its
 compiled contracts to a network, using a **deploy profile** you have configured
 in the [Blockchain Explorer](blockchain-explorer.md).
 
-![The Deploy Solidity Project tool window](https://ajb.nyc3.cdn.digitaloceanspaces.com/Viscous/docs/images/deploy-window.png)
+![The Deploy Solidity Project tool window](https://ajb.nyc3.cdn.digitaloceanspaces.com/viscous/docs/images/deploy-window.png)
 
 ## Before you deploy
 

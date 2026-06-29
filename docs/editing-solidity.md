@@ -6,7 +6,7 @@ gives you a rich editing experience backed by the
 [vscode‑solidity](https://github.com/juanfranblanco/vscode-solidity) language
 server.
 
-![The Solidity editor with highlighting and IntelliSense](https://ajb.nyc3.cdn.digitaloceanspaces.com/Viscous/docs/images/editor.png)
+![The Solidity editor with highlighting and IntelliSense](https://ajb.nyc3.cdn.digitaloceanspaces.com/viscous/docs/images/editor.png)
 
 ## What you get in the editor
 
