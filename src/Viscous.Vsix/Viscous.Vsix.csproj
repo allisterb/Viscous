@@ -113,10 +113,6 @@
     <Compile Include="VSUtil.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Images\FolderSelected.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <Content Include="Images\ViscousLogo200x200.png">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

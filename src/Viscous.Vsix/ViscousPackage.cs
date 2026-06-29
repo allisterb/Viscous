@@ -138,7 +138,6 @@ namespace Viscous
             solution.AdviseSolutionEvents(this, out var c);
           
             await TaskScheduler.Default;
-            await EnsureNpmRcAsync();
             await InstallBuildSystemAsync();
             AppSettings.EnsureFileExists();
             await JoinableTaskFactory.SwitchToMainThreadAsync();
@@ -152,10 +151,6 @@ namespace Viscous
         #endregion
 
         #region Static Methods
-        // Writes the extension's private .npmrc (ignore-scripts=true) into the extension directory, where the language
-        // server's npm install runs. It is created at runtime rather than shipped in the VSIX, because a bundled
-        // .npmrc is flagged by marketplace secret scanners (they normally hold auth tokens). A failure here only
-        // weakens an npm hardening setting, so it is logged rather than allowed to break package initialization.
         internal static async Task EnsureNpmRcAsync()
         {
             var path = Path.Combine(Runtime.AssemblyLocation, ".npmrc");
@@ -201,7 +196,7 @@ namespace Viscous
         {
             if (!File.Exists(Runtime.AssemblyLocation.CombinePath(SolcSelectExe)))
             {
-                if (!await Runtime.DownloadFileAsync("solc-select", new Uri("https://ajb.nyc3.cdn.digitaloceanspaces.com/Viscous/solc-select.exe"), Runtime.AssemblyLocation.CombinePath(SolcSelectExe)))
+                if (!await Runtime.DownloadFileAsync("solc-select", new Uri("https://ajb.nyc3.cdn.digitaloceanspaces.com/viscous/solc-select.exe"), Runtime.AssemblyLocation.CombinePath(SolcSelectExe)))
                 {
                     Runtime.Error("Could not download solc-select executable.");
                     return;
@@ -218,7 +213,7 @@ namespace Viscous
         {
             if (!File.Exists(Runtime.AssemblyLocation.CombinePath(SlitherExe)))
             {
-                if (!await Runtime.DownloadFileAsync("slither", new Uri("https://ajb.nyc3.cdn.digitaloceanspaces.com/Viscous/slither-0.10.3.exe"), Runtime.AssemblyLocation.CombinePath(SlitherExe)))
+                if (!await Runtime.DownloadFileAsync("slither", new Uri("https://ajb.nyc3.cdn.digitaloceanspaces.com/viscous/slither-0.10.3.exe"), Runtime.AssemblyLocation.CombinePath(SlitherExe)))
                 {
                     Runtime.Error("Could not download Slither executable.");
                     return;

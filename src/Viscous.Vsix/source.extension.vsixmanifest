@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="Viscous.98df02f4-bb4f-4d39-90f8-aa2f3b7bdec0" Version="0.1.0.8" Language="en-US" Publisher="Allister Beharry" />
+        <Identity Id="Viscous.fe71db81-5086-4b1a-ad5d-867bb84d2441" Version="0.1.0.8" Language="en-US" Publisher="Allister Beharry" />
         <DisplayName>Viscous</DisplayName>
         <Description xml:space="preserve">Develop, compile, and deploy Solidity smart contracts to EVM-compatible blockchain networks.</Description>
         <MoreInfo>https://github.com/allisterb/Viscous</MoreInfo>

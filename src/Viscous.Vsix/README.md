@@ -1,12 +1,13 @@
 # Viscous
 
 Viscous is a Visual Studio extension for developing, compiling, and deploying [Solidity](https://soliditylang.org/) smart contracts to EVM-compatible blockchain networks.
+![](https://ajb.nyc3.cdn.digitaloceanspaces.com/viscous/docs/images/blockchain-explorer.png)
 
 ## Features
 
 * Solidity project system for Visual Studio featuring Solidity compiler integration and NPM dependency management. Integrates with the Visual Studio **New Project…** and **Open Folder…** dialogs.
 
-* Uses the  [vscode‑solidity](https://github.com/juanfranblanco/vscode-solidity) language server.for syntax highlighting, hover information, IntelliSense, and linting. 
+* Solidity language server.for syntax highlighting, hover information, IntelliSense, and linting. 
 
 * Solidity compiler integration with MSBuild and the Visual Studio Build command - compile Solidity projects and individual files from the IDE with errors reported in the Errors tool window.
 
