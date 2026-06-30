@@ -37,13 +37,13 @@ Viscous is a Visual Studio extension for developing, compiling, and deploying [S
 
 ## Getting started
 ### Downloading
-Get the latest release from the GitHub [Releases](https://github.com/allisterb/Viscous/releases) page or use the [MyGet dev feed](https://www.myget.org/feed/Packages/viscous): Add https://www.myget.org/F/viscous/vsix/ as an Extension Gallery in the Visual Studio Extensions settings and you can then install it in the usual way.
+Get the latest release from the GitHub [Releases](https://github.com/allisterb/Viscous/releases) page or use the [MyGet dev feed](https://www.myget.org/feed/viscous/package/vsix/Viscous.fe71db81-5086-4b1a-ad5d-867bb84d2441): Add https://www.myget.org/F/viscous/vsix/ as an Extension Gallery in the Visual Studio Extensions settings and you can then install it in the usual way.
 
 ### Building
 1. Build the extension inside Visual Studio
 2. Run the extension in the Visual Studio Experimental Instance
 
-Edit the %LOCALAPPDATA%\Viscous\appsettings.json file to set different paths to the node and npm executables you want to use for the extension's language server. The extension's private .npmrc has `ignore-scripts=true`
+Edit the %LOCALAPPDATA%\Viscous\appsettings.json file to set different paths to the Node.js and npm and Python executables you want to use for the extension's language server and other tools. The extension's private .npmrc has `ignore-scripts=true`
 
 ## Usage Notes
 * The very first time you open a Solidity file the extension will install the Node.js language server package in the extension's private `node_modules` directory. This will take a few seconds to complete and Solidity IntelliSense and hover information etc. won't be available during this time. Once the language server is installed the first time, editing Solidity contracts will be as usual.

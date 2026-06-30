@@ -188,9 +188,6 @@ namespace Viscous
             {
                 await Runtime.CopyFileAsync(Runtime.AssemblyLocation.CombinePath("CompactJson.dll"), Runtime.LocalAppDataDir.CombinePath("CustomProjectSystems", "Solidity", "Tools", "CompactJson.dll"));
             }
-            // The Python analysis tools (solc-select, slither) are provisioned on demand, right before a build
-            // or analysis needs them (see SolidityCompiler.EnsureSolcSelectAsync / EnsureSlitherAsync and the
-            // build task), so a build triggered before package init finished still waits for the install.
         }
 
         /// <summary>
