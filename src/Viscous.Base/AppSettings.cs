@@ -15,9 +15,11 @@ public static class AppSettings
     #region Keys and defaults
     public const string JSPackageManagerCmdKey = "JSPackageManagerCmd";
     public const string JSRuntimeCmdKey = "JSRuntimeCmd";
+    public const string PythonCmdKey = "PythonCmd";
 
     public const string DefaultJSPackageManagerCmd = "npm";
     public const string DefaultJSRuntimeCmd = "node";
+    public const string DefaultPythonCmd = "py -3";
     #endregion
 
     #region Properties
@@ -35,6 +37,15 @@ public static class AppSettings
     /// May include arguments, e.g. <c>deno run -A</c>.
     /// </summary>
     public static string JSRuntimeCmd => Get(JSRuntimeCmdKey, DefaultJSRuntimeCmd);
+
+    /// <summary>
+    /// The Python command used to create the virtual environment that hosts the
+    /// solc-select and slither analysis tools (default <c>py -3</c>). Requires Python 3.8+.
+    /// May be a bare command or a full path, e.g. <c>C:\Python312\python.exe</c>.
+    /// Only used to bootstrap the venv; the tools themselves are run with the venv's
+    /// own interpreter.
+    /// </summary>
+    public static string PythonCmd => Get(PythonCmdKey, DefaultPythonCmd);
 
     private static IConfigurationRoot Config
     {
@@ -85,7 +96,8 @@ public static class AppSettings
     private static string DefaultJson =>
         "{" + Environment.NewLine +
         "  \"" + JSPackageManagerCmdKey + "\": \"" + DefaultJSPackageManagerCmd + "\"," + Environment.NewLine +
-        "  \"" + JSRuntimeCmdKey + "\": \"" + DefaultJSRuntimeCmd + "\"" + Environment.NewLine +
+        "  \"" + JSRuntimeCmdKey + "\": \"" + DefaultJSRuntimeCmd + "\"," + Environment.NewLine +
+        "  \"" + PythonCmdKey + "\": \"" + DefaultPythonCmd.Replace("\\", "\\\\") + "\"" + Environment.NewLine +
         "}" + Environment.NewLine;
     #endregion
 

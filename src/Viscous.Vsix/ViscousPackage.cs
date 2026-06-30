@@ -23,7 +23,7 @@ using static Microsoft.VisualStudio.VSConstants.UICONTEXT;
 namespace Viscous
 {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [InstalledProductRegistration("#110", "#112", "0.1.0.8", IconResourceID = 400)]
+    [InstalledProductRegistration("#110", "#112", "0.1.0.9", IconResourceID = 400)]
     [Guid(PackageGuidString)]
     [ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideAutoLoad(UIContextGuids.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
@@ -138,9 +138,10 @@ namespace Viscous
             solution.AdviseSolutionEvents(this, out var c);
           
             await TaskScheduler.Default;
+            AppSettings.EnsureFileExists();            
             await InstallBuildSystemAsync();
-            AppSettings.EnsureFileExists();
-            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            await EnsurePythonVenvAsync();
+            await JoinableTaskFactory.SwitchToMainThreadAsync();                        
             ApplicationThemeManager.Apply(UI.VSTheme.ApplicationThemeGuess);
             await SolidityProjectMenuCommands.InitializeAsync(this);
             await UI.BlockchainExplorerToolWindowCommand.InitializeAsync(this);
@@ -187,42 +188,28 @@ namespace Viscous
             {
                 await Runtime.CopyFileAsync(Runtime.AssemblyLocation.CombinePath("CompactJson.dll"), Runtime.LocalAppDataDir.CombinePath("CustomProjectSystems", "Solidity", "Tools", "CompactJson.dll"));
             }
-
-            await InstallSolcSelectAsync();
-            await InstallSlitherAnalyzerAsync();
+            // The Python analysis tools (solc-select, slither) are provisioned on demand, right before a build
+            // or analysis needs them (see SolidityCompiler.EnsureSolcSelectAsync / EnsureSlitherAsync and the
+            // build task), so a build triggered before package init finished still waits for the install.
         }
 
-        private static async Task InstallSolcSelectAsync()
+        /// <summary>
+        /// Creates the private Python virtual environment under <c>%LOCALAPPDATA%\Viscous\venv</c> if it
+        /// does not yet exist. Idempotent; safe to await on every build/analyze.
+        /// </summary>
+        public static async Task<bool> EnsurePythonVenvAsync()
         {
-            if (!File.Exists(Runtime.AssemblyLocation.CombinePath(SolcSelectExe)))
+            if (File.Exists(Runtime.VenvPython))
             {
-                if (!await Runtime.DownloadFileAsync("solc-select", new Uri("https://ajb.nyc3.cdn.digitaloceanspaces.com/viscous/solc-select.exe"), Runtime.AssemblyLocation.CombinePath(SolcSelectExe)))
-                {
-                    Runtime.Error("Could not download solc-select executable.");
-                    return;
-                }
-                
-            }
-            if (!File.Exists(Runtime.LocalAppDataDir.CombinePath("CustomProjectSystems", "Solidity", "Tools", SolcSelectExe)))
+                return true;
+            }            
+            await Runtime.RunCmdAsync("cmd.exe", "/c " + AppSettings.PythonCmd + " -m venv \"" + Runtime.VenvDir + "\"", Runtime.ViscousDir);
+            if (!File.Exists(Runtime.VenvPython))
             {
-                await Runtime.CopyFileAsync(Runtime.AssemblyLocation.CombinePath(SolcSelectExe), Runtime.LocalAppDataDir.CombinePath("CustomProjectSystems", "Solidity", "Tools", SolcSelectExe));
+                Runtime.Error($"Could not create the Python virtual environment at {Runtime.VenvDir}. Ensure Python 3.8+ is installed and available as '{AppSettings.PythonCmd}' (configurable via the PythonCmd setting in {AppSettings.FilePath}).");
+                return false;
             }
-        }
-
-        private static async Task InstallSlitherAnalyzerAsync()
-        {
-            if (!File.Exists(Runtime.AssemblyLocation.CombinePath(SlitherExe)))
-            {
-                if (!await Runtime.DownloadFileAsync("slither", new Uri("https://ajb.nyc3.cdn.digitaloceanspaces.com/viscous/slither-0.10.3.exe"), Runtime.AssemblyLocation.CombinePath(SlitherExe)))
-                {
-                    Runtime.Error("Could not download Slither executable.");
-                    return;
-                }
-            }
-            if (!File.Exists(Runtime.LocalAppDataDir.CombinePath("CustomProjectSystems", "Solidity", "Tools", SlitherExe)))
-            {
-                await Runtime.CopyFileAsync(Runtime.AssemblyLocation.CombinePath(SlitherExe), Runtime.LocalAppDataDir.CombinePath("CustomProjectSystems", "Solidity", "Tools", SlitherExe));
-            }
+            return true;
         }
 
         private void InstallSolidityProjectDataFlowSinks(UnconfiguredProject unconfiguredProject)
@@ -254,9 +241,13 @@ namespace Viscous
 
         public const string NPMFileUIContextRule = "333C0751-5D5E-47A8-804D-6763A1363906";
 
-        public const string SlitherExe = "slither-0.10.3.exe";
+        public const string SolcSelectVersion = "1.2.0";
+        public const string SlitherVersion = "0.10.3";
 
-        public const string SolcSelectExe = "solc-select.exe";
+        // The package directories under the venv act as "already installed" markers.
+        public static string SolcSelectPackageDir => Path.Combine(Runtime.VenvDir, "Lib", "site-packages", "solc_select");
+
+        public static string SlitherPackageDir => Path.Combine(Runtime.VenvDir, "Lib", "site-packages", "slither");
         #endregion
 
     }

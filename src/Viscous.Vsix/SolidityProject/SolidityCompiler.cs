@@ -17,9 +17,67 @@ namespace Viscous
 {
     public class SolidityCompiler : Runtime
     {
-        public static string SlitherPath => Path.Combine(TaskToolsDir, "slither-0.10.3.exe");
-
         public static string TaskToolsDir { get; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CustomProjectSystems", "Solidity", "Tools");
+
+        // solc-select installs compilers under the user profile (Python's expanduser("~")), not the Tools dir.
+        public static string SolcArtifactPath(string compilerVersion) =>
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".solc-select", "artifacts", "solc-" + compilerVersion, "solc-" + compilerVersion);
+
+        #region Python tool provisioning
+        
+        
+        /// <summary>
+        /// Ensures solc-select is installed in the venv (creating the venv first if needed).
+        /// Call this right before a solc compiler is needed.
+        /// </summary>
+        public static async Task<bool> EnsureSolcSelectAsync()
+        {
+            if (Directory.Exists(ViscousPackage.SolcSelectPackageDir))
+            {
+                return true;
+            }
+            if (!await ViscousPackage.EnsurePythonVenvAsync())
+            {
+                VSUtil.LogError("Viscous", $"Could not create the Python virtual environment at {Runtime.VenvDir}. Ensure Python 3.8+ is installed and available as '{AppSettings.PythonCmd}' (configurable via the PythonCmd setting in {AppSettings.FilePath}).");
+                return false;
+            }
+            VSUtil.LogInfo("Viscous", $"Installing solc-select {ViscousPackage.SolcSelectVersion} into the virtual environment at {Runtime.VenvDir}...");
+            // Wheels-only so pip never runs an arbitrary setup.py.
+            await RunCmdAsync(VenvPython, $"-m pip install --only-binary :all: solc-select=={ViscousPackage.SolcSelectVersion}", ViscousDir);
+            if (!Directory.Exists(ViscousPackage.SolcSelectPackageDir))
+            {
+                VSUtil.LogError("Viscous", $"Could not install solc-select into {VenvDir}.");
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Ensures slither-analyzer is installed in the venv (creating the venv first if needed).
+        /// Call this right before running a Slither analysis.
+        /// </summary>        
+        public static async Task<bool> EnsureSlitherAsync()
+        {
+            if (Directory.Exists(ViscousPackage.SlitherPackageDir))
+            {
+                return true;
+            }
+            if (!await ViscousPackage.EnsurePythonVenvAsync())
+            {
+                VSUtil.LogError("Viscous", $"Could not create the Python virtual environment at {Runtime.VenvDir}. Ensure Python 3.8+ is installed and available as '{AppSettings.PythonCmd}' (configurable via the PythonCmd setting in {AppSettings.FilePath}).");
+                return false;
+            }
+            VSUtil.LogInfo("Viscous", $"Installing slither-analyzer {ViscousPackage.SlitherVersion} into the virtual environment at {Runtime.VenvDir}...");
+            // Wheels-only so pip never runs an arbitrary setup.py.
+            await RunCmdAsync(VenvPython, $"-m pip install --only-binary :all: slither-analyzer=={ViscousPackage.SlitherVersion}", ViscousDir);
+            if (!Directory.Exists(ViscousPackage.SlitherPackageDir))
+            {
+                VSUtil.LogError("Viscous", $"Could not install slither-analyzer into {VenvDir}.");
+                return false;
+            }
+            return true;
+        }
+        #endregion
 
         public static async Task CompileFileAsync(string file, string workspaceDir)
         {
@@ -110,37 +168,8 @@ namespace Viscous
             VSUtil.LogInfo("Viscous", ((string)output["stdout"]).Trim());
         }
 
-        public static SolidityCompilerIO2.SolidityCompilerOutput ParseOutputFile(string file) => 
+        public static SolidityCompilerIO2.SolidityCompilerOutput ParseOutputFile(string file) =>
             JsonConvert.DeserializeObject<SolidityCompilerIO2.SolidityCompilerOutput>(File.ReadAllText(file));
-
-
-        public static bool InstallSolcCompiler(string compilerVersion)
-        {
-            string solcPath = Path.Combine(TaskToolsDir, ".solc-select", "artifacts", "solc-" + compilerVersion, "solc-" + compilerVersion);
-            if (File.Exists(solcPath))
-            {
-                return true;
-            }
-            VSUtil.LogInfo("Viscous", $"Installing solc {compilerVersion} compiler...");
-            var solcselectpath = Path.Combine(TaskToolsDir, "solc-select.exe");
-            if (!File.Exists(solcselectpath))
-            {
-                VSUtil.LogError("StratsEVM", $"Could not find solc-select executable. Could not install solc {compilerVersion} compiler");
-                return false;
-
-            }
-            var output = RunCmd("cmd.exe", $"/c solc-select.exe install {compilerVersion}", TaskToolsDir);
-            if (CheckRunCmdOutput(output, $"Version '{compilerVersion}' installed") && File.Exists(solcPath))
-            {
-                VSUtil.LogInfo("Viscous", $"solc {compilerVersion} compiler installed.");
-                return true;
-            }
-            else
-            {
-                VSUtil.LogError("Viscous", $"Could not install solc {compilerVersion} compiler: " + GetRunCmdError(output));
-                return false;
-            }
-        }
 
         public static string TryGetSolcVersion(string filepath, string projectDir)
         {
@@ -167,19 +196,16 @@ namespace Viscous
         }
         public static async Task<bool> InstallSolcCompilerAsync(string compilerVersion)
         {
-            string solcPath = Path.Combine(TaskToolsDir, ".solc-select", "artifacts", "solc-" + compilerVersion, "solc-" + compilerVersion);
+            string solcPath = SolcArtifactPath(compilerVersion);
             if (File.Exists(solcPath))
             {
                 return true;
             }
-            var solcselectpath = Path.Combine(TaskToolsDir, "solc-select.exe");
-            if (!File.Exists(solcselectpath))
+            if (!await EnsureSolcSelectAsync())
             {
-                VSUtil.LogError("Viscous", "Could not find solc-select executable.");
                 return false;
-
             }
-            var output = await RunCmdAsync("cmd.exe", $"/c solc-select.exe install {compilerVersion}", TaskToolsDir);
+            var output = await RunCmdAsync(VenvPython, $"{SolcSelectInvoke} install {compilerVersion}", TaskToolsDir);
             if ((CheckRunCmdOutput(output, $"Version '{compilerVersion}' installed", true) || (CheckRunCmdOutput(output, $"Version '{compilerVersion}' is already installed, skipping...")) && File.Exists(solcPath)))
             {
                 VSUtil.LogInfo("Viscous", $"solc {compilerVersion} compiler installed at {solcPath}.");
@@ -195,6 +221,11 @@ namespace Viscous
         public static async Task<SoliditySlitherAnalysis> AnalyzeAsync(string filePath, string projectDir, string outputDir, string compilerVersion = null)
         {
             VSUtil.LogInfo("Viscous", $"Starting Slither analysis of {filePath}.");
+            if (!await EnsureSlitherAsync())
+            {
+                VSUtil.LogError("Viscous", "Could not install Slither. Aborting analysis.");
+                return null;
+            }
             compilerVersion = compilerVersion ?? TryGetSolcVersion(filePath, projectDir);
             if (compilerVersion is null)
             {
@@ -207,9 +238,9 @@ namespace Viscous
                 return null;    
             }
 
-            string solcPath = Path.Combine(TaskToolsDir, ".solc-select", "artifacts", "solc-" + compilerVersion, "solc-" + compilerVersion);
-            string slitherargs = $"\"{filePath}\" --compile-force-framework solc --solc \"{solcPath}\" --solc-args \"--base-path {projectDir} --include-path {Path.Combine(projectDir, "node_modules")} \" --json -";            
-            var slithercmdrun = await RunCmdAsync(SlitherPath, slitherargs, projectDir);
+            string solcPath = SolcArtifactPath(compilerVersion);
+            string slitherargs = $"-m slither \"{filePath}\" --compile-force-framework solc --solc \"{solcPath}\" --solc-args \"--base-path {projectDir} --include-path {Path.Combine(projectDir, "node_modules")} \" --json -";
+            var slithercmdrun = await RunCmdAsync(VenvPython, slitherargs, projectDir);
             var stdout = slithercmdrun.ContainsKey("stdout") ? (string)slithercmdrun["stdout"] : "";
             var stderr = slithercmdrun.ContainsKey("stderr") ? (string)slithercmdrun["stderr"] : "";
             if (stdout.Contains("\"success\": true"))

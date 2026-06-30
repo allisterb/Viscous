@@ -39,10 +39,112 @@ namespace Viscous
 
         public string SolcPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".solc-select", "artifacts", "solc-" + CompilerVersion, "solc-" + CompilerVersion);
 
-        public string SlitherPath => Path.Combine(TaskToolsDir, "slither-0.10.3.exe");
-
         public static string TaskToolsDir { get; } =  Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CustomProjectSystems", "Solidity", "Tools");
-        
+
+        public const string SolcSelectVersion = "1.2.0";
+        public const string SlitherVersion = "0.10.3";
+
+        /// <summary>The Viscous Python virtual environment directory (<c>%LOCALAPPDATA%\Viscous\venv</c>).</summary>
+        public static string ViscousDir { get; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Viscous");
+
+        public static string VenvDir { get; } = Path.Combine(ViscousDir, "venv");
+
+        /// <summary>The Viscous Python virtual environment's interpreter. The analysis tools are run through this rather than the pip-generated launcher .exes.</summary>
+        public static string VenvPython { get; } = Path.Combine(VenvDir, "Scripts", "python.exe");
+
+        private static string SolcSelectPackageDir => Path.Combine(VenvDir, "Lib", "site-packages", "solc_select");
+        private static string SlitherPackageDir => Path.Combine(VenvDir, "Lib", "site-packages", "slither");
+
+        /// <summary>Arguments that invoke solc-select through the venv interpreter (its <c>__main__</c> has no script entry point). Prepend with the subcommand and args.</summary>
+        public const string SolcSelectInvoke = "-c \"from solc_select.__main__ import solc_select; solc_select()\"";
+
+        /// <summary>
+        /// The Python command used to bootstrap the venv. Mirrors the VSIX's <c>AppSettings.PythonCmd</c> by reading
+        /// the same <c>%LOCALAPPDATA%\Viscous\appsettings.json</c> (so command-line builds honor the user's setting),
+        /// falling back to <c>py -3</c>.
+        /// </summary>
+        protected string PythonCmd
+        {
+            get
+            {
+                try
+                {
+                    var path = Path.Combine(ViscousDir, "appsettings.json");
+                    if (File.Exists(path))
+                    {
+                        var cfg = CompactJson.Serializer.Parse<Dictionary<string, string>>(File.ReadAllText(path));
+                        if (cfg != null && cfg.TryGetValue("PythonCmd", out var v) && !string.IsNullOrWhiteSpace(v))
+                        {
+                            return v.Trim();
+                        }
+                    }
+                }
+                catch { /* fall back to the default */ }
+                return "py -3";
+            }
+        }
+
+        /// <summary>Creates the Python virtual environment if it does not yet exist. Idempotent.</summary>
+        protected bool EnsurePythonVenv()
+        {
+            if (File.Exists(VenvPython))
+            {
+                return true;
+            }
+            Log.LogMessage(MessageImportance.High, $"Creating Python virtual environment at {VenvDir} using '{PythonCmd}'...");
+            RunCmd("cmd.exe", "/c " + PythonCmd + " -m venv \"" + VenvDir + "\"", ViscousDir);
+            if (!File.Exists(VenvPython))
+            {
+                Log.LogError($"Could not create the Python virtual environment at {VenvDir}. Ensure Python 3.8+ is installed and available as '{PythonCmd}' (configurable via the PythonCmd setting in {Path.Combine(ViscousDir, "appsettings.json")}).");
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>Ensures solc-select is installed in the venv. Call right before a solc compiler is needed.</summary>
+        protected bool EnsureSolcSelect()
+        {
+            if (Directory.Exists(SolcSelectPackageDir))
+            {
+                return true;
+            }
+            if (!EnsurePythonVenv())
+            {
+                return false;
+            }
+            Log.LogMessage(MessageImportance.High, $"Installing solc-select {SolcSelectVersion} into the virtual environment at {VenvDir}...");
+            RunCmd(VenvPython, $"-m pip install --only-binary :all: solc-select=={SolcSelectVersion}", ViscousDir);
+            if (!Directory.Exists(SolcSelectPackageDir))
+            {
+                Log.LogError($"Could not install solc-select into {VenvDir}.");
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>Ensures slither-analyzer is installed in the venv. Call right before running a Slither analysis.</summary>
+        /*
+        protected bool EnsureSlither()
+        {
+            if (Directory.Exists(SlitherPackageDir))
+            {
+                return true;
+            }
+            if (!EnsurePythonVenv())
+            {
+                return false;
+            }
+            Log.LogMessage(MessageImportance.High, $"Installing slither-analyzer {SlitherVersion} into the virtual environment...");
+            RunCmd(VenvPython, $"-m pip install --only-binary :all: slither-analyzer=={SlitherVersion}", ViscousDir);
+            if (!Directory.Exists(SlitherPackageDir))
+            {
+                Log.LogError($"Could not install slither-analyzer into {VenvDir}.");
+                return false;
+            }
+            return true;
+        }
+        */
+
         public override bool Execute()
         {                       
             if (!InstallSolcCompiler())
@@ -242,9 +344,7 @@ namespace Viscous
                     }
                 }
             }
-
-            RunSlitherAnalysis();
-
+            //RunSlitherAnalysis();
             return true;
         }
 
@@ -322,14 +422,11 @@ namespace Viscous
             {
                 Log.LogMessage(MessageImportance.High, $"Solc compiler version {CompilerVersion} not found at {SolcPath}. Installing...");
             }
-            var solcselectpath = Path.Combine(TaskToolsDir, "solc-select.exe");
-            if (!File.Exists(solcselectpath))
+            if (!EnsureSolcSelect())
             {
-                Log.LogError("Could not find solc-select executable.");
-                return false;                
+                return false;
             }
-            Dictionary<string, string> envVars = new Dictionary<string, string>() { { "VIRTUAL_ENV", TaskToolsDir }, { "HOMEPATH", TaskToolsDir } };           
-            var output = RunCmd("cmd.exe", $"/c {solcselectpath} install {CompilerVersion}", TaskToolsDir, envVars);
+            var output = RunCmd(VenvPython, $"{SolcSelectInvoke} install {CompilerVersion}", TaskToolsDir);
             if ((CheckRunCmdOutput(output, $"Version '{CompilerVersion}' installed", true) || (CheckRunCmdOutput(output,  $"Version '{CompilerVersion}' is already installed, skipping...")) && File.Exists(SolcPath)))
             {
                 Log.LogMessage(MessageImportance.High, $"solc {CompilerVersion} compiler installed at " + SolcPath);
@@ -342,8 +439,14 @@ namespace Viscous
             }
         }
 
+        /*
         protected bool RunSlitherAnalysis()
         {
+            if (!EnsureSlither())
+            {
+                Log.LogWarning("Slither is not available; skipping static analysis.");
+                return false;
+            }
             var outputdir = Path.Combine(ProjectDir, OutputPath);
             string slitherAnalysisOutputPath = Path.Combine(outputdir, "slither-analysis.json");
             if (File.Exists(slitherAnalysisOutputPath))
@@ -351,8 +454,8 @@ namespace Viscous
                 if (File.Exists(slitherAnalysisOutputPath + ".bak")) File.Delete(slitherAnalysisOutputPath + ".bak");
                 File.Move(slitherAnalysisOutputPath, slitherAnalysisOutputPath + ".bak");
             }
-            string slitherargs = $"\"{ProjectDir}\" --compile-force-framework solc --solc \"{SolcPath}\" --solc-args \"--base-path {ProjectDir} --include-path {Path.Combine(ProjectDir, "node_modules")} \" --json {slitherAnalysisOutputPath}";
-            var slithercmdrun = RunCmd(SlitherPath, slitherargs, ProjectDir);
+            string slitherargs = $"-m slither \"{ProjectDir}\" --compile-force-framework solc --solc \"{SolcPath}\" --solc-args \"--base-path {ProjectDir} --include-path {Path.Combine(ProjectDir, "node_modules")} \" --json {slitherAnalysisOutputPath}";
+            var slithercmdrun = RunCmd(VenvPython, slitherargs, ProjectDir);
             if (slithercmdrun.ContainsKey("stderr") && ((string)slithercmdrun["stderr"]).Contains($"{ProjectDir} analyzed"))
             {
                 Log.LogMessage(MessageImportance.High, "Slither analysis completed. Output written to " + slitherAnalysisOutputPath);
@@ -364,6 +467,7 @@ namespace Viscous
                 return false;
             }
         }
+        */
 
         public Dictionary<string, object> RunCmd(string filename, string arguments, string workingdirectory, Dictionary<string, string> envVars = null)
         {

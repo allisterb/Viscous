@@ -23,6 +23,7 @@ Viscous is a Visual Studio extension for developing, compiling, and deploying [S
 ## Requirements
 * Visual Studio 2022 and above
 * A recent version of [Node.js](https://nodejs.org/) or compatible runtime
+* Python 3.8+
 
 ## User Guide
 - [Creating and Opening Projects](https://github.com/allisterb/Viscous/blob/master/docs/creating-a-project.md)

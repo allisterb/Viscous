@@ -95,16 +95,38 @@ with.
 - **Copy Address** copies the account's address to the clipboard.
 - **Edit…** lets you change the label or set/replace the private key.
 
-> **About the private key.** When an account has a private key, Viscous signs
-> deployments and transactions locally with it — this is what lets you deploy to
-> hosted endpoints and public testnets (Infura, Alchemy, Sepolia, …) that won't
-> sign on your behalf. For a local node with unlocked accounts (such as Ganache)
-> you can leave it blank and still transact. Keys are stored encrypted on disk
-> using Windows DPAPI, scoped to your user account. To change a saved key, open
-> the account's **Edit…** dialog and type a new one (leaving the field blank
-> keeps the existing key). In the **Deploy Profile** and **Run contract**
-> dialogs the private‑key box is read‑only when the selected account already has
-> a stored key — that key is used automatically.
+### Private keys 
+For a local node with unlocked accounts (such as Ganache) you can don't need private keys for transactions. For real-world networks there are two ways of entering private keys for signing transactions for deploying and executing smart contracts: store with the account or on-demand.
+When an account stores a private key, Viscous signs all deployments and transactions with it when that account is used. **Keys are stored encrypted on disk using Windows DPAPI, scoped to your user account, in the
+Blockchain Explorer's saved data (your Visual Studio user settings).** 
+
+To change a saved key, open the account's **Edit…** dialog and type a new one (leaving the field blank keeps the existing key). 
+
+You don't need to store private keys with your account since you can just enter it on-demand in the **Deploy Profile** and **Run contract**
+dialogs. The private key box in those dialogs will read‑only when the selected account already has a stored key — that key is used automatically.
+
+However you enter your private keys, a key is used only locally, to sign transactions on your machine. It is never sent to an RPC endpoint or anywhere else; only the resulting signed transaction goes
+to the network.
+
+### Private keys storage
+Viscous encrypts private keys with the **Windows Data Protection API (DPAPI)** — `ProtectedData.Protect` scoped to **`CurrentUser`** — and stores only the encrypted blob alongside the account in the
+Blockchain Explorer's saved data in the Visual Studio user settings. What that means in practice:
+
+- The key can only be decrypted by the **same Windows user account on the same
+  machine**. The encryption is tied to your Windows login by the operating system, so
+  another user — or the settings copied to a different machine — cannot decrypt it.
+ 
+- To **remove** a stored key, open the account's **Edit…** dialog, clear the Private
+  Key field, and save (or delete the account).
+
+- DPAPI `CurrentUser` protects against *other* users on the machine and against someone
+  reading the raw settings offline. It does **not** protect against malicious software
+  running under **your own** Windows account — such code can ask DPAPI to decrypt the
+  key exactly as Viscous does. Your machine's own security is the trust boundary.
+
+- For that reason, prefer **dedicated development / testnet accounts** over high‑value
+  or treasury keys, especially while the deploy/sign features are still maturing. For a
+  local node with unlocked accounts (e.g. Ganache) you don't need to store a key at all.
 
 ## Deploy profiles
 

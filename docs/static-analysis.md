@@ -19,6 +19,15 @@ Viscous manages the Slither tool and the matching `solc` compiler version for
 you; the analyzer uses the compiler version detected from your project (falling
 back to a recent version if it can't be determined).
 
+## Prerequisites
+
+Slither and `solc-select` are Python tools. Viscous installs them from PyPI into a
+private virtual environment under `%LOCALAPPDATA%\Viscous\venv` the first time it
+needs them, so you must have **Python 3.8 or later** installed. By default Viscous
+uses the `py -3` launcher; if Python is installed under a different command or path,
+set `PythonCmd` in `%LOCALAPPDATA%\Viscous\appsettings.json` (for example
+`"PythonCmd": "C:\\Python312\\python.exe"`).
+
 ## Opening the results window
 
 The **Solidity Static Analysis** window opens automatically when you run

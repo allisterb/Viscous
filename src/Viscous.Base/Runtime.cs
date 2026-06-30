@@ -55,6 +55,18 @@ public abstract class Runtime
 
     public static string ViscousDir => Path.Combine(AppDataDir, "Viscous");
 
+    /// <summary>Directory of the Python virtual environment hosting the solc-select and slither tools.</summary>
+    public static string VenvDir => Path.Combine(ViscousDir, "venv");
+
+    /// <summary>The virtual environment's Python interpreter. Run the analysis tools through this rather than the pip-generated launcher .exes.</summary>
+    public static string VenvPython => Path.Combine(VenvDir, "Scripts", "python.exe");
+
+    /// <summary>
+    /// Arguments that invoke solc-select through the venv interpreter (its <c>__main__</c> has no
+    /// script entry point, so it must be called explicitly). Prepend with the install/use subcommand and args.
+    /// </summary>
+    public const string SolcSelectInvoke = "-c \"from solc_select.__main__ import solc_select; solc_select()\"";
+
     public static string LocalAppDataDir => Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
     public static Random Rng { get; } = new Random();
