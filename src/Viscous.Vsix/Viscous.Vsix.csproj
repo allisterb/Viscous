@@ -158,9 +158,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\ViscousBlockchainDashboardToolWindowCommand.png" />
-    <Content Include="package.json">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <Content Include="LanguageServer\Grammars\solidity.json">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

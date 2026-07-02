@@ -62,6 +62,13 @@ public abstract class Runtime
     public static string VenvPython => Path.Combine(VenvDir, "Scripts", "python.exe");
 
     /// <summary>
+    /// Where the Node.js language server and its npm dependencies are installed. Kept under ViscousDir (next to
+    /// the Python venv) so all external tools live in one place and survive extension updates, which wipe the
+    /// extension assembly dir. npm is run with ViscousDir as its working directory so this is the resulting tree.
+    /// </summary>
+    public static string NodeModulesDir => Path.Combine(ViscousDir, "node_modules");
+
+    /// <summary>
     /// Arguments that invoke solc-select through the venv interpreter (its <c>__main__</c> has no
     /// script entry point, so it must be called explicitly). Prepend with the install/use subcommand and args.
     /// </summary>

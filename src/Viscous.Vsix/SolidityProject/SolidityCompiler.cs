@@ -91,7 +91,8 @@ namespace Viscous
                 File.Delete(binfile);   
             }
             var cmd = "cmd.exe";
-            var solcpath = File.Exists(Path.Combine(workspaceDir, "node_modules", "solc", "solc.js")) ? Path.Combine(workspaceDir, "node_modules", "solc", "solc.js") : Path.Combine(AssemblyLocation, "node_modules", "solc", "solc.js");
+            // Prefer the project's own solc.js; otherwise fall back to the one under Viscous's node_modules (installed with the language server).
+            var solcpath = File.Exists(Path.Combine(workspaceDir, "node_modules", "solc", "solc.js")) ? Path.Combine(workspaceDir, "node_modules", "solc", "solc.js") : Path.Combine(NodeModulesDir, "solc", "solc.js");
             // Use the configured JS runtime (default "node"; configurable in %LOCALAPPDATA%\Viscous\appsettings.json).
             var args = "/c " + AppSettings.JSRuntimeCmd + " " + "\"" + solcpath + "\"" + " --base-path=\"" + workspaceDir + "\"" + " \"" + file + "\" --bin";
             if (Directory.Exists(Path.Combine(workspaceDir, "node_modules")))

@@ -152,21 +152,44 @@ namespace Viscous
         #endregion
 
         #region Static Methods
-        internal static async Task EnsureNpmRcAsync()
+        internal static async Task EnsureNpmEnvironmentAsync()
         {
-            var path = Path.Combine(Runtime.AssemblyLocation, ".npmrc");
+            // Set up ViscousDir as npm's working directory for our tool install: an .npmrc (ignore-scripts hardening)
+            // and a package.json so `npm install` has a project to write into. Both live here (not the extension
+            // assembly dir) so they sit with node_modules and survive extension updates. Each is write-if-absent:
+            // in particular we must not clobber package.json, since npm records installed dependencies into it.
+            Runtime.CreateIfDirectoryDoesNotExist(Runtime.ViscousDir);
             try
             {
-                if (!File.Exists(path))
+                var npmrc = Path.Combine(Runtime.ViscousDir, ".npmrc");
+                if (!File.Exists(npmrc))
                 {
-                    await File.WriteAllTextAsync(path, "ignore-scripts=true\n");
+                    await File.WriteAllTextAsync(npmrc, "ignore-scripts=true\n");
+                }
+
+                var packageJson = Path.Combine(Runtime.ViscousDir, "package.json");
+                if (!File.Exists(packageJson))
+                {
+                    await File.WriteAllTextAsync(packageJson, DefaultNpmPackageJson);
                 }
             }
             catch (Exception ex)
             {
-                Runtime.Error(ex, "Could not write the extension's .npmrc (ignore-scripts).");
+                Runtime.Error(ex, "Could not write the Viscous npm environment (.npmrc / package.json).");
             }
         }
+
+        // Minimal private manifest so npm has a project to install into. Marked "private" so it can never be
+        // published, and given a real description/name (no contentless stub shipped in the extension).
+        private const string DefaultNpmPackageJson = @"{
+  ""name"": ""viscous-tools"",
+  ""version"": ""1.0.0"",
+  ""description"": ""Local Node.js environment for the Viscous Visual Studio extension. Hosts the vscode-solidity language server and related npm dependencies."",
+  ""private"": true,
+  ""license"": ""MIT"",
+  ""author"": ""Allister Beharry""
+}
+";
 
         private static async Task InstallBuildSystemAsync()
         {

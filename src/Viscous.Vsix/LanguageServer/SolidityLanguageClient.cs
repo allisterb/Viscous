@@ -41,8 +41,9 @@ namespace Viscous
         #region Properties
         public static string SolutionOpenFolder { get; set; }
 
-        // Entry point of the installed vscode-solidity language server.
-        internal static string LanguageServerPath => Path.Combine(Runtime.AssemblyLocation, "node_modules", "vscode-solidity-server", "dist", "cli", "server.js");
+        // Entry point of the installed vscode-solidity language server. Installed under ViscousDir (see Runtime.NodeModulesDir)
+        // so it lives alongside the other external tools and survives extension updates.
+        internal static string LanguageServerPath => Path.Combine(Runtime.NodeModulesDir, "vscode-solidity-server", "dist", "cli", "server.js");
 
         public string Name => "Solidity Language Client";
 
@@ -95,7 +96,7 @@ namespace Viscous
             //info.Arguments = "/c " + Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "npm", "nomicfoundation-solidity-language-server.cmd") +  " --stdio";
             // Use the configured JS runtime (default "node"; can be set to e.g. "deno run -A" in appsettings.json).
             info.Arguments = "/c " + AppSettings.JSRuntimeCmd + " \"" + LanguageServerPath + "\" --stdio";
-            info.WorkingDirectory = AssemblyLocation;
+            info.WorkingDirectory = ViscousDir;
             info.RedirectStandardInput = true;
             info.RedirectStandardOutput = true;
             info.UseShellExecute = false;
@@ -123,10 +124,13 @@ namespace Viscous
         // Use the configured JS package manager (default "npm"; can be set to e.g. "pnpm" in appsettings.json).
         public static async Task<Dictionary<string, object>> InstallVSCodeSolidityLanguageServerAsync()
         {
-            // Ensure the extension's .npmrc (ignore-scripts=true) exists before npm runs here. Guarding inside this
-            // method makes it impossible to run the install without the hardening setting, regardless of caller.
-            await ViscousPackage.EnsureNpmRcAsync();
-            return await RunCmdAsync("cmd.exe", "/c " + AppSettings.JSPackageManagerCmd + " install vscode-solidity-server", AssemblyLocation);
+            // Ensure the npm environment (.npmrc ignore-scripts + package.json) exists in ViscousDir before npm runs
+            // here. Guarding inside this method makes it impossible to run the install without the hardening setting
+            // and target manifest, regardless of caller.
+            await ViscousPackage.EnsureNpmEnvironmentAsync();
+            // Install into ViscousDir (creating it if needed) so node_modules ends up under Runtime.NodeModulesDir.
+            CreateIfDirectoryDoesNotExist(ViscousDir);
+            return await RunCmdAsync("cmd.exe", "/c " + AppSettings.JSPackageManagerCmd + " install vscode-solidity-server", ViscousDir);
         }
 
         #region ILanguageClient, ILanguageClientCustomMessage2 implementation
