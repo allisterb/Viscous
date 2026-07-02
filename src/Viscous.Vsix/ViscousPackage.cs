@@ -23,7 +23,7 @@ using static Microsoft.VisualStudio.VSConstants.UICONTEXT;
 namespace Viscous
 {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [InstalledProductRegistration("#110", "#112", "0.1.0.9", IconResourceID = 400)]
+    [InstalledProductRegistration("#110", "#112", "0.1.0.10", IconResourceID = 400)]
     [Guid(PackageGuidString)]
     [ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideAutoLoad(UIContextGuids.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
