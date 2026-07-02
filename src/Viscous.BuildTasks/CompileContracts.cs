@@ -145,13 +145,56 @@ namespace Viscous
         }
         */
 
+        /// <summary>
+        /// Reconciles the shared external tools with the versions this build task ships, so command-line/CI builds
+        /// (which never trigger the VSIX's startup reconcile) still pick up pin bumps. Only solc-select is used by
+        /// the build; it is upgraded in place when already installed and the pin moved. Reads/writes the same
+        /// tools-manifest.json the VSIX uses, preserving the fields it does not own (ExtensionLocation, SlitherVersion).
+        /// </summary>
+        protected void ReconcileToolVersions()
+        {
+            var manifestPath = Path.Combine(ViscousDir, "tools-manifest.json");
+            ToolsManifest manifest = null;
+            try
+            {
+                if (File.Exists(manifestPath))
+                {
+                    manifest = CompactJson.Serializer.Parse<ToolsManifest>(File.ReadAllText(manifestPath));
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.LogMessage(MessageImportance.Low, "Could not read the Viscous tools manifest: " + ex.Message);
+            }
+            manifest = manifest ?? new ToolsManifest();
+
+            if (Directory.Exists(SolcSelectPackageDir) && manifest.SolcSelectVersion != SolcSelectVersion)
+            {
+                Log.LogMessage(MessageImportance.High, $"Updating solc-select ({manifest.SolcSelectVersion ?? "none"} -> {SolcSelectVersion}) in the virtual environment...");
+                RunCmd(VenvPython, $"-m pip install --only-binary :all: --upgrade solc-select=={SolcSelectVersion}", ViscousDir);
+                // Persist only the field we own; the deserialized manifest carries the VSIX's other fields through unchanged.
+                manifest.SolcSelectVersion = SolcSelectVersion;
+                try
+                {
+                    File.WriteAllText(manifestPath, Serialize(manifest));
+                }
+                catch (Exception ex)
+                {
+                    Log.LogMessage(MessageImportance.Low, "Could not write the Viscous tools manifest: " + ex.Message);
+                }
+            }
+        }
+
         public override bool Execute()
-        {                       
+        {
+            // Keep the shared external tools current for command-line/CI builds, where VS's once-per-session startup
+            // reconcile never runs. Cheap per build (a small manifest read + compare); only pip-upgrades on a pin bump.
+            ReconcileToolVersions();
             if (!InstallSolcCompiler())
             {
                 Log.LogError("No solc compiler available. Stopping.");
                 return false;
-            }            
+            }
             var cmdline = SolcPath + " --standard-json --base-path=\"" + ProjectDir + "\"" + " --include-path=\"" + Path.Combine(ProjectDir, "node_modules") + "\"";
             Log.LogMessage(MessageImportance.High, "Compiling {0} file(s) in directory {1} using solc compiler targeting EVM version {2}...", Contracts.Count(), ProjectDir, EVMVersion);
             Log.LogCommandLine(MessageImportance.High, cmdline);
@@ -600,6 +643,20 @@ namespace Viscous
                 CompactJson.Serializer.Write(obj, new StringWriter(sb), true);
                 return sb.ToString();
             }
+        }
+
+        // Mirrors the VSIX's tools-manifest.json (same PascalCase keys) so the file round-trips between the two
+        // processes. The build task only manages SolcSelectVersion; the other fields are carried through unchanged.
+        public class ToolsManifest
+        {
+            [CompactJson.JsonProperty("ExtensionLocation")]
+            public string ExtensionLocation { get; set; }
+
+            [CompactJson.JsonProperty("SolcSelectVersion")]
+            public string SolcSelectVersion { get; set; }
+
+            [CompactJson.JsonProperty("SlitherVersion")]
+            public string SlitherVersion { get; set; }
         }
     }
 }

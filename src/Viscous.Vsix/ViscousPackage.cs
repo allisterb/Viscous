@@ -138,10 +138,11 @@ namespace Viscous
             solution.AdviseSolutionEvents(this, out var c);
           
             await TaskScheduler.Default;
-            AppSettings.EnsureFileExists();            
+            AppSettings.EnsureUpToDate();
             await InstallBuildSystemAsync();
             await EnsurePythonVenvAsync();
-            await JoinableTaskFactory.SwitchToMainThreadAsync();                        
+            await ReconcileToolVersionsAsync();
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
             ApplicationThemeManager.Apply(UI.VSTheme.ApplicationThemeGuess);
             await SolidityProjectMenuCommands.InitializeAsync(this);
             await UI.BlockchainExplorerToolWindowCommand.InitializeAsync(this);
@@ -232,6 +233,77 @@ namespace Viscous
             return true;
         }
 
+        /// <summary>
+        /// Reconciles the installed external tools with the versions this extension build ships. Runs once per session
+        /// at startup on a background thread — deliberately OFF the build/analyze hot paths, which keep their cheap
+        /// "is it installed?" guards. Already-installed Python tools are upgraded in place when their pinned version
+        /// changed; the (unpinned) language server is refreshed when the extension install changed. Fresh installs are
+        /// still handled on demand by the Ensure* methods at the current pins. A no-op once nothing has changed.
+        /// </summary>
+        private static async Task ReconcileToolVersionsAsync()
+        {
+            var manifestPath = Path.Combine(Runtime.ViscousDir, "tools-manifest.json");
+            ToolsManifest manifest = null;
+            try
+            {
+                if (File.Exists(manifestPath))
+                {
+                    manifest = Newtonsoft.Json.JsonConvert.DeserializeObject<ToolsManifest>(File.ReadAllText(manifestPath));
+                }
+            }
+            catch (Exception ex)
+            {
+                Runtime.Error(ex, "Could not read the Viscous tools manifest; treating tools as unprovisioned.");
+            }
+            manifest = manifest ?? new ToolsManifest();
+
+            try
+            {
+                // Python tools: upgrade in place only if already installed and the pin moved. --upgrade to the exact
+                // pin is a no-op when already satisfied.
+                if (Directory.Exists(SolcSelectPackageDir) && manifest.SolcSelectVersion != SolcSelectVersion)
+                {
+                    Runtime.Info("Updating solc-select ({0} -> {1}) in the virtual environment...", manifest.SolcSelectVersion ?? "none", SolcSelectVersion);
+                    await Runtime.RunCmdAsync(Runtime.VenvPython, $"-m pip install --only-binary :all: --upgrade solc-select=={SolcSelectVersion}", Runtime.ViscousDir);
+                }
+                if (Directory.Exists(SlitherPackageDir) && manifest.SlitherVersion != SlitherVersion)
+                {
+                    Runtime.Info("Updating slither-analyzer ({0} -> {1}) in the virtual environment...", manifest.SlitherVersion ?? "none", SlitherVersion);
+                    await Runtime.RunCmdAsync(Runtime.VenvPython, $"-m pip install --only-binary :all: --upgrade slither-analyzer=={SlitherVersion}", Runtime.ViscousDir);
+                }
+
+                // The language server has no explicit version pin (installed as latest). Refresh it whenever the
+                // extension install changes — AssemblyLocation is version-specific, so it differs after an update —
+                // but only if it's already installed (a fresh install is handled on first activation).
+                if (File.Exists(SolidityLanguageClient.LanguageServerPath) && manifest.ExtensionLocation != Runtime.AssemblyLocation)
+                {
+                    Runtime.Info("Extension install changed; refreshing the Solidity language server to the latest version...");
+                    await EnsureNpmEnvironmentAsync();
+                    await Runtime.RunCmdAsync("cmd.exe", "/c " + AppSettings.JSPackageManagerCmd + " install vscode-solidity-server@latest", Runtime.ViscousDir);
+                }
+            }
+            catch (Exception ex)
+            {
+                Runtime.Error(ex, "Error reconciling external tool versions.");
+            }
+
+            // Record what is now provisioned (only when something actually changed, to avoid needless disk writes).
+            if (manifest.ExtensionLocation != Runtime.AssemblyLocation || manifest.SolcSelectVersion != SolcSelectVersion || manifest.SlitherVersion != SlitherVersion)
+            {
+                manifest.ExtensionLocation = Runtime.AssemblyLocation;
+                manifest.SolcSelectVersion = SolcSelectVersion;
+                manifest.SlitherVersion = SlitherVersion;
+                try
+                {
+                    File.WriteAllText(manifestPath, Newtonsoft.Json.JsonConvert.SerializeObject(manifest, Newtonsoft.Json.Formatting.Indented));
+                }
+                catch (Exception ex)
+                {
+                    Runtime.Error(ex, "Could not write the Viscous tools manifest at {0}.", manifestPath);
+                }
+            }
+        }
+
         private void InstallSolidityProjectDataFlowSinks(UnconfiguredProject unconfiguredProject)
         {
             var subscriptionService = unconfiguredProject.Services.ActiveConfiguredProjectSubscription;
@@ -250,6 +322,17 @@ namespace Viscous
 
         #region Fields
         public static ViscousPackage Instance { get; private set; }
+        #endregion
+
+        #region Types
+        // Records the external-tool versions last provisioned into ViscousDir, so a session can detect what changed
+        // since the last extension build and update only what's needed. Persisted as tools-manifest.json.
+        private class ToolsManifest
+        {
+            public string ExtensionLocation { get; set; }
+            public string SolcSelectVersion { get; set; }
+            public string SlitherVersion { get; set; }
+        }
         #endregion
 
         #region Constants
